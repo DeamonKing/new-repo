@@ -226,56 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize knob position
   setKnobPosition(angle);
 
-  // Function to fetch ingredients from db.json
-  async function fetchIngredients() {
-    try {
-      const response = await fetch("db.json"); // Ensure this path is correct
-      const data = await response.json(); // Parse JSON data
-
-      const container = document.getElementById("ingredients-container");
-
-      // Loop through each ingredient and create divs
-      data[0].data.forEach((ingredient) => {
-        const ingDiv = document.createElement("div");
-        ingDiv.classList.add("ing-item");
-
-        const label = document.createElement("label");
-        label.classList.add("btn-checkbox");
-
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.classList.add("checkbox");
-
-        checkbox.addEventListener("change", () => {
-          const checkedCheckboxes =
-            document.querySelectorAll(".checkbox:checked");
-          if (checkedCheckboxes.length > 10) {
-            checkbox.checked = false;
-            alert("You can only select up to 10 ingredients.");
-          } else {
-            updateSelectedCount();
-          }
-        });
-
-        const img = document.createElement("img");
-        img.src = "img/ing2.gif";
-        img.alt = `Ingredient - ${ingredient.ING_Name}`;
-
-        const para = document.createElement("p");
-        para.textContent = ingredient.ING_Name;
-
-        label.appendChild(checkbox);
-        label.appendChild(img);
-        label.appendChild(para);
-        ingDiv.appendChild(label);
-
-        container.appendChild(ingDiv);
-      });
-    } catch (error) {
-      console.error("Error fetching ingredients:", error);
-    }
-  }
-
   // Call fetchIngredients when page loads
   fetchIngredients();
 
@@ -301,7 +251,7 @@ async function fetchIngredients() {
     const data = await response.json(); // Parse JSON data
 
     const container = document.getElementById("ingredients-container");
-
+    container.innerHTML = ""; // Clear existing ingredients
     // Loop through each ingredient and create divs
     data[0].data.forEach((ingredient) => {
       const ingDiv = document.createElement("div");
@@ -325,8 +275,11 @@ async function fetchIngredients() {
         }
       });
 
+      // Determine the image source
+      const imgSrc = ingredient.ING_IMG && ingredient.ING_IMG.trim() !== "" ? ingredient.ING_IMG : "img/ing2.gif"; // Default image if ING_IMG is empty or not provided
+
       const img = document.createElement("img");
-      img.src = "img/ing2.gif";
+      img.src = imgSrc;
       img.alt = `Ingredient - ${ingredient.ING_Name}`;
 
       const para = document.createElement("p");
@@ -481,18 +434,19 @@ async function fetchIngredientsID() {
 document.addEventListener("DOMContentLoaded", () => {
   const submitButton = document.getElementById("submit-button");
   fetchIngredientsID()
-
-  // Handle the Add Ingredient button click
+  
   submitButton.addEventListener("click", async (event) => {
     event.preventDefault();
-
+  
     const ingredientId = document.getElementById("ingredient-id").textContent; // Get the ID from the span
     const ingredientName = document.getElementById("ingredient-name").value;
     const ingredientType = document.getElementById("ingredient-type").value;
-
+    const ingredientImageInput = document.getElementById("ingredient-image");
+    const ingredientImage = ingredientImageInput.files[0]; // Get the selected image file
+  
     // Initialize an array to collect error messages
     let errorMessages = [];
-
+  
     // Validate inputs
     if (!ingredientId) {
       errorMessages.push("Ingredient ID is required.");
@@ -503,47 +457,70 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!ingredientType) {
       errorMessages.push("Ingredient Type is required.");
     }
-
+    if (!ingredientImage) {
+      errorMessages.push("Ingredient Image is required.");
+    }
+  
     // If there are error messages, alert the user and return
     if (errorMessages.length > 0) {
       alert(errorMessages.join("\n")); // Display all error messages in an alert
       return;
     }
-
-    // Create the new ingredient object
-    const newIngredient = {
-      ING_ID: ingredientId,
-      ING_Name: ingredientName,
-      ING_Type: ingredientType,
-    };
-
-    // Append new ingredient to db.json
-    try {
-      const response = await fetch("/addIngredient", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(newIngredient)
-      });
-
-      if (response.ok) {
-        alert("Ingredient added successfully!");
-        await fetchIngredients(); // Refresh the ingredient list after adding
-        resetIngredientForm(); // Clear the form fields
-        await fetchIngredientsID(); // Fetch new ID for the next ingredient
-      } else {
-        const errorText = await response.text();
-        alert("Failed to add the ingredient. Server response: " + errorText);
+  
+    // Read the image file and convert it to a Base64 string
+    const reader = new FileReader();
+    reader.readAsDataURL(ingredientImage); // Convert image to Base64
+    reader.onload = async () => {
+      const newIngredient = {
+        ING_ID: ingredientId,
+        ING_Name: ingredientName,
+        ING_Type: ingredientType,
+        ING_IMG: reader.result // Base64 string of the image
+      };
+  
+      // Append new ingredient to db.json
+      try {
+        const response = await fetch("/addIngredient", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(newIngredient)
+        });
+  
+        if (response.ok) {
+          alert("Ingredient added successfully!");
+          await fetchIngredients(); // Refresh the ingredient list after adding
+          resetIngredientForm(); // Clear the form fields
+          await fetchIngredientsID(); // Fetch new ID for the next ingredient
+        } else {
+          const errorText = await response.text();
+          alert("Failed to add the ingredient. Server response: " + errorText);
+        }
+      } catch (error) {
+        console.error("Error adding ingredient:", error);
+        alert("An error occurred while adding the ingredient: " + error.message);
       }
-    } catch (error) {
-      console.error("Error adding ingredient:", error);
-      alert("An error occurred while adding the ingredient: " + error.message);
-    }
+    };
+  
+    reader.onerror = (error) => {
+      console.error("Error reading image file:", error);
+      alert("An error occurred while reading the image file: " + error.message);
+    };
   });
+  
+  // Function to reset the ingredient form fields
+  function resetIngredientForm() {
+    document.getElementById("ingredient-name").value = ""; // Clear the ingredient name
+    document.getElementById("ingredient-type").value = "Liquid"; // Reset to default type
+    document.getElementById("ingredient-image").value = ""; // Clear the image input
+    document.getElementById("image-name").textContent = ""; // Clear the displayed image name
+  }
+  
+  // Function to display the selected image name
+  function displayImageName() {
+    const ingredientImageInput = document.getElementById("ingredient-image");
+    const imageName = ingredientImageInput.files[0] ? ingredientImageInput.files[0].name : "";
+    document.getElementById("image-name").textContent = imageName; // Display the image name
+  }
 });
-
-function resetIngredientForm() {
-  document.getElementById("ingredient-name").value = ""; // Clear the ingredient name
-  document.getElementById("ingredient-type").value = "Liquid"; // Reset to default type
-}
