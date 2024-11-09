@@ -112,7 +112,7 @@ def start_electron_app():
     if platform.system() == "Windows":
         electron_executable = r'C:\Users\LOQ\AppData\Roaming\npm\node_modules\electron\dist\electron.exe'
     elif platform.system() == "Linux":
-        electron_executable = 'electron'
+        electron_executable = '/usr/local/bin/electron'
     else:
         raise EnvironmentError("Unsupported operating system")
 
