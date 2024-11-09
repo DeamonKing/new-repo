@@ -529,9 +529,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (response.ok) {
         alert("Ingredient added successfully!");
-        fetchIngredients(); // Refresh the ingredient list
+        await fetchIngredients(); // Refresh the ingredient list after adding
+        resetIngredientForm(); // Clear the form fields
+        await fetchIngredientsID(); // Fetch new ID for the next ingredient
       } else {
-        // Log the response text for debugging
         const errorText = await response.text();
         alert("Failed to add the ingredient. Server response: " + errorText);
       }
@@ -541,3 +542,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+function resetIngredientForm() {
+  document.getElementById("ingredient-name").value = ""; // Clear the ingredient name
+  document.getElementById("ingredient-type").value = "Liquid"; // Reset to default type
+}

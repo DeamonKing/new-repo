@@ -530,6 +530,11 @@
         "ING_ID": "106",
         "ING_Name": "NewAdded",
         "ING_Type": "liquor"
+      },
+      {
+        "ING_ID": "107",
+        "ING_Name": "Newone",
+        "ING_Type": "Liquid"
       }
     ]
   }
