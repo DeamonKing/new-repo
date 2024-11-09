@@ -283,7 +283,6 @@ function showAddCocktail() {
 }
 
 
-
 // Add click event listeners to the buttons
 findCocktailBtn.addEventListener("click", function (event) {
   event.preventDefault();
@@ -463,10 +462,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+let ingredientsData = []; // Global variable to store ingredients data
+
 async function fetchIngredients(searchTerm = "") {
   try {
     const response = await fetch("db.json"); // Ensure this path is correct
     const data = await response.json(); // Parse JSON data
+    ingredientsData = data[0].data; // Store the data globally
 
     const container = document.getElementById("ingredients-container");
     container.innerHTML = ""; // Clear existing ingredients
@@ -546,4 +548,80 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Add event listener to the search input
   document.getElementById("ingredient-search").addEventListener("input", handleSearchInput);
+});
+
+async function fetchIngredientsTypes() {
+  try {
+    const response = await fetch("db.json");
+    const data = await response.json();
+    const types = new Set(); // Use a Set to avoid duplicates
+
+    // Loop through each ingredient to collect types
+    data[0].data.forEach((ingredient) => {
+      types.add(ingredient.ING_Type);
+    });
+
+    // Create filter buttons based on the types
+    const filterContainer = document.getElementById("ing-filterfind");
+    types.forEach((type) => {
+      const button = document.createElement("a");
+      button.className = "btn deactive";
+      button.setAttribute("data-type", type);
+      button.textContent = type.charAt(0).toUpperCase() + type.slice(1); // Capitalize first letter
+      filterContainer.appendChild(button);
+
+      // Add click event to filter by type
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        const selectedType = button.getAttribute("data-type");
+        filterIngredientsByType(selectedType);
+      });
+    });
+  } catch (error) {
+    console.error("Error fetching ingredient types:", error);
+  }
+}
+
+function filterIngredientsByType(type) {
+  const checkboxes = document.querySelectorAll(".checkbox");
+  const selectedCountElement = document.querySelector(".fi-top p span");
+  let selectedCount = 0;
+
+  checkboxes.forEach((checkbox, index) => {
+    const ingredientType = ingredientsData[index].ING_Type; // Assuming you have a global ingredientsData array
+    const ingredientItem = checkbox.closest('.ing-item');
+
+    // Show all ingredients if 'all' is selected, otherwise filter by type
+    if (type === 'all' || ingredientType === type) {
+      ingredientItem.style.display = 'flex';
+    } else {
+      ingredientItem.style.display = 'none';
+    }
+
+    if (checkbox.checked) {
+      selectedCount++;
+    }
+  });
+
+  selectedCountElement.textContent = `${selectedCount}/10`; // Update displayed count
+}
+
+// Call fetchIngredientsTypes when the DOM is loaded
+document.addEventListener("DOMContentLoaded", () => {
+  fetchIngredients(); // Load all ingredients initially
+  fetchIngredientsTypes(); // Fetch ingredient types for filtering
+});
+
+document.querySelectorAll('.ing-filter a').forEach((button) => {
+  button.addEventListener('click', (event) => {
+    event.preventDefault(); // Prevent default anchor behavior
+    const selectedType = button.getAttribute('data-type');
+
+    // Remove active class from all buttons and add it to the clicked button
+    document.querySelectorAll('.ing-filter a').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+
+    // Call filter function with the selected type
+    filterIngredientsByType(selectedType);
+  });
 });
