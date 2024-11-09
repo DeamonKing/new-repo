@@ -226,76 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize knob position
   setKnobPosition(angle);
 
-  // Call fetchIngredients when page loads
-  fetchIngredients();
-
-  // Function to update selected ingredients count
-  function updateSelectedCount() {
-    const checkboxes = document.querySelectorAll(".checkbox");
-    const selectedCountElement = document.querySelector(".fi-top p span");
-    let selectedCount = 0;
-
-    checkboxes.forEach((checkbox) => {
-      if (checkbox.checked) {
-        selectedCount++;
-      }
-    });
-
-    selectedCountElement.textContent = `${selectedCount}/10`;
-  }
 });
-
-async function fetchIngredients() {
-  try {
-    const response = await fetch("db.json"); // Ensure this path is correct
-    const data = await response.json(); // Parse JSON data
-
-    const container = document.getElementById("ingredients-container");
-    container.innerHTML = ""; // Clear existing ingredients
-    // Loop through each ingredient and create divs
-    data[0].data.forEach((ingredient) => {
-      const ingDiv = document.createElement("div");
-      ingDiv.classList.add("ing-item");
-
-      const label = document.createElement("label");
-      label.classList.add("btn-checkbox");
-
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.classList.add("checkbox");
-
-      checkbox.addEventListener("change", () => {
-        const checkedCheckboxes =
-          document.querySelectorAll(".checkbox:checked");
-        if (checkedCheckboxes.length > 10) {
-          checkbox.checked = false;
-          alert("You can only select up to 10 ingredients.");
-        } else {
-          updateSelectedCount();
-        }
-      });
-
-      // Determine the image source
-      const imgSrc = ingredient.ING_IMG && ingredient.ING_IMG.trim() !== "" ? ingredient.ING_IMG : "img/ing2.gif"; // Default image if ING_IMG is empty or not provided
-
-      const img = document.createElement("img");
-      img.src = imgSrc;
-      img.alt = `Ingredient - ${ingredient.ING_Name}`;
-
-      const para = document.createElement("p");
-      para.textContent = ingredient.ING_Name;
-
-      label.appendChild(checkbox);
-      label.appendChild(img);
-      label.appendChild(para);
-      ingDiv.appendChild(label);
-
-      container.appendChild(ingDiv);
-    });
-  } catch (error) {
-    console.error("Error fetching ingredients:", error);
-  }
-}
 
 // hide & show frames
 let activeMenu = 'findCocktail'; // Default active menu
@@ -351,6 +282,8 @@ function showAddCocktail() {
   updateButtonStyles(); // Update button styles
 }
 
+
+
 // Add click event listeners to the buttons
 findCocktailBtn.addEventListener("click", function (event) {
   event.preventDefault();
@@ -365,6 +298,11 @@ addIngredientsBtn.addEventListener("click", function (event) {
 addCocktailBtn.addEventListener("click", function (event) {
   event.preventDefault();
   showAddCocktail();
+});
+
+document.getElementById("add-new-btn").addEventListener("click", function (event) {
+  event.preventDefault(); // Prevent the default anchor behavior
+  showAddIngredients(); // Call the function to show the Add Ingredients section
 });
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -523,4 +461,89 @@ document.addEventListener("DOMContentLoaded", () => {
     const imageName = ingredientImageInput.files[0] ? ingredientImageInput.files[0].name : "";
     document.getElementById("image-name").textContent = imageName; // Display the image name
   }
+});
+
+async function fetchIngredients(searchTerm = "") {
+  try {
+    const response = await fetch("db.json"); // Ensure this path is correct
+    const data = await response.json(); // Parse JSON data
+
+    const container = document.getElementById("ingredients-container");
+    container.innerHTML = ""; // Clear existing ingredients
+
+    // Loop through each ingredient and create divs
+    data[0].data.forEach((ingredient) => {
+      const ingredientName = ingredient.ING_Name.toLowerCase(); // Convert to lower case for case-insensitive comparison
+
+      // Check if searchTerm is empty or if the ingredient name includes the search term
+      if (searchTerm === "" || ingredientName.includes(searchTerm.toLowerCase())) {
+        const ingDiv = document.createElement("div");
+        ingDiv.classList.add("ing-item");
+
+        const label = document.createElement("label");
+        label.classList.add("btn-checkbox");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.classList.add("checkbox");
+
+        // Add event listener to update selected count when checkbox changes
+        checkbox.addEventListener("change", updateSelectedCount);
+
+        // Create the ingredient image
+        const imgSrc = ingredient.ING_IMG && ingredient.ING_IMG.trim() !== "" ? ingredient.ING_IMG : "img/ing2.gif";
+        const img = document.createElement("img");
+        img.src = imgSrc;
+        img.alt = `Ingredient - ${ingredient.ING_Name}`;
+
+        const para = document.createElement("p");
+        para.textContent = ingredient.ING_Name;
+
+        label.appendChild(checkbox);
+        label.appendChild(img);
+        label.appendChild(para);
+        ingDiv.appendChild(label);
+        container.appendChild(ingDiv);
+      }
+    });
+
+    // Call updateSelectedCount to initialize the count
+    updateSelectedCount();
+  } catch (error) {
+    console.error(`Error fetching ingredients: ${error.message}`); // Log error to server
+  }
+}
+
+// Function to update the selected ingredients count
+function updateSelectedCount() {
+  const checkboxes = document.querySelectorAll(".checkbox");
+  const selectedCountElement = document.querySelector(".fi-top p span");
+  let selectedCount = 0;
+
+  checkboxes.forEach((checkbox) => {
+    if (checkbox.checked) {
+      selectedCount++;
+    }
+  });
+
+  selectedCountElement.textContent = `${selectedCount}/10`; // Update displayed count
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  fetchIngredients(); // Load all ingredients initially
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Function to handle input changes in the search box
+  function handleSearchInput() {
+    const searchInput = document.getElementById("ingredient-search").value; // Get the input value
+    fetchIngredients(searchInput); // Fetch ingredients based on the search input
+
+    // Log the search term to the Python server
+    console.error(`Search term: ${searchInput}`);
+  }
+
+  // Add event listener to the search input
+  document.getElementById("ingredient-search").addEventListener("input", handleSearchInput);
 });
