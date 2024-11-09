@@ -1,0 +1,756 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body,
+html {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+
+.nunito,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+div,
+a,
+input,
+textarea,
+select {
+  font-family: "Nunito", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: normal;
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  color: #000;
+}
+
+.app {
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(135deg, #e3d7c1, #9eb395);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg {
+  background: #ffffff30;
+}
+
+.app-content {
+  width: 100%;
+  height: 100%;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-topbar {
+  width: 100%;
+  height: 20%;
+  /* background: #ffffff30; */
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.picker-setting {
+  position: absolute;
+  top: 50%;
+  right: 1.5%;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+.picker-setting:hover {
+  cursor: pointer;
+}
+.picker-setting img {
+  width: 50px;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+}
+
+.app-logo img {
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: invert(1);
+}
+
+.app-body {
+  width: 100%;
+  height: 80%;
+  display: flex;
+  overflow: hidden;
+  padding-top: 15px;
+}
+
+.app-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  /* background: #ffffff30; */
+  border-radius: 15px;
+  padding: 15px;
+}
+
+.navbar a {
+  /* background: #ffffff30; */
+  border-radius: 10px;
+  padding: 10px;
+  width: 100%;
+  display: block;
+  text-align: center;
+  /* color: #57492c; */
+  transition: background 0.3s ease;
+}
+.navbar .active,
+.navbar a:hover {
+  /* background: #57492c; */
+  /* color: #fff; */
+  font-weight: 500;
+}
+
+.app-pageview {
+  flex-grow: 1;
+  margin-left: 15px;
+  /* background: #ffffff30; */
+  border-radius: 15px;
+  height: 100%;
+}
+.find-ing {
+  width: 100%;
+  height: 100%;
+  padding: 15px 0px;
+  display: block;
+}
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  height: auto;
+}
+.search-box svg {
+  width: 5%;
+}
+.search-box .searchbar {
+  width: 85%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 10px;
+  padding: 5px;
+}
+.search-box .searchbar input {
+  width: 70%;
+  padding: 10px;
+  background: transparent;
+  border: none;
+}
+.search-box .searchbar input:focus,
+.search-box .searchbar input:focus-visible,
+.search-box .searchbar input:focus-within {
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+.search-box .searchbar p {
+  width: 25%;
+  text-align: right;
+  padding-right: 15px;
+}
+.search-box .searchbar p span {
+  color: #57492c;
+  font-weight: 700;
+}
+.search-box a {
+  width: 15%;
+  /* background: #57492c; */
+  border-radius: 10px;
+  /* color: #fff; */
+  text-align: center;
+  padding: 15px;
+}
+.search-box a:hover {
+  background: #359267;
+}
+.search-box a svg {
+  font-weight: bold;
+}
+.ing-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+  height: auto;
+}
+.ing-filter a {
+  /* background: #ffffff30; */
+  border-radius: 6px;
+  padding: 6px 10px;
+  text-align: center;
+  /* color: #57492c; */
+  font-size: 12px;
+  transition: background 0.3s ease;
+}
+.ing-filter .active,
+.ing-filter a:hover {
+  /* background: #57492c; */
+  /* color: #fff; */
+  font-weight: 500;
+}
+.ing-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  height: 83.5%;
+  overflow: hidden;
+}
+.ing-grid {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding: 0px 15px;
+  padding-bottom: 25px;
+}
+.fi-top {
+  width: 100%;
+  height: auto;
+  padding: 0px 15px;
+}
+.fi-bottom {
+  width: 100%;
+  height: 100%;
+}
+/* Styles for the scrollbar in WebKit browsers */
+.ing-grid::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+  height: 8px; /* Height of the scrollbar */
+}
+
+.ing-grid::-webkit-scrollbar-track {
+  background: rgba(245, 222, 179, 0.1); /* Color of the track */
+  border-radius: 10px; /* Rounded corners for the track */
+}
+
+.ing-grid::-webkit-scrollbar-thumb {
+  background: #4b3d2e; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Rounded corners for the thumb */
+}
+
+.ing-grid::-webkit-scrollbar-thumb:hover {
+  background: #3d3229; /* Darker color on hover */
+}
+
+/* For Firefox */
+.ing-grid {
+  scrollbar-width: thin; /* Make the scrollbar thin */
+  scrollbar-color: #4b3d2e rgba(245, 222, 179, 0.1); /* Thumb color and track color */
+}
+
+div#ingredients-container,
+div#cocktail-ingredients-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(125px, auto));
+  gap: 15px;
+  width: 100%;
+  height: auto;
+  padding-top: 5px;
+}
+.ing-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #ffffff50;
+  overflow: hidden;
+  box-shadow: 0px 0px 5px #00000010;
+}
+label.btn-checkbox {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-direction: column;
+  margin: 0px;
+}
+label.btn-checkbox:hover {
+  /* background: #4caf5075; */
+  background: var(--bg-color, #4caf5075);
+  cursor: pointer;
+}
+label.btn-checkbox img {
+  padding: 10px 0px;
+  width: 100%;
+  height: 65px;
+  object-fit: contain;
+  object-position: center;
+}
+label.btn-checkbox p {
+  text-align: center;
+  width: 100%;
+  font-size: 12px;
+}
+label.btn-checkbox:hover p {
+  color: #fff;
+}
+label.btn-checkbox:hover input {
+  border-color: #fff;
+}
+input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  /* background-color: #f0f0f0; */
+  border: 1px solid #57492c;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type="checkbox"]:checked {
+  background: var(--bg-color, #4caf50);
+  border-color: var(--bg-color, #4caf50);
+}
+
+input[type="checkbox"]:checked::before {
+  content: "✔";
+  display: block;
+  color: white;
+  font-size: 12px;
+  text-align: center;
+  line-height: normal;
+}
+
+.btn {
+  background: #3d3229;
+  color: #fff;
+}
+.btn:hover {
+  background: #000;
+  color: #fff;
+}
+.btn.active {
+  background: #3d3229;
+}
+.btn.deactive {
+  background: rgba(255, 255, 255, 0.5);
+  color: #000;
+}
+/* Modal Styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1000; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto; /* Center modal vertically */
+  padding: 25px;
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+  width: 50%;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.mod-left,
+.mod-right {
+  width: 50%;
+}
+
+.modl-txt h2,
+.gp-txt h3,
+.ap-txt h4,
+.mr-btn-txt h2 {
+  font-size: 18px;
+  color: #359267;
+  margin-bottom: 15px;
+}
+/* Close Button */
+.close {
+  color: #fff;
+  float: right;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #fff; /* Darker on hover */
+  /* background: #000; */
+}
+
+/* Color Picker and Gradient Styles */
+.color-picker,
+.gradient-picker,
+.mr-btn,
+.mr-btn-tx {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  width: 100%;
+}
+.mr-btn,
+.mr-btn-tx {
+  margin-bottom: 15px;
+}
+.mrc {
+  display: flex;
+  width: 50%;
+  flex-direction: column;
+}
+.color-picker,
+.gp-picker {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  width: 100%;
+}
+.color-picker label,
+.gp-picker label,
+.mrc label {
+  width: 50%;
+  margin: 0;
+  padding-right: 15px;
+  font-size: 16px;
+}
+.mrc label {
+  width: 100%;
+  padding-bottom: 5px;
+}
+.color-picker input,
+.gp-picker input,
+.mrc input {
+  width: 50px;
+  margin: 0;
+  padding: 0px;
+  background: transparent;
+  border: none;
+  border-radius: 0px;
+  height: 35px;
+}
+.gradient-picker {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+h2,
+h3,
+h4 {
+  font-weight: 600; /* Semi-bold for headings */
+  margin-bottom: 10px;
+}
+
+label {
+  font-size: 14px; /* Smaller font size */
+  margin-bottom: 5px; /* Space below labels */
+}
+
+/* Modern Input Styles */
+.modern-color-input {
+  border: none;
+  border-radius: 5px;
+  height: 40px; /* Height for input fields */
+  width: 100%; /* Full width */
+  margin-bottom: 15px; /* Space below inputs */
+  padding: 0 10px; /* Padding for input */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Input shadow */
+  transition: box-shadow 0.2s; /* Smooth transition */
+}
+
+.modern-color-input:focus {
+  outline: none; /* Remove outline */
+  box-shadow: 0 0 5px rgba(0, 102, 204, 0.8); /* Highlight on focus */
+}
+
+/* Button Styles */
+.modern-button {
+  border: none;
+  border-radius: 5px;
+  height: 40px; /* Height for button */
+  cursor: pointer;
+  transition: background-color 0.2s; /* Smooth transition */
+}
+
+/* Angle Picker Styles */
+.angle-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.angle-slider {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%; /* Ensure the circle stays circular */
+
+  /* Set the background to transparent */
+  background: transparent;
+
+  /* Apply gradient to border using border-image */
+  border: 8px solid transparent; /* Make the border transparent */
+  border-image: linear-gradient(
+      var(--gradient-angle, 131deg),
+      var(--gradient-color1, #e3d7c1),
+      var(--gradient-color2, #9eb395)
+    )
+    1; /* Apply gradient to the border */
+
+  /* margin: 15px 0; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.angle-knob {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(
+    var(--gradient-angle),
+    var(--gradient-color1),
+    var(--gradient-color2)
+  );
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer; /* Cursor change */
+  transition: background 0.2s; /* Smooth color transition */
+}
+.predefined-colors {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.predefined-color {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Optional: Add hover effect */
+.predefined-color:hover {
+  transform: scale(1.1);
+}
+
+.mod-close {
+  position: absolute;
+  top: 2%;
+  right: 1%;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: var(--bg-color, #359267);
+  box-shadow: 0px 0px 5px #00000025;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+.mod-close:hover {
+  background: #000;
+}
+.btn-rest {
+  position: absolute;
+  bottom: 2%;
+  right: 1%;
+}
+button#reset-defaults {
+  background: var(--bg-color, #359267);
+  box-shadow: 0px 0px 5px #00000025;
+  color: #fff;
+  padding: 5px 15px;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+}
+button#reset-defaults:hover {
+  background: #000;
+  cursor: pointer;
+}
+
+.add-ing,
+.add-cocktail {
+  width: 100%;
+  height: 100%;
+  padding: 25px;
+  position: relative;
+  display: none;
+}
+.add-cocktail-box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+}
+.add-cocktail-form {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  background: var(--bg-color, #ffffff50);
+  padding: 25px;
+  border-radius: 15px;
+}
+.add-cocktail-find-ing {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  background: var(--bg-color, #ffffff50);
+  padding: 25px;
+  border-radius: 15px;
+}
+.add-cocktail-find-ing .cocktail-fi-top,
+.add-cocktail-find-ing .ing-grid {
+  padding: 0px;
+}
+.form-group {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  width: 100%;
+  margin-bottom: 15px;
+}
+.form-group label {
+  width: 175px;
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: normal;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 300px;
+  border-radius: 5px;
+  background: #fff;
+  border: none;
+  height: 35px;
+  padding: 5px;
+  box-shadow: 0px 0px 5px #00000025;
+}
+.form-group textarea {
+  min-height: 100px;
+}
+.form-group input[type="file"] {
+  background: transparent;
+  box-shadow: none;
+}
+.footer-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  padding: 25px;
+  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 15px;
+}
+.add-cocktail-form .footer-btn {
+  padding: 8px;
+}
+button#submit-button {
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 15px;
+}
+button#back-button {
+  background: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 15px;
+}
+.footer-btn button:hover {
+  cursor: pointer;
+}
+.navbar a {
+  margin-bottom: 15px;
+}
+.navbar a:last-child {
+  margin-bottom: 0px;
+}
+.cocktail-fi-top .search-box .searchbar {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .app-body {
+    flex-direction: column;
+  }
+
+  .app-sidebar {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .app-pageview {
+    margin-left: 0;
+  }
+
+  .search-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-box .searchbar input {
+    width: 100%;
+  }
+
+  .search-box a {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .modal-content {
+    width: 90%; /* Full width on smaller screens */
+  }
+
+  .angle-slider {
+    width: 70px; /* Smaller angle slider */
+    height: 70px; /* Smaller angle slider */
+  }
+}
