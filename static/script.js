@@ -295,7 +295,57 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+async function fetchIngredients() {
+  try {
+    const response = await fetch("db.json"); // Ensure this path is correct
+    const data = await response.json(); // Parse JSON data
+
+    const container = document.getElementById("ingredients-container");
+
+    // Loop through each ingredient and create divs
+    data[0].data.forEach((ingredient) => {
+      const ingDiv = document.createElement("div");
+      ingDiv.classList.add("ing-item");
+
+      const label = document.createElement("label");
+      label.classList.add("btn-checkbox");
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.classList.add("checkbox");
+
+      checkbox.addEventListener("change", () => {
+        const checkedCheckboxes =
+          document.querySelectorAll(".checkbox:checked");
+        if (checkedCheckboxes.length > 10) {
+          checkbox.checked = false;
+          alert("You can only select up to 10 ingredients.");
+        } else {
+          updateSelectedCount();
+        }
+      });
+
+      const img = document.createElement("img");
+      img.src = "img/ing2.gif";
+      img.alt = `Ingredient - ${ingredient.ING_Name}`;
+
+      const para = document.createElement("p");
+      para.textContent = ingredient.ING_Name;
+
+      label.appendChild(checkbox);
+      label.appendChild(img);
+      label.appendChild(para);
+      ingDiv.appendChild(label);
+
+      container.appendChild(ingDiv);
+    });
+  } catch (error) {
+    console.error("Error fetching ingredients:", error);
+  }
+}
+
 // hide & show frames
+let activeMenu = 'findCocktail'; // Default active menu
 
 // Toggle visibility of sections
 const findCocktailBtn = document.getElementById("findCocktailBtn");
@@ -331,6 +381,7 @@ function showAddIngredients() {
   addCocktailBtn.classList.remove("active"); // Remove active from Add Cocktail
   addCocktailBtn.classList.add("deactive"); // Set Add Cocktail button deactivated
   updateButtonStyles(); // Update button styles
+  fetchIngredientsID();
 }
 
 // Function to show the "Add Cocktail" section
@@ -349,17 +400,144 @@ function showAddCocktail() {
 
 // Add click event listeners to the buttons
 findCocktailBtn.addEventListener("click", function (event) {
-  event.preventDefault(); // Prevent default anchor behavior
+  event.preventDefault();
   showFindCocktail();
 });
 
 addIngredientsBtn.addEventListener("click", function (event) {
-  event.preventDefault(); // Prevent default anchor behavior
+  event.preventDefault();
   showAddIngredients();
 });
 
-// Add click event listener for Add Cocktail button
 addCocktailBtn.addEventListener("click", function (event) {
-  event.preventDefault(); // Prevent default anchor behavior
-  showAddCocktail(); // Call the new function to show Add Cocktail
+  event.preventDefault();
+  showAddCocktail();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Check which menu should be active
+  if (activeMenu === 'addIngredients') {
+    showAddIngredients();
+  } else if (activeMenu === 'addCocktail') {
+    showAddCocktail();
+  } else {
+    showFindCocktail(); // Default
+  }
+
+});
+document.getElementById("ingredient-image").addEventListener("change", (event) => {
+  event.preventDefault(); // Prevent default form submission
+});
+
+// Function to handle focus-in and focus-out events
+function checkFocus(event) {
+  const inputs = document.querySelectorAll("input, textarea");
+  let isAnyFieldFocused = false;
+
+  // Check if the current target (focused element) is an input or textarea
+  if (event.type === 'focus') {
+    isAnyFieldFocused = true;
+  }
+
+  // Send POST request based on focus event type
+  if (isAnyFieldFocused) {
+    fetch('/focus-in', {
+      method: 'POST',
+    }).then(response => response.text())
+      .then(data => console.log(data));
+  } else {
+    fetch('/focus-out', {
+      method: 'POST',
+    }).then(response => response.text())
+      .then(data => console.log(data));
+  }
+}
+
+// Add event listeners for focus and blur events directly on input fields
+document.querySelectorAll("input, textarea").forEach((input) => {
+  input.addEventListener("focus", checkFocus);
+  input.addEventListener("blur", checkFocus);
+});
+
+
+// Function to fetch existing ingredients and set up the form
+async function fetchIngredientsID() {
+  try {
+    const response = await fetch("db.json");
+    const data = await response.json();
+    const ingredients = data[0].data;
+
+    // Get the last ingredient ID and generate the new ID
+    const lastId = ingredients.length > 0 ? parseInt(ingredients[ingredients.length - 1].ING_ID) : 0;
+    const newId = lastId + 1; // Calculate the new ID
+
+    // Set the new ID as text content of the span
+    document.getElementById("ingredient-id").textContent = newId; // Set new ID as text
+  } catch (error) {
+    console.error("Error fetching ingredients:", error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const submitButton = document.getElementById("submit-button");
+  fetchIngredientsID()
+
+  // Handle the Add Ingredient button click
+  submitButton.addEventListener("click", async (event) => {
+    event.preventDefault();
+
+    const ingredientId = document.getElementById("ingredient-id").textContent; // Get the ID from the span
+    const ingredientName = document.getElementById("ingredient-name").value;
+    const ingredientType = document.getElementById("ingredient-type").value;
+
+    // Initialize an array to collect error messages
+    let errorMessages = [];
+
+    // Validate inputs
+    if (!ingredientId) {
+      errorMessages.push("Ingredient ID is required.");
+    }
+    if (!ingredientName) {
+      errorMessages.push("Ingredient Name is required.");
+    }
+    if (!ingredientType) {
+      errorMessages.push("Ingredient Type is required.");
+    }
+
+    // If there are error messages, alert the user and return
+    if (errorMessages.length > 0) {
+      alert(errorMessages.join("\n")); // Display all error messages in an alert
+      return;
+    }
+
+    // Create the new ingredient object
+    const newIngredient = {
+      ING_ID: ingredientId,
+      ING_Name: ingredientName,
+      ING_Type: ingredientType,
+    };
+
+    // Append new ingredient to db.json
+    try {
+      const response = await fetch("/addIngredient", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(newIngredient)
+      });
+
+      if (response.ok) {
+        alert("Ingredient added successfully!");
+        fetchIngredients(); // Refresh the ingredient list
+      } else {
+        // Log the response text for debugging
+        const errorText = await response.text();
+        alert("Failed to add the ingredient. Server response: " + errorText);
+      }
+    } catch (error) {
+      console.error("Error adding ingredient:", error);
+      alert("An error occurred while adding the ingredient: " + error.message);
+    }
+  });
 });

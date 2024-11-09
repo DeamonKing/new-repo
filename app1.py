@@ -4,6 +4,7 @@ from http.server import SimpleHTTPRequestHandler, HTTPServer
 import subprocess
 import time
 import platform
+import json
 
 # Define the base directory as the directory where this script is located
 base_dir = os.path.dirname(__file__)
@@ -28,15 +29,27 @@ class CustomHandler(SimpleHTTPRequestHandler):
 
         # Handling focus-in and focus-out events
         if self.path == '/focus-in':
-            threading.Thread(target=self.execute_shell_script, args=('keyboardstart.sh',)).start()
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write(b"Focus-in event received, running keyboardstart.sh")
+            if platform.system() != "Windows":
+                threading.Thread(target=self.execute_shell_script, args=('keyboardstart.sh',)).start()
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(b"Focus-in event received, running keyboardstart.sh")
+            else:
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(b"Focus-in event received, but keyboard functionality is disabled on Windows.")
+
         elif self.path == '/focus-out':
-            threading.Thread(target=self.execute_shell_script, args=('keyboardstop.sh',)).start()
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write(b"Focus-out event received, running keyboardstop.sh")
+            if platform.system() != "Windows":
+                threading.Thread(target=self.execute_shell_script, args=('keyboardstop.sh',)).start()
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(b"Focus-out event received, running keyboardstop.sh")
+            else:
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(b"Focus-out event received, but keyboard functionality is disabled on Windows.")
+
         elif self.path == '/shutdown':
             self.send_response(200)
             self.end_headers()
@@ -44,9 +57,14 @@ class CustomHandler(SimpleHTTPRequestHandler):
             print("Shutting down the server...")
             httpd.shutdown()  # Graceful shutdown of the server
             os._exit(0)
+            
+        elif self.path == '/addIngredient':
+            self.add_ingredient(post_data)
+            
         else:
             self.send_response(404)
             self.end_headers()
+
 
     def execute_shell_script(self, script_name):
         # Run scripts from the same directory as the Python script
@@ -57,6 +75,31 @@ class CustomHandler(SimpleHTTPRequestHandler):
             subprocess.Popen(['sh', script_path])
         else:
             print(f"Unsupported operating system for script execution.")
+            
+    def add_ingredient(self, post_data):
+        # Load the existing ingredients from db.json
+        try:
+            with open(os.path.join(web_dir, 'db.json'), 'r') as file:
+                data = json.load(file)
+
+            # Parse the new ingredient data
+            new_ingredient = json.loads(post_data)
+
+            # Append the new ingredient to the existing data
+            data[0]['data'].append(new_ingredient)
+
+            # Write the updated data back to db.json
+            with open(os.path.join(web_dir, 'db.json'), 'w') as file:
+                json.dump(data, file, indent=2)
+
+            self.send_response(201)
+            self.end_headers()
+            self.wfile.write(b"Ingredient added successfully")
+        except Exception as e:
+            print(f"Error adding ingredient: {e}")  # Log the error to the console
+            self.send_response(500)  # Internal Server Error
+            self.end_headers()
+            self.wfile.write(f"Error saving ingredient: {str(e)}".encode())
 
 def start_http_server():
     global httpd
@@ -65,7 +108,7 @@ def start_http_server():
     httpd.serve_forever()
 
 def start_electron_app():
-    time.sleep(1)
+    time.sleep(2)
     if platform.system() == "Windows":
         electron_executable = r'C:\Users\LOQ\AppData\Roaming\npm\node_modules\electron\dist\electron.exe'
     elif platform.system() == "Linux":

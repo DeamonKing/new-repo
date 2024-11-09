@@ -520,6 +520,16 @@
         "ING_ID": "104",
         "ING_Name": "Lime Wedges",
         "ING_Type": "Garnish"
+      },
+      {
+        "ING_ID": "105",
+        "ING_Name": "NewETs",
+        "ING_Type": "Liquid"
+      },
+      {
+        "ING_ID": "106",
+        "ING_Name": "NewAdded",
+        "ING_Type": "liquor"
       }
     ]
   }
