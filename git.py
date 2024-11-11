@@ -1,0 +1,60 @@
+import os
+import subprocess
+
+# Path to your local repository
+repo_dir = "C:/Users/karan/Downloads/NR_APP"
+
+
+# Change directory to the repository
+os.chdir(repo_dir)
+
+
+# Step 1: Pull the latest changes from the remote repository
+def git_pull():
+    try:
+        subprocess.run(["git", "pull"], check=True)
+        print("Successfully pulled the latest changes.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error pulling changes: {e}")
+
+
+# Step 2: Add changes to the staging area (you can specify files or use '.' for all)
+def git_add():
+    try:
+        subprocess.run(["git", "add", "."], check=True)  # Adds all changes
+        print("Successfully added changes.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error adding changes: {e}")
+
+
+# Step 3: Commit the changes with a commit message
+def git_commit(message):
+    try:
+        subprocess.run(["git", "commit", "-m", message], check=True)
+        print("Successfully committed changes.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error committing changes: {e}")
+
+
+# Step 4: Push the changes to the remote repository
+def git_push():
+    try:
+        subprocess.run(["git", "push"], check=True)
+        print("Successfully pushed changes to remote repository.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error pushing changes: {e}")
+
+
+# Main function to execute all steps
+def update_git_repo(commit_message):
+    git_pull()
+    git_add()
+    git_commit(commit_message)
+    git_push()
+
+
+# Example commit message
+commit_message = "Updated code with latest changes"
+
+# Call the update function with a commit message
+update_git_repo(commit_message)

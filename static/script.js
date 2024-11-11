@@ -225,63 +225,162 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize knob position
   setKnobPosition(angle);
-
 });
 
-// hide & show frames
-let activeMenu = 'findCocktail'; // Default active menu
+let activeMenu = "findCocktail"; // Default active menu
 
 // Toggle visibility of sections
 const findCocktailBtn = document.getElementById("findCocktailBtn");
 const addIngredientsBtn = document.getElementById("addIngredientsBtn");
-const addCocktailBtn = document.getElementById("addCocktailBtn"); // Add this line
+const addCocktailBtn = document.getElementById("addCocktailBtn");
+const allCocktailsBtn = document.getElementById("allCocktailsBtn");
+const cotailInfoBtn = document.getElementById("cotailInfo"); // New button
 const findIngSection = document.querySelector(".find-ing");
 const addIngSection = document.querySelector(".add-ing");
-const addCocktailSection = document.querySelector(".add-cocktail"); // Add this line
+const addCocktailSection = document.querySelector(".add-cocktail");
+const allCocktailSection = document.querySelector(".all-cocktail");
+const cocktailDetailsSection = document.querySelector(".cocktail-details"); // New section for cocktail details
+const assignPipelineBtn = document.getElementById("assignPipeline");
+const selectPipelineSection = document.querySelector(".select-pipeline");
 
 // Function to show the "Find Cocktail" section
 function showFindCocktail() {
-  findIngSection.style.display = "block"; // Show Find Cocktail section
-  addIngSection.style.display = "none"; // Hide Add Ingredients section
-  addCocktailSection.style.display = "none"; // Hide Add Cocktail section
-  findCocktailBtn.classList.add("active"); // Set Find Cocktail button active
-  findCocktailBtn.classList.remove("deactive"); // Ensure it's not deactivated
-  addIngredientsBtn.classList.remove("active"); // Remove active from Add Ingredients
-  addIngredientsBtn.classList.add("deactive"); // Set Add Ingredients button deactivated
-  addCocktailBtn.classList.remove("active"); // Remove active from Add Cocktail
-  addCocktailBtn.classList.add("deactive"); // Set Add Cocktail button deactivated
-  updateButtonStyles(); // Update button styles
+  findIngSection.style.display = "block";
+  addIngSection.style.display = "none";
+  addCocktailSection.style.display = "none";
+  allCocktailSection.style.display = "none";
+  cocktailDetailsSection.style.display = "none"; // Hide Cocktail Details section
+  selectPipelineSection.style.display = "none";
+  findCocktailBtn.classList.add("active");
+  findCocktailBtn.classList.remove("deactive");
+  addIngredientsBtn.classList.remove("active");
+  addIngredientsBtn.classList.add("deactive");
+  addCocktailBtn.classList.remove("active");
+  addCocktailBtn.classList.add("deactive");
+  assignPipelineBtn.classList.remove("active");
+  assignPipelineBtn.classList.add("deactive");
+  allCocktailsBtn.classList.remove("active");
+  allCocktailsBtn.classList.add("deactive");
+  cotailInfoBtn.classList.remove("active"); // Remove active from Cocktail Info
+  cotailInfoBtn.classList.add("deactive");
+  updateButtonStyles();
 }
 
 // Function to show the "Add Ingredients" section
 function showAddIngredients() {
-  findIngSection.style.display = "none"; // Hide Find Cocktail section
-  addIngSection.style.display = "block"; // Show Add Ingredients section
-  addCocktailSection.style.display = "none"; // Hide Add Cocktail section
-  addIngredientsBtn.classList.add("active"); // Set Add Ingredients button active
-  addIngredientsBtn.classList.remove("deactive"); // Ensure it's not deactivated
-  findCocktailBtn.classList.remove("active"); // Remove active from Find Cocktail
-  findCocktailBtn.classList.add("deactive"); // Set Find Cocktail button deactivated
-  addCocktailBtn.classList.remove("active"); // Remove active from Add Cocktail
-  addCocktailBtn.classList.add("deactive"); // Set Add Cocktail button deactivated
-  updateButtonStyles(); // Update button styles
+  findIngSection.style.display = "none";
+  addIngSection.style.display = "block";
+  addCocktailSection.style.display = "none";
+  allCocktailSection.style.display = "none";
+  cocktailDetailsSection.style.display = "none";
+  selectPipelineSection.style.display = "none";
+  addIngredientsBtn.classList.add("active");
+  addIngredientsBtn.classList.remove("deactive");
+  findCocktailBtn.classList.remove("active");
+  findCocktailBtn.classList.add("deactive");
+  addCocktailBtn.classList.remove("active");
+  addCocktailBtn.classList.add("deactive");
+  assignPipelineBtn.classList.remove("active");
+  assignPipelineBtn.classList.add("deactive");
+  allCocktailsBtn.classList.remove("active");
+  allCocktailsBtn.classList.add("deactive");
+  cotailInfoBtn.classList.remove("active");
+  cotailInfoBtn.classList.add("deactive");
+  updateButtonStyles();
   fetchIngredientsID();
 }
 
 // Function to show the "Add Cocktail" section
 function showAddCocktail() {
-  findIngSection.style.display = "none"; // Hide Find Cocktail section
-  addIngSection.style.display = "none"; // Hide Add Ingredients section
-  addCocktailSection.style.display = "block"; // Show Add Cocktail section
-  addCocktailBtn.classList.add("active"); // Set Add Cocktail button active
-  addCocktailBtn.classList.remove("deactive"); // Ensure it's not deactivated
-  findCocktailBtn.classList.remove("active"); // Remove active from Find Cocktail
-  findCocktailBtn.classList.add("deactive"); // Set Find Cocktail button deactivated
-  addIngredientsBtn.classList.remove("active"); // Remove active from Add Ingredients
-  addIngredientsBtn.classList.add("deactive"); // Set Add Ingredients button deactivated
-  updateButtonStyles(); // Update button styles
+  findIngSection.style.display = "none";
+  addIngSection.style.display = "none";
+  addCocktailSection.style.display = "block";
+  allCocktailSection.style.display = "none";
+  cocktailDetailsSection.style.display = "none";
+  selectPipelineSection.style.display = "none";
+  addCocktailBtn.classList.add("active");
+  addCocktailBtn.classList.remove("deactive");
+  findCocktailBtn.classList.remove("active");
+  findCocktailBtn.classList.add("deactive");
+  addIngredientsBtn.classList.remove("active");
+  addIngredientsBtn.classList.add("deactive");
+  assignPipelineBtn.classList.remove("active");
+  assignPipelineBtn.classList.add("deactive");
+  allCocktailsBtn.classList.remove("active");
+  allCocktailsBtn.classList.add("deactive");
+  cotailInfoBtn.classList.remove("active");
+  cotailInfoBtn.classList.add("deactive");
+  updateButtonStyles();
 }
 
+// Function to show the "All Cocktails" section
+function showAllCocktails() {
+  findIngSection.style.display = "none";
+  addIngSection.style.display = "none";
+  addCocktailSection.style.display = "none";
+  allCocktailSection.style.display = "block"; // Show All Cocktails section
+  cocktailDetailsSection.style.display = "none";
+  selectPipelineSection.style.display = "none";
+  allCocktailsBtn.classList.add("active");
+  allCocktailsBtn.classList.remove("deactive");
+  findCocktailBtn.classList.remove("active");
+  findCocktailBtn.classList.add("deactive");
+  addIngredientsBtn.classList.remove("active");
+  addIngredientsBtn.classList.add("deactive");
+  addCocktailBtn.classList.remove("active");
+  addCocktailBtn.classList.add("deactive");
+  assignPipelineBtn.classList.remove("active");
+  assignPipelineBtn.classList.add("deactive");
+  cotailInfoBtn.classList.remove("active");
+  cotailInfoBtn.classList.add("deactive");
+  updateButtonStyles();
+}
+
+// Function to show the "Cocktail Details" section
+function showCocktailDetails() {
+  findIngSection.style.display = "none";
+  addIngSection.style.display = "none";
+  addCocktailSection.style.display = "none";
+  allCocktailSection.style.display = "none";
+  cocktailDetailsSection.style.display = "block"; // Show Cocktail Details section
+  selectPipelineSection.style.display = "none";
+  cotailInfoBtn.classList.add("active");
+  cotailInfoBtn.classList.remove("deactive");
+  findCocktailBtn.classList.remove("active");
+  findCocktailBtn.classList.add("deactive");
+  addIngredientsBtn.classList.remove("active");
+  addIngredientsBtn.classList.add("deactive");
+  addCocktailBtn.classList.remove("active");
+  addCocktailBtn.classList.add("deactive");
+  assignPipelineBtn.classList.remove("active");
+  assignPipelineBtn.classList.add("deactive");
+  allCocktailsBtn.classList.remove("active");
+  allCocktailsBtn.classList.add("deactive");
+  updateButtonStyles();
+}
+
+// Function to show the "Assign Pipeline" section
+function showAssignPipeline() {
+  findIngSection.style.display = "none";
+  addIngSection.style.display = "none";
+  addCocktailSection.style.display = "none";
+  allCocktailSection.style.display = "none";
+  cocktailDetailsSection.style.display = "none";
+  selectPipelineSection.style.display = "block"; // Show Assign Pipeline section
+  assignPipelineBtn.classList.add("active");
+  assignPipelineBtn.classList.remove("deactive");
+  findCocktailBtn.classList.remove("active");
+  findCocktailBtn.classList.add("deactive");
+  addIngredientsBtn.classList.remove("active");
+  addIngredientsBtn.classList.add("deactive");
+  addCocktailBtn.classList.remove("active");
+  addCocktailBtn.classList.add("deactive");
+  allCocktailsBtn.classList.remove("active");
+  allCocktailsBtn.classList.add("deactive");
+  cotailInfoBtn.classList.remove("active");
+  cotailInfoBtn.classList.add("deactive");
+  updateButtonStyles();
+}
 
 // Add click event listeners to the buttons
 findCocktailBtn.addEventListener("click", function (event) {
@@ -299,25 +398,68 @@ addCocktailBtn.addEventListener("click", function (event) {
   showAddCocktail();
 });
 
-document.getElementById("add-new-btn").addEventListener("click", function (event) {
-  event.preventDefault(); // Prevent the default anchor behavior
-  showAddIngredients(); // Call the function to show the Add Ingredients section
+allCocktailsBtn.addEventListener("click", function (event) {
+  event.preventDefault();
+  showAllCocktails(); // Show All Cocktails section
 });
+
+cotailInfoBtn.addEventListener("click", function (event) {
+  event.preventDefault();
+  showCocktailDetails(); // Show Cocktail Details section
+});
+
+assignPipelineBtn.addEventListener("click", function (event) {
+  event.preventDefault();
+  showAssignPipeline();
+});
+
+document
+  .getElementById("add-new-btn")
+  .addEventListener("click", function (event) {
+    event.preventDefault();
+    showAddIngredients();
+  });
 
 document.addEventListener("DOMContentLoaded", () => {
   // Check which menu should be active
-  if (activeMenu === 'addIngredients') {
+  if (activeMenu === "addIngredients") {
     showAddIngredients();
-  } else if (activeMenu === 'addCocktail') {
+  } else if (activeMenu === "addCocktail") {
     showAddCocktail();
+  } else if (activeMenu === "allCocktails") {
+    showAllCocktails(); // Default to All Cocktails
+  } else if (activeMenu === "cocktailDetails") {
+    showCocktailDetails(); // Default to Cocktail Details
   } else {
     showFindCocktail(); // Default
   }
+});
 
+document
+  .getElementById("add-new-btn")
+  .addEventListener("click", function (event) {
+    event.preventDefault();
+    showAddIngredients();
+  });
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Check which menu should be active
+  if (activeMenu === "addIngredients") {
+    showAddIngredients();
+  } else if (activeMenu === "addCocktail") {
+    showAddCocktail();
+  } else if (activeMenu === "allCocktails") {
+    showAllCocktails(); // Default to All Cocktails
+  } else {
+    showFindCocktail(); // Default
+  }
 });
-document.getElementById("ingredient-image").addEventListener("change", (event) => {
-  event.preventDefault(); // Prevent default form submission
-});
+
+document
+  .getElementById("ingredient-image")
+  .addEventListener("change", (event) => {
+    event.preventDefault(); // Prevent default form submission
+  });
 
 // Function to handle focus-in and focus-out events
 function checkFocus(event) {
@@ -325,21 +467,23 @@ function checkFocus(event) {
   let isAnyFieldFocused = false;
 
   // Check if the current target (focused element) is an input or textarea
-  if (event.type === 'focus') {
+  if (event.type === "focus") {
     isAnyFieldFocused = true;
   }
 
   // Send POST request based on focus event type
   if (isAnyFieldFocused) {
-    fetch('/focus-in', {
-      method: 'POST',
-    }).then(response => response.text())
-      .then(data => console.log(data));
+    fetch("/focus-in", {
+      method: "POST",
+    })
+      .then((response) => response.text())
+      .then((data) => console.log(data));
   } else {
-    fetch('/focus-out', {
-      method: 'POST',
-    }).then(response => response.text())
-      .then(data => console.log(data));
+    fetch("/focus-out", {
+      method: "POST",
+    })
+      .then((response) => response.text())
+      .then((data) => console.log(data));
   }
 }
 
@@ -349,7 +493,6 @@ document.querySelectorAll("input, textarea").forEach((input) => {
   input.addEventListener("blur", checkFocus);
 });
 
-
 // Function to fetch existing ingredients and set up the form
 async function fetchIngredientsID() {
   try {
@@ -358,7 +501,10 @@ async function fetchIngredientsID() {
     const ingredients = data[0].data;
 
     // Get the last ingredient ID and generate the new ID
-    const lastId = ingredients.length > 0 ? parseInt(ingredients[ingredients.length - 1].ING_ID) : 0;
+    const lastId =
+      ingredients.length > 0
+        ? parseInt(ingredients[ingredients.length - 1].ING_ID)
+        : 0;
     const newId = lastId + 1; // Calculate the new ID
 
     // Set the new ID as text content of the span
@@ -370,20 +516,20 @@ async function fetchIngredientsID() {
 
 document.addEventListener("DOMContentLoaded", () => {
   const submitButton = document.getElementById("submit-button");
-  fetchIngredientsID()
-  
+  fetchIngredientsID();
+
   submitButton.addEventListener("click", async (event) => {
     event.preventDefault();
-  
+
     const ingredientId = document.getElementById("ingredient-id").textContent; // Get the ID from the span
     const ingredientName = document.getElementById("ingredient-name").value;
     const ingredientType = document.getElementById("ingredient-type").value;
     const ingredientImageInput = document.getElementById("ingredient-image");
     const ingredientImage = ingredientImageInput.files[0]; // Get the selected image file
-  
+
     // Initialize an array to collect error messages
     let errorMessages = [];
-  
+
     // Validate inputs
     if (!ingredientId) {
       errorMessages.push("Ingredient ID is required.");
@@ -397,13 +543,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!ingredientImage) {
       errorMessages.push("Ingredient Image is required.");
     }
-  
+
     // If there are error messages, alert the user and return
     if (errorMessages.length > 0) {
       alert(errorMessages.join("\n")); // Display all error messages in an alert
       return;
     }
-  
+
     // Read the image file and convert it to a Base64 string
     const reader = new FileReader();
     reader.readAsDataURL(ingredientImage); // Convert image to Base64
@@ -412,19 +558,19 @@ document.addEventListener("DOMContentLoaded", () => {
         ING_ID: ingredientId,
         ING_Name: ingredientName,
         ING_Type: ingredientType,
-        ING_IMG: reader.result // Base64 string of the image
+        ING_IMG: reader.result, // Base64 string of the image
       };
-  
+
       // Append new ingredient to db.json
       try {
         const response = await fetch("/addIngredient", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(newIngredient)
+          body: JSON.stringify(newIngredient),
         });
-  
+
         if (response.ok) {
           alert("Ingredient added successfully!");
           await fetchIngredients(); // Refresh the ingredient list after adding
@@ -436,16 +582,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       } catch (error) {
         console.error("Error adding ingredient:", error);
-        alert("An error occurred while adding the ingredient: " + error.message);
+        alert(
+          "An error occurred while adding the ingredient: " + error.message
+        );
       }
     };
-  
+
     reader.onerror = (error) => {
       console.error("Error reading image file:", error);
       alert("An error occurred while reading the image file: " + error.message);
     };
   });
-  
+
   // Function to reset the ingredient form fields
   function resetIngredientForm() {
     document.getElementById("ingredient-name").value = ""; // Clear the ingredient name
@@ -453,11 +601,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("ingredient-image").value = ""; // Clear the image input
     document.getElementById("image-name").textContent = ""; // Clear the displayed image name
   }
-  
+
   // Function to display the selected image name
   function displayImageName() {
     const ingredientImageInput = document.getElementById("ingredient-image");
-    const imageName = ingredientImageInput.files[0] ? ingredientImageInput.files[0].name : "";
+    const imageName = ingredientImageInput.files[0]
+      ? ingredientImageInput.files[0].name
+      : "";
     document.getElementById("image-name").textContent = imageName; // Display the image name
   }
 });
@@ -478,7 +628,10 @@ async function fetchIngredients(searchTerm = "") {
       const ingredientName = ingredient.ING_Name.toLowerCase(); // Convert to lower case for case-insensitive comparison
 
       // Check if searchTerm is empty or if the ingredient name includes the search term
-      if (searchTerm === "" || ingredientName.includes(searchTerm.toLowerCase())) {
+      if (
+        searchTerm === "" ||
+        ingredientName.includes(searchTerm.toLowerCase())
+      ) {
         const ingDiv = document.createElement("div");
         ingDiv.classList.add("ing-item");
 
@@ -493,7 +646,10 @@ async function fetchIngredients(searchTerm = "") {
         checkbox.addEventListener("change", updateSelectedCount);
 
         // Create the ingredient image
-        const imgSrc = ingredient.ING_IMG && ingredient.ING_IMG.trim() !== "" ? ingredient.ING_IMG : "img/ing2.gif";
+        const imgSrc =
+          ingredient.ING_IMG && ingredient.ING_IMG.trim() !== ""
+            ? ingredient.ING_IMG
+            : "img/ing2.gif";
         const img = document.createElement("img");
         img.src = imgSrc;
         img.alt = `Ingredient - ${ingredient.ING_Name}`;
@@ -536,7 +692,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-
   // Function to handle input changes in the search box
   function handleSearchInput() {
     const searchInput = document.getElementById("ingredient-search").value; // Get the input value
@@ -547,7 +702,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Add event listener to the search input
-  document.getElementById("ingredient-search").addEventListener("input", handleSearchInput);
+  document
+    .getElementById("ingredient-search")
+    .addEventListener("input", handleSearchInput);
 });
 
 async function fetchIngredientsTypes() {
@@ -589,13 +746,13 @@ function filterIngredientsByType(type) {
 
   checkboxes.forEach((checkbox, index) => {
     const ingredientType = ingredientsData[index].ING_Type; // Assuming you have a global ingredientsData array
-    const ingredientItem = checkbox.closest('.ing-item');
+    const ingredientItem = checkbox.closest(".ing-item");
 
     // Show all ingredients if 'all' is selected, otherwise filter by type
-    if (type === 'all' || ingredientType === type) {
-      ingredientItem.style.display = 'flex';
+    if (type === "all" || ingredientType === type) {
+      ingredientItem.style.display = "flex";
     } else {
-      ingredientItem.style.display = 'none';
+      ingredientItem.style.display = "none";
     }
 
     if (checkbox.checked) {
@@ -612,14 +769,16 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchIngredientsTypes(); // Fetch ingredient types for filtering
 });
 
-document.querySelectorAll('.ing-filter a').forEach((button) => {
-  button.addEventListener('click', (event) => {
+document.querySelectorAll(".ing-filter a").forEach((button) => {
+  button.addEventListener("click", (event) => {
     event.preventDefault(); // Prevent default anchor behavior
-    const selectedType = button.getAttribute('data-type');
+    const selectedType = button.getAttribute("data-type");
 
     // Remove active class from all buttons and add it to the clicked button
-    document.querySelectorAll('.ing-filter a').forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
+    document
+      .querySelectorAll(".ing-filter a")
+      .forEach((btn) => btn.classList.remove("active"));
+    button.classList.add("active");
 
     // Call filter function with the selected type
     filterIngredientsByType(selectedType);

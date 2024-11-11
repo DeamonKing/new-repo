@@ -241,24 +241,29 @@ select {
 .fi-bottom {
   width: 100%;
   height: 100%;
+  padding-bottom: 70px;
 }
 /* Styles for the scrollbar in WebKit browsers */
-.ing-grid::-webkit-scrollbar {
+.ing-grid::-webkit-scrollbar,
+::-webkit-scrollbar {
   width: 8px; /* Width of the scrollbar */
   height: 8px; /* Height of the scrollbar */
 }
 
-.ing-grid::-webkit-scrollbar-track {
+.ing-grid::-webkit-scrollbar-track,
+::-webkit-scrollbar-track {
   background: rgba(245, 222, 179, 0.1); /* Color of the track */
   border-radius: 10px; /* Rounded corners for the track */
 }
 
-.ing-grid::-webkit-scrollbar-thumb {
+.ing-grid::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb {
   background: #4b3d2e; /* Color of the scrollbar thumb */
   border-radius: 10px; /* Rounded corners for the thumb */
 }
 
-.ing-grid::-webkit-scrollbar-thumb:hover {
+.ing-grid::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:hover {
   background: #3d3229; /* Darker color on hover */
 }
 
@@ -607,7 +612,9 @@ button#reset-defaults:hover {
 }
 
 .add-ing,
-.add-cocktail {
+.add-cocktail,
+.select-pipeline,
+.all-cocktail {
   width: 100%;
   height: 100%;
   padding: 25px;
@@ -689,9 +696,15 @@ button#reset-defaults:hover {
   gap: 15px;
 }
 .add-cocktail-form .footer-btn {
-  padding: 8px;
+  padding: 8px 25px;
 }
 button#submit-button {
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 15px;
+}
+.btns {
   border: none;
   padding: 10px 15px;
   border-radius: 5px;
@@ -715,6 +728,180 @@ button#back-button {
 }
 .cocktail-fi-top .search-box .searchbar {
   width: 100%;
+}
+.sp-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  width: 100%;
+  height: auto;
+  padding-top: 5px;
+}
+.sp-form-grid .form-group {
+  gap: 15px;
+  margin-top: 15px;
+}
+.sp-form-grid .form-group label {
+  width: 30%;
+}
+.sp-form-grid .form-group select {
+  width: 60%;
+}
+.sp-form-grid .form-group button {
+  width: 6%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  border-radius: 5px;
+  background: #fff;
+}
+.sp-form-grid .form-group button:hover {
+  background: #000;
+  cursor: pointer;
+}
+.sp-form-grid .form-group button svg {
+  font-size: 16px;
+  fill: #000;
+}
+.sp-form-grid .form-group button:hover svg path {
+  fill: #fff;
+}
+.find-ing .fi-bottom {
+  position: relative;
+}
+.find-ing .footer-btn {
+  bottom: 16%;
+  background: #ffffff25;
+  backdrop-filter: blur(5px);
+  padding: 10px 25px 22px 25px;
+}
+.form-group input:focus-visible,
+.form-group select:focus-visible,
+.form-group textarea:focus-visible {
+  border: none;
+  outline: none;
+}
+.cocktail-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(125px, auto));
+  gap: 15px;
+  width: 100%;
+  height: auto;
+}
+.cl-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 10px;
+  background: #ffffff50;
+  overflow: hidden;
+  box-shadow: 0px 0px 5px #00000010;
+  padding: 15px;
+}
+.cl-item:hover {
+  background: var(--bg-color, #4caf5075);
+  cursor: pointer;
+}
+.cl-item:hover p {
+  color: #fff;
+}
+.cl-item img {
+  padding: 10px 0px;
+  padding-top: 0px;
+  width: 100%;
+  height: 100px;
+  object-fit: contain;
+  object-position: center;
+}
+.cl-item p {
+  text-align: center;
+  width: 100%;
+  font-size: 12px;
+}
+.add-cocktail-form .form-group label {
+  width: 30%;
+}
+.add-cocktail-form .form-group input,
+.add-cocktail-form .form-group select,
+.add-cocktail-form .form-group textarea {
+  width: 70%;
+}
+.cocktail-details {
+  width: 100%;
+  height: 100%;
+}
+.cd-box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+  overflow: hidden;
+}
+.cd-left {
+  width: 35%;
+  height: 100%;
+}
+.cdl-img {
+  width: 100%;
+  height: 100%;
+}
+.cdl-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+.cd-right {
+  width: 65%;
+  height: 100%;
+  position: relative;
+  overflow-y: scroll;
+  padding-right: 15px;
+}
+.cd-right .footer-btn {
+  padding: 0px 15px;
+}
+.cd-right .fi-bottom {
+  padding-bottom: 0px;
+}
+.cd-right .ing-grid {
+  padding: 0px;
+}
+.cdr-txt {
+  padding-bottom: 15px;
+}
+.cdr-txt:last-child {
+  padding-bottom: 0px;
+}
+.cdr-txt h2 {
+  color: var(--bg-color, #359267);
+}
+form.drink-type .drink-form-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 15px;
+}
+.drink-form-grid .form-group label {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  background: #ffffff50;
+  overflow: hidden;
+  box-shadow: 0px 0px 5px #00000010;
+}
+.drink-form-grid .form-group label span {
+  font-size: 15px;
+}
+.drink-form-grid .form-group input {
+  width: max-content;
+  margin-right: 10px;
+  box-shadow: none;
 }
 
 @media (max-width: 768px) {

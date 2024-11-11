@@ -31,6 +31,9 @@
               <a href="#" class="btn active" id="findCocktailBtn"
                 >Find Cocktail</a
               >
+              <a href="#" class="btn deactive" id="allCocktailsBtn"
+                >All Cocktails</a
+              >
               <a href="#" class="btn deactive" id="addIngredientsBtn"
                 >Add Ingredients</a
               >
@@ -53,18 +56,32 @@
                     />
                     <p>Selected Ingredients : <span>0/10</span></p>
                   </div>
-                  <a href="#" class="btn" id="add-new-btn"
+                  <a
+                    href="#"
+                    class="btn"
+                    id="add-new-btn"
+                    onclick="showAddIngredients()"
                     ><i class="fa-solid fa-plus"></i> Add New</a
                   >
                 </div>
                 <div class="ing-filter" id="ing-filterfind">
-                  <a href="#" class="btn active"data-type="all">All Ingredients</a>
+                  <a href="#" class="btn active" data-type="all"
+                    >All Ingredients</a
+                  >
                 </div>
               </div>
               <div class="fi-bottom">
                 <div class="ing-box">
                   <div class="ing-grid">
                     <div id="ingredients-container"></div>
+                  </div>
+                  <div class="footer-btn">
+                    <button id="clear-all-button" class="btn active btns">
+                      Clear All
+                    </button>
+                    <button id="assignPipeline" class="btn active btns">
+                      Assign Pipeline
+                    </button>
                   </div>
                 </div>
               </div>
@@ -75,10 +92,7 @@
                   <form id="ingredient-form">
                     <div class="form-group">
                       <label for="ingredient-id">Ingredient ID:</label>
-                      <span
-                        id="ingredient-id"
-                        name="ingredient-id"
-                        required>
+                      <span id="ingredient-id" name="ingredient-id" required>
                       </span>
                     </div>
 
@@ -194,6 +208,9 @@
 
                   <div class="footer-btn">
                     <button id="back-button" class="btn deactive">Back</button>
+                    <button id="clear-all-button" class="btn active btns">
+                      Clear All
+                    </button>
                     <button id="submit-button" class="btn active">
                       Add Cocktail
                     </button>
@@ -212,7 +229,7 @@
                         <p><span>0/10</span></p>
                       </div>
                     </div>
-                    <div class="ing-filter1" id=""ing-filter1>
+                    <div class="ing-filter" id="" ing-filter1>
                       <a href="#" class="btn active">All Ingredients</a>
                       <a href="#" class="btn deactive">Liquid</a>
                       <a href="#" class="btn deactive">Liquor</a>
@@ -223,8 +240,234 @@
                   <div class="fi-bottom cocktail-fi-bottom">
                     <div class="ing-box">
                       <div class="ing-grid">
-                        <div id="cocktail-ingredients-container"></div>
+                        <div id="cocktail-ingredients-container">
+                          <div class="ing-item" bis_skin_checked="1">
+                            <label class="btn-checkbox"
+                              ><input type="checkbox" class="checkbox" /><img
+                                src="img/ing2.gif"
+                                alt="Ingredient - Vodka"
+                              />
+                              <p>Vodka</p></label
+                            >
+                          </div>
+                        </div>
                       </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="select-pipeline">
+              <div class="select-pipeline-box">
+                <div class="sp-txt">
+                  <h2>Assign Pipeline For Selected Ingredients</h2>
+                </div>
+                <div class="sp-form">
+                  <form action="#">
+                    <div class="sp-form-grid">
+                      <div class="form-group">
+                        <label for="product-type">Product Type:</label>
+                        <select id="product-type" name="product-type">
+                          <option value="Pipe 1">Pipe 1</option>
+                          <option value="Pipe 2">Pipe 2</option>
+                          <option value="Pipe 3">Pipe 3</option>
+                          <option value="Pipe 4">Pipe 4</option>
+                          <option value="Pipe 5">Pipe 5</option>
+                          <option value="Pipe 6">Pipe 6</option>
+                          <option value="Pipe 7">Pipe 7</option>
+                          <option value="Pipe 8">Pipe 8</option>
+                          <option value="Pipe 9">Pipe 9</option>
+                          <option value="Pipe 10">Pipe 10</option>
+                          <option value="Pipe 11">Pipe 11</option>
+                          <option value="Pipe 12">Pipe 12</option>
+                        </select>
+                        <button id="reset-selected-pipe">
+                          <i class="fa-solid fa-rotate"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                  <div class="footer-btn">
+                    <button id="back-button" class="btn deactive">Back</button>
+                    <button id="clear-all-button" class="btn active btns">
+                      Clear All
+                    </button>
+                    <button id="submit-button" class="btn active">
+                      Serial Out
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="all-cocktail">
+              <div class="cocktail-box">
+                <div class="cocktail-list">
+                  <div class="cl-item" id="cotailInfo">
+                    <img src="img/product_1.png" alt="" />
+                    <p>Aperol Spritz</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="cocktail-details">
+              <div class="cd-box">
+                <div class="cd-left">
+                  <div class="cdl-img">
+                    <img src="img/product_1.png" alt="" />
+                  </div>
+                </div>
+                <div class="cd-right">
+                  <div class="cdr-box">
+                    <div class="cdr-txt">
+                      <h2>Aperol Spritz</h2>
+                      <p>
+                        Apiol Spritz Crocket is a refreshing, herb-infused
+                        beverage that combines the natural essence of Apiol, a
+                        traditional botanical extract, with a crisp,
+                        effervescent spritz.
+                      </p>
+                    </div>
+                    <div class="cdr-txt">
+                      <h2>Ingredients</h2>
+                      <div class="fi-bottom cocktail-fi-bottom">
+                        <div class="ing-box">
+                          <div class="ing-grid">
+                            <div id="cocktail-ingredients-container">
+                              <div class="ing-item" bis_skin_checked="1">
+                                <label class="btn-checkbox"
+                                  ><input
+                                    type="checkbox"
+                                    class="checkbox"
+                                  /><img
+                                    src="img/ing2.gif"
+                                    alt="Ingredient - Vodka"
+                                  />
+                                  <p>Vodka</p></label
+                                >
+                              </div>
+                              <div class="ing-item" bis_skin_checked="1">
+                                <label class="btn-checkbox"
+                                  ><input
+                                    type="checkbox"
+                                    class="checkbox"
+                                  /><img
+                                    src="img/ing2.gif"
+                                    alt="Ingredient - Vodka"
+                                  />
+                                  <p>Vodka</p></label
+                                >
+                              </div>
+                              <div class="ing-item" bis_skin_checked="1">
+                                <label class="btn-checkbox"
+                                  ><input
+                                    type="checkbox"
+                                    class="checkbox"
+                                  /><img
+                                    src="img/ing2.gif"
+                                    alt="Ingredient - Vodka"
+                                  />
+                                  <p>Vodka</p></label
+                                >
+                              </div>
+                              <div class="ing-item" bis_skin_checked="1">
+                                <label class="btn-checkbox"
+                                  ><input
+                                    type="checkbox"
+                                    class="checkbox"
+                                  /><img
+                                    src="img/ing2.gif"
+                                    alt="Ingredient - Vodka"
+                                  />
+                                  <p>Vodka</p></label
+                                >
+                              </div>
+                              <div class="ing-item" bis_skin_checked="1">
+                                <label class="btn-checkbox"
+                                  ><input
+                                    type="checkbox"
+                                    class="checkbox"
+                                  /><img
+                                    src="img/ing2.gif"
+                                    alt="Ingredient - Vodka"
+                                  />
+                                  <p>Vodka</p></label
+                                >
+                              </div>
+                              <div class="ing-item" bis_skin_checked="1">
+                                <label class="btn-checkbox"
+                                  ><input
+                                    type="checkbox"
+                                    class="checkbox"
+                                  /><img
+                                    src="img/ing2.gif"
+                                    alt="Ingredient - Vodka"
+                                  />
+                                  <p>Vodka</p></label
+                                >
+                              </div>
+                              <div class="ing-item" bis_skin_checked="1">
+                                <label class="btn-checkbox"
+                                  ><input
+                                    type="checkbox"
+                                    class="checkbox"
+                                  /><img
+                                    src="img/ing2.gif"
+                                    alt="Ingredient - Vodka"
+                                  />
+                                  <p>Vodka</p></label
+                                >
+                              </div>
+                              <div class="ing-item" bis_skin_checked="1">
+                                <label class="btn-checkbox"
+                                  ><input
+                                    type="checkbox"
+                                    class="checkbox"
+                                  /><img
+                                    src="img/ing2.gif"
+                                    alt="Ingredient - Vodka"
+                                  />
+                                  <p>Vodka</p></label
+                                >
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="cdr-txt">
+                      <h2>Select Your Type</h2>
+                      <form action="#" class="drink-type">
+                        <div class="drink-form-grid">
+                          <div class="form-group">
+                            <label class="radio-btn" for="soft_drink">
+                              <input
+                                type="radio"
+                                id="soft_drink"
+                                name="drink"
+                                value="soft_drink"
+                              /><span>Soft Drink</span>
+                            </label>
+                          </div>
+                          <div class="form-group">
+                            <label class="radio-btn" for="hard_drink">
+                              <input
+                                type="radio"
+                                id="hard_drink"
+                                name="drink"
+                                value="hard_drink"
+                              /><span>Hard Drink</span>
+                            </label>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="footer-btn">
+                      <button id="back-button" class="btn deactive">
+                        Back
+                      </button>
+                      <button id="startMaking" class="btn active btns">
+                        Start Making
+                      </button>
                     </div>
                   </div>
                 </div>
