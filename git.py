@@ -39,10 +39,29 @@ def git_commit(message):
 # Step 4: Push the changes to the remote repository
 def git_push():
     try:
+        # Check the current remote URL to ensure it's correct
+        result = subprocess.run(
+            ["git", "remote", "get-url", "origin"], capture_output=True, text=True
+        )
+        remote_url = result.stdout.strip()
+        print(f"Remote URL: {remote_url}")
+
+        # If using HTTPS, prompt for credentials (personal access token instead of password)
+        if remote_url.startswith("https://"):
+            print(
+                "Using HTTPS for pushing. If prompted, use your GitHub personal access token."
+            )
+
         subprocess.run(["git", "push"], check=True)
         print("Successfully pushed changes to remote repository.")
     except subprocess.CalledProcessError as e:
-        print(f"Error pushing changes: {e}")
+        # Handle permission denied error
+        if "permission denied" in e.stderr.lower():
+            print(
+                "Permission denied. Please check your access rights or authentication method."
+            )
+        else:
+            print(f"Error pushing changes: {e}")
 
 
 # Main function to execute all steps
