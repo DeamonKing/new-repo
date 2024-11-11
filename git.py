@@ -52,16 +52,22 @@ def git_push():
                 "Using HTTPS for pushing. If prompted, use your GitHub personal access token."
             )
 
-        subprocess.run(["git", "push"], check=True)
+        # Run the push command and capture both stdout and stderr
+        result = subprocess.run(
+            ["git", "push"], check=True, capture_output=True, text=True
+        )
+        print(result.stdout)  # Output of the git push command
         print("Successfully pushed changes to remote repository.")
     except subprocess.CalledProcessError as e:
+        # Capture stderr if present
+        error_message = e.stderr if e.stderr else e.output
+        print(f"Error pushing changes: {error_message}")
+
         # Handle permission denied error
-        if "permission denied" in e.stderr.lower():
+        if error_message and "permission denied" in error_message.lower():
             print(
                 "Permission denied. Please check your access rights or authentication method."
             )
-        else:
-            print(f"Error pushing changes: {e}")
 
 
 # Main function to execute all steps
