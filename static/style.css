@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+
 *,
 *::before,
 *::after {
@@ -13,7 +15,6 @@ html {
   overflow: hidden;
 }
 
-@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
 
 .nunito,
 h1,
@@ -619,7 +620,6 @@ button#reset-defaults:hover {
   height: 100%;
   padding: 25px;
   position: relative;
-  display: none;
 }
 .add-cocktail-box {
   width: 100%;
@@ -711,6 +711,27 @@ button#submit-button {
   font-size: 15px;
 }
 button#back-button {
+  background: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 15px;
+}
+button#back-button1 {
+  background: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 15px;
+}
+button#back-button2 {
+  background: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 15px;
+}
+button#back-button3 {
   background: #fff;
   border: none;
   padding: 10px 15px;
@@ -940,4 +961,67 @@ form.drink-type .drink-form-grid {
     width: 70px; /* Smaller angle slider */
     height: 70px; /* Smaller angle slider */
   }
+}
+
+.selected-ingredients-container {
+    /* Styles for the container */
+    padding: 15px;
+    border-radius: 8px; /* Corrected border radius (removed space) */
+}
+
+.ingredient-item {
+    /* Styles for each ingredient item */
+    margin-bottom: 20px; /* Increased space between items (adjust as needed) */
+    padding: 10px; /* Padding inside each item */
+    border: 1px solid #ccc; /* Border for each item */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #fff; /* Background color for each item */
+    display: flex; /* Flexbox for layout */
+    align-items: center; /* Center items vertically */
+    position: relative; /* Ensure the dropdown can be positioned relative to this item */
+}
+
+.ingredient-item span {
+    /* Styles for the ingredient label */
+    font-weight: bold; /* Bold text for ingredient name */
+    font-size: 18px; /* Increase font size (adjust as needed) */
+    color: #333; /* Optional: change text color for better visibility */
+    margin-right: 50px; /* Space between the label and dropdown */
+}
+
+select {
+    /* Styles for the dropdown */
+    padding: 5px; /* Padding inside the dropdown */
+    border: 2px solid #ccc; /* Thin border for the dropdown (adjust thickness as needed) */
+    border-radius: 10px; /* Rounded corners with a radius of 20px */
+    width: 500px; /* Set a specific width for the dropdown (adjust as needed) */
+    margin-right: 500px; /* Push the dropdown to the left with a margin of 100px */
+}
+
+/* CSS for Active Button */
+.active-class {
+  background-color: #3d3229; /* Background color for active state */
+  color: #ffffff; /* Text color for active state */
+  border: 2px solid #ffffff; /* Optional border for active state */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+}
+
+/* CSS for Deactive Button */
+.deactive-class {
+  background-color: rgba(61, 50, 41, 0.5); /* Background color for deactivated state */
+  color: #000000; /* Text color for deactivated state */
+  border: 2px solid rgba(61, 50, 41, 0.5); /* Optional border for deactivated state */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+}
+
+/* Hover Effects for Active Buttons */
+.active-class:hover {
+  background-color: #000; /* Darker background on hover */
+  color: #ffffff; /* Keep text color white on hover */
+}
+
+/* Hover Effects for Deactive Buttons */
+.deactive-class:hover {
+  background-color: rgba(255, 255, 255, 0.7); /* Lighter background on hover */
+  color: #000; /* Change text color to black on hover */
 }

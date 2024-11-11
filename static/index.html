@@ -65,10 +65,12 @@
                   >
                 </div>
                 <div class="ing-filter" id="ing-filterfind">
-                  <a href="#" class="btn active" data-type="all"
-                    >All Ingredients</a
-                  >
-                </div>
+                  <a href="#" class="btn active" data-type="all">All Ingredients</a>
+                  <a href="#" class="btn deactive" data-type="Liquid">Liquid</a>
+                  <a href="#" class="btn deactive" data-type="Liquor">Liquor</a>
+                  <a href="#" class="btn deactive" data-type="Garnish">Garnish</a>
+                  <a href="#" class="btn deactive" data-type="Other">Other</a>
+              </div>
               </div>
               <div class="fi-bottom">
                 <div class="ing-box">
@@ -207,7 +209,7 @@
                   </form>
 
                   <div class="footer-btn">
-                    <button id="back-button" class="btn deactive">Back</button>
+                    <button id="back-button2" class="btn deactive">Back</button>
                     <button id="clear-all-button" class="btn active btns">
                       Clear All
                     </button>
@@ -262,34 +264,13 @@
                 <div class="sp-txt">
                   <h2>Assign Pipeline For Selected Ingredients</h2>
                 </div>
+                <div class="selected-ingredients-container">
+                  <!-- This will be populated with selected ingredients and their pipe options -->
+                </div>
                 <div class="sp-form">
-                  <form action="#">
-                    <div class="sp-form-grid">
-                      <div class="form-group">
-                        <label for="product-type">Product Type:</label>
-                        <select id="product-type" name="product-type">
-                          <option value="Pipe 1">Pipe 1</option>
-                          <option value="Pipe 2">Pipe 2</option>
-                          <option value="Pipe 3">Pipe 3</option>
-                          <option value="Pipe 4">Pipe 4</option>
-                          <option value="Pipe 5">Pipe 5</option>
-                          <option value="Pipe 6">Pipe 6</option>
-                          <option value="Pipe 7">Pipe 7</option>
-                          <option value="Pipe 8">Pipe 8</option>
-                          <option value="Pipe 9">Pipe 9</option>
-                          <option value="Pipe 10">Pipe 10</option>
-                          <option value="Pipe 11">Pipe 11</option>
-                          <option value="Pipe 12">Pipe 12</option>
-                        </select>
-                        <button id="reset-selected-pipe">
-                          <i class="fa-solid fa-rotate"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </form>
                   <div class="footer-btn">
-                    <button id="back-button" class="btn deactive">Back</button>
-                    <button id="clear-all-button" class="btn active btns">
+                    <button id="back-button1" class="btn deactive">Back</button>
+                    <button id="clear-all-buttonpipe" class="btn active btns">
                       Clear All
                     </button>
                     <button id="submit-button" class="btn active">
@@ -462,7 +443,7 @@
                       </form>
                     </div>
                     <div class="footer-btn">
-                      <button id="back-button" class="btn deactive">
+                      <button id="back-button3" class="btn deactive">
                         Back
                       </button>
                       <button id="startMaking" class="btn active btns">
@@ -557,7 +538,7 @@
                 type="color"
                 id="btnHoverBackgroundColor"
                 name="btnHoverBackgroundColor"
-                value="#000"
+                value="#000000"
               />
             </div>
           </div>
@@ -612,5 +593,6 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"></script>
     <script src="script.js"></script>
+    <script src="colorPicker.js"></script>
   </body>
-</html>
+  </html>

@@ -121,7 +121,7 @@ def start_electron_app():
     time.sleep(2)
     os.environ["DISPLAY"] = ":0"
     if platform.system() == "Windows":
-        electron_executable = r"C:\Users\karan\AppData\Roaming\npm\node_modules\electron\dist\electron.exe"
+        electron_executable = r"C:\Users\LOQ\AppData\Roaming\npm\node_modules\electron\dist\electron.exe"
     elif platform.system() == "Linux":
         electron_executable = "/usr/local/bin/electron"
     else:
@@ -131,10 +131,6 @@ def start_electron_app():
     electron_process = subprocess.Popen(
         [
             electron_executable,
-            "--disable-gpu",
-            "--no-sandbox",
-            "--use-gl=swiftshader",
-            "--no-cache",
             os.path.join(web_dir, "main.js"),
         ]
     )

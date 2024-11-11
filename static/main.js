@@ -26,11 +26,6 @@ function createWindow() {
   // Load the HTML page served by your Python HTTP server
   mainWindow.loadURL('http://127.0.0.1:5000/home');  // Ensure this is the correct URL for the 'home' endpoint
 
-  // Set cache control headers for no cache in the Electron app itself
-  mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
-    details.requestHeaders['Cache-Control'] = 'no-store, no-cache, must-revalidate';
-    callback({ cancel: false, requestHeaders: details.requestHeaders });
-  });
 
   // Reload the window when it gets focus to ensure fresh content
   mainWindow.on('focus', () => {
