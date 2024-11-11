@@ -9,7 +9,25 @@ repo_dir = "C:/Users/karan/Downloads/NR_APP"
 os.chdir(repo_dir)
 
 
-# Step 1: Pull the latest changes from the remote repository
+# Step 1: Update the remote URL to the correct GitHub repository
+def update_remote_url():
+    try:
+        subprocess.run(
+            [
+                "git",
+                "remote",
+                "set-url",
+                "origin",
+                "https://github.com/DeamonKing/new-repo.git",
+            ],
+            check=True,
+        )
+        print("Successfully updated the remote URL.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error updating remote URL: {e}")
+
+
+# Step 2: Pull the latest changes from the remote repository
 def git_pull():
     try:
         subprocess.run(["git", "pull"], check=True)
@@ -18,7 +36,7 @@ def git_pull():
         print(f"Error pulling changes: {e}")
 
 
-# Step 2: Add changes to the staging area (you can specify files or use '.' for all)
+# Step 3: Add changes to the staging area (you can specify files or use '.' for all)
 def git_add():
     try:
         subprocess.run(["git", "add", "."], check=True)  # Adds all changes
@@ -27,7 +45,7 @@ def git_add():
         print(f"Error adding changes: {e}")
 
 
-# Step 3: Commit the changes with a commit message
+# Step 4: Commit the changes with a commit message
 def git_commit(message):
     try:
         subprocess.run(["git", "commit", "-m", message], check=True)
@@ -36,7 +54,7 @@ def git_commit(message):
         print(f"Error committing changes: {e}")
 
 
-# Step 4: Push the changes to the remote repository
+# Step 5: Push the changes to the remote repository
 def git_push():
     try:
         # Check the current remote URL to ensure it's correct
@@ -72,6 +90,7 @@ def git_push():
 
 # Main function to execute all steps
 def update_git_repo(commit_message):
+    update_remote_url()  # Ensure the correct remote URL is set
     git_pull()
     git_add()
     git_commit(commit_message)
