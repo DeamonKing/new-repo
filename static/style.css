@@ -546,10 +546,11 @@ label {
   width: 20px;
   height: 20px;
   background: linear-gradient(
-    var(--gradient-angle),
-    var(--gradient-color1),
-    var(--gradient-color2)
+    var(--gradient-angle, 130deg),
+    var(--gradient-color1, #e3d7c1),
+    var(--gradient-color2, #9eb395)
   );
+
   border-radius: 50%;
   transform: translate(-50%, -50%);
   cursor: pointer; /* Cursor change */
