@@ -15,7 +15,6 @@ html {
   overflow: hidden;
 }
 
-
 .nunito,
 h1,
 h2,
@@ -207,10 +206,10 @@ select {
 .ing-filter a {
   /* background: #ffffff30; */
   border-radius: 6px;
-  padding: 6px 10px;
+  padding: 10px 15px;
   text-align: center;
   /* color: #57492c; */
-  font-size: 12px;
+  font-size: 15px;
   transition: background 0.3s ease;
 }
 .ing-filter .active,
@@ -602,10 +601,11 @@ button#reset-defaults {
   background: var(--bg-color, #359267);
   box-shadow: 0px 0px 5px #00000025;
   color: #fff;
-  padding: 5px 15px;
+  padding: 10px 15px;
   border: none;
   border-radius: 5px;
   outline: none;
+  font-size: 15px;
 }
 button#reset-defaults:hover {
   background: #000;
@@ -633,7 +633,7 @@ button#reset-defaults:hover {
   position: relative;
   width: 50%;
   height: 100%;
-  background: var(--bg-color, #ffffff50);
+  background: #ffffff50;
   padding: 25px;
   border-radius: 15px;
 }
@@ -641,7 +641,7 @@ button#reset-defaults:hover {
   position: relative;
   width: 50%;
   height: 100%;
-  background: var(--bg-color, #ffffff50);
+  background: #ffffff50;
   padding: 25px;
   border-radius: 15px;
 }
@@ -792,7 +792,7 @@ button#back-button3 {
   position: relative;
 }
 .find-ing .footer-btn {
-  bottom: 16%;
+  bottom: 18.3%;
   background: #ffffff25;
   backdrop-filter: blur(5px);
   padding: 10px 25px 22px 25px;
@@ -924,6 +924,35 @@ form.drink-type .drink-form-grid {
   margin-right: 10px;
   box-shadow: none;
 }
+.form-group label {
+  width: 15%;
+}
+.form-group span,
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 35%;
+  margin: 0px;
+}
+form#cocktail-form {
+  width: 100%;
+}
+.form-group-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 70%;
+}
+.form-group-flex input#product-image {
+  padding: 0px;
+  padding-top: 6px;
+}
+form.drink-type input,
+form.drink-type span,
+form.drink-type textarea,
+form.drink-type select {
+  width: max-content;
+}
 
 @media (max-width: 768px) {
   .app-body {
@@ -964,38 +993,38 @@ form.drink-type .drink-form-grid {
 }
 
 .selected-ingredients-container {
-    /* Styles for the container */
-    padding: 15px;
-    border-radius: 8px; /* Corrected border radius (removed space) */
+  /* Styles for the container */
+  padding: 15px;
+  border-radius: 8px; /* Corrected border radius (removed space) */
 }
 
 .ingredient-item {
-    /* Styles for each ingredient item */
-    margin-bottom: 20px; /* Increased space between items (adjust as needed) */
-    padding: 10px; /* Padding inside each item */
-    border: 1px solid #ccc; /* Border for each item */
-    border-radius: 5px; /* Rounded corners */
-    background-color: #fff; /* Background color for each item */
-    display: flex; /* Flexbox for layout */
-    align-items: center; /* Center items vertically */
-    position: relative; /* Ensure the dropdown can be positioned relative to this item */
+  /* Styles for each ingredient item */
+  margin-bottom: 20px; /* Increased space between items (adjust as needed) */
+  padding: 10px; /* Padding inside each item */
+  border: 1px solid #ccc; /* Border for each item */
+  border-radius: 5px; /* Rounded corners */
+  background-color: #fff; /* Background color for each item */
+  display: flex; /* Flexbox for layout */
+  align-items: center; /* Center items vertically */
+  position: relative; /* Ensure the dropdown can be positioned relative to this item */
 }
 
 .ingredient-item span {
-    /* Styles for the ingredient label */
-    font-weight: bold; /* Bold text for ingredient name */
-    font-size: 18px; /* Increase font size (adjust as needed) */
-    color: #333; /* Optional: change text color for better visibility */
-    margin-right: 50px; /* Space between the label and dropdown */
+  /* Styles for the ingredient label */
+  font-weight: bold; /* Bold text for ingredient name */
+  font-size: 18px; /* Increase font size (adjust as needed) */
+  color: #333; /* Optional: change text color for better visibility */
+  margin-right: 50px; /* Space between the label and dropdown */
 }
 
 select {
-    /* Styles for the dropdown */
-    padding: 5px; /* Padding inside the dropdown */
-    border: 2px solid #ccc; /* Thin border for the dropdown (adjust thickness as needed) */
-    border-radius: 10px; /* Rounded corners with a radius of 20px */
-    width: 500px; /* Set a specific width for the dropdown (adjust as needed) */
-    margin-right: 500px; /* Push the dropdown to the left with a margin of 100px */
+  /* Styles for the dropdown */
+  padding: 5px; /* Padding inside the dropdown */
+  border: 2px solid #ccc; /* Thin border for the dropdown (adjust thickness as needed) */
+  border-radius: 10px; /* Rounded corners with a radius of 20px */
+  width: 500px; /* Set a specific width for the dropdown (adjust as needed) */
+  margin-right: 500px; /* Push the dropdown to the left with a margin of 100px */
 }
 
 /* CSS for Active Button */
@@ -1008,7 +1037,12 @@ select {
 
 /* CSS for Deactive Button */
 .deactive-class {
-  background-color: rgba(61, 50, 41, 0.5); /* Background color for deactivated state */
+  background-color: rgba(
+    61,
+    50,
+    41,
+    0.5
+  ); /* Background color for deactivated state */
   color: #000000; /* Text color for deactivated state */
   border: 2px solid rgba(61, 50, 41, 0.5); /* Optional border for deactivated state */
   transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */

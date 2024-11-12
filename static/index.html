@@ -65,12 +65,16 @@
                   >
                 </div>
                 <div class="ing-filter" id="ing-filterfind">
-                  <a href="#" class="btn active" data-type="all">All Ingredients</a>
+                  <a href="#" class="btn active" data-type="all"
+                    >All Ingredients</a
+                  >
                   <a href="#" class="btn deactive" data-type="Liquid">Liquid</a>
                   <a href="#" class="btn deactive" data-type="Liquor">Liquor</a>
-                  <a href="#" class="btn deactive" data-type="Garnish">Garnish</a>
+                  <a href="#" class="btn deactive" data-type="Garnish"
+                    >Garnish</a
+                  >
                   <a href="#" class="btn deactive" data-type="Other">Other</a>
-              </div>
+                </div>
               </div>
               <div class="fi-bottom">
                 <div class="ing-box">
@@ -166,14 +170,16 @@
 
                     <div class="form-group">
                       <label for="product-image">Product Image:</label>
-                      <input
-                        type="file"
-                        id="product-image"
-                        name="product-image"
-                        accept="image/*"
-                        onchange="displayImageName()"
-                      />
-                      <span id="image-name"></span>
+                      <div class="form-group-flex">
+                        <input
+                          type="file"
+                          id="product-image"
+                          name="product-image"
+                          accept="image/*"
+                          onchange="displayImageName()"
+                        />
+                        <span id="image-name"></span>
+                      </div>
                     </div>
 
                     <div class="form-group">
@@ -209,11 +215,21 @@
                   </form>
 
                   <div class="footer-btn">
-                    <button id="back-button2" class="btn deactive">Back</button>
+                    <button
+                      id="back-button2"
+                      class="btn deactive"
+                      onclick="showFindCocktail()"
+                    >
+                      Back
+                    </button>
                     <button id="clear-all-button" class="btn active btns">
                       Clear All
                     </button>
-                    <button id="submit-button" class="btn active">
+                    <button
+                      id="submit-button"
+                      class="btn active"
+                      onclick="showAddIngredients()"
+                    >
                       Add Cocktail
                     </button>
                   </div>
@@ -443,7 +459,11 @@
                       </form>
                     </div>
                     <div class="footer-btn">
-                      <button id="back-button3" class="btn deactive">
+                      <button
+                        id="back-button3"
+                        class="btn deactive"
+                        onclick="showFindCocktail()"
+                      >
                         Back
                       </button>
                       <button id="startMaking" class="btn active btns">
@@ -595,4 +615,4 @@
     <script src="script.js"></script>
     <script src="colorPicker.js"></script>
   </body>
-  </html>
+</html>
