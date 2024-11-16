@@ -211,7 +211,16 @@ function sendPipesToPython(assignedPipes) {
         },
         body: JSON.stringify(assignedPipes),
     })
-    .then(response => response.text())
+    .then(response => {
+        if (response.ok) {
+            return response.text(); // Get the response text if the response is OK
+        } else {
+            // If the response is not OK, throw an error with the status
+            return response.text().then(errorText => {
+                throw new Error(errorText); // Throw the error text from the server
+            });
+        }
+    })
     .then(data => {
         // Check for 'OK' response
         if (data.trim() === 'OK') {
@@ -222,8 +231,11 @@ function sendPipesToPython(assignedPipes) {
     })
     .catch(error => {
         console.error("Error sending data to Python:", error);
-        // Hide loading page in case of error
+        // Hide loading page
         hideLoadingPage();
+
+        // Display the error message on the loading page
+        displayErrorMessage(error.message);
     });
 }
 
@@ -237,6 +249,18 @@ function showLoadingPage() {
 function hideLoadingPage() {
     const loadingPage = document.getElementById("loading-page");
     loadingPage.style.display = "none"; // Hide loading page
+}
+
+// Function to display error message on the loading page
+function displayErrorMessage(message) {
+    const loadingPage = document.getElementById("loading-page");
+    loadingPage.innerHTML = `<h1>Error</h1><p>${message}</p><button id="cancel-button">Cancel</button>`;
+    loadingPage.style.display = "block"; // Ensure the loading page is visible
+
+    // Add event listener for cancel button
+    document.getElementById("cancel-button").addEventListener("click", () => {
+        hideLoadingPage(); // Hide loading page when canceled
+    });
 }
 
 // Add click event listeners to the buttons

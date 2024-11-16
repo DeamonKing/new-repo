@@ -1093,3 +1093,45 @@ select {
 .cdr-txt label:hover {
     color: #2a6b5d; /* Darker color on hover */
 }
+
+#loading-page {
+    display: none; /* Initially hidden */
+    position: fixed; /* Stay in place */
+    top: 0; /* Align to the top */
+    left: 0; /* Align to the left */
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    background: rgba(0, 0, 0, 0.8); /* Dark background with opacity */
+    color: white; /* White text color for all text */
+    text-align: center; /* Center text */
+    padding-top: 20%; /* Space from the top */
+    z-index: 1000; /* Sit on top */
+    font-family: 'Nunito', sans-serif; /* Font family for better typography */
+}
+
+#loading-page h1 {
+    font-size: 36px; /* Larger font size for the heading */
+    margin-bottom: 20px; /* Space below the heading */
+    color: white; /* Ensure heading text is white */
+}
+
+#loading-page p {
+    font-size: 18px; /* Font size for the message */
+    margin-bottom: 30px; /* Space below the message */
+    color: white; /* Ensure paragraph text is white */
+}
+
+#loading-page button {
+    background-color: #359267; /* Green background for the button */
+    color: white; /* White text color for the button */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 20px; /* Padding inside the button */
+    font-size: 16px; /* Font size for the button */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+#loading-page button:hover {
+    background-color: #2a6b5d; /* Darker green on hover */
+}
