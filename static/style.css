@@ -705,6 +705,12 @@ button#submit-button {
   border-radius: 5px;
   font-size: 15px;
 }
+button#serial-out-button {
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 15px;
+}
 .btns {
   border: none;
   padding: 10px 15px;
@@ -1059,4 +1065,31 @@ select {
 .deactive-class:hover {
   background-color: rgba(255, 255, 255, 0.7); /* Lighter background on hover */
   color: #000; /* Change text color to black on hover */
+}
+
+.cdr-txt {
+    margin-bottom: 20px; /* Space below the section */
+}
+
+.cdr-txt h2 {
+    font-size: 20px; /* Font size for the heading */
+    margin-bottom: 10px; /* Space below the heading */
+    color: #359267; /* Heading color */
+}
+
+.cdr-txt label {
+    display: flex; /* Flexbox for alignment */
+    align-items: center; /* Center vertically */
+    margin-right: 15px; /* Space between radio buttons */
+    cursor: pointer; /* Change cursor on hover */
+}
+
+.cdr-txt input[type="radio"] {
+    margin-right: 5px; /* Space between radio button and label text */
+    accent-color: #359267; /* Change radio button color */
+}
+
+/* Optional: Add hover effect on label */
+.cdr-txt label:hover {
+    color: #2a6b5d; /* Darker color on hover */
 }

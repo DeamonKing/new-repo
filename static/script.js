@@ -172,21 +172,72 @@ function showAddCocktail() {
 }
 
 
-document.getElementById("submit-button").addEventListener("click", () => {
+document.getElementById("serial-out-button").addEventListener("click", () => {
     const assignedPipes = {};
     const ingredientDivs = document.querySelectorAll(".selected-ingredients-container > div");
+    let errorMessages = []; // Array to collect error messages
+
     ingredientDivs.forEach(div => {
         const ingredientName = div.querySelector("span").textContent;
         const selectedPipe = div.querySelector("select").value;
-        if (selectedPipe) {
+
+        // Check if a pipe has been assigned
+        if (!selectedPipe) {
+            errorMessages.push(`Please assign a pipeline for ${ingredientName}.`);
+        } else {
             assignedPipes[ingredientName] = selectedPipe; // Store the assigned pipe for each ingredient
         }
     });
 
-    // Now you can process the assignedPipes object as needed
-    console.log(assignedPipes); // For demonstration, log the assigned pipes
-    // You can add further logic to handle the submission of this data
+    // Display error messages if any
+    if (errorMessages.length > 0) {
+        alert(errorMessages.join("\n")); // Display all error messages in an alert
+        return; // Prevent further processing if there are errors
+    }
+
+    // Show loading page
+    showLoadingPage();
+
+    // Send the assigned pipes to the Python server
+    sendPipesToPython(assignedPipes);
 });
+
+// Function to send assigned pipelines to the Python script
+function sendPipesToPython(assignedPipes) {
+    fetch("/send-pipes", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(assignedPipes),
+    })
+    .then(response => response.text())
+    .then(data => {
+        // Check for 'OK' response
+        if (data.trim() === 'OK') {
+            console.log("Received OK from Python. Continuing...");
+            // Hide loading page
+            hideLoadingPage();
+        }
+    })
+    .catch(error => {
+        console.error("Error sending data to Python:", error);
+        // Hide loading page in case of error
+        hideLoadingPage();
+    });
+}
+
+// Function to show the loading page
+function showLoadingPage() {
+    const loadingPage = document.getElementById("loading-page");
+    loadingPage.style.display = "block"; // Show loading page
+}
+
+// Function to hide the loading page
+function hideLoadingPage() {
+    const loadingPage = document.getElementById("loading-page");
+    loadingPage.style.display = "none"; // Hide loading page
+}
 
 // Add click event listeners to the buttons
 findCocktailBtn.addEventListener("click", function (event) {
@@ -466,37 +517,27 @@ function updateSelectedCount() {
         }
     });
 
-    selectedCountElement.textContent = `${selectedCount}/10`; // Update displayed count
-
-    // Disable checkboxes if the limit is reached
-    if (selectedCount >= 10) {
-        checkboxes.forEach((checkbox) => {
-            if (!checkbox.checked) {
-                checkbox.disabled = true; // Disable unchecked checkboxes
-            }
-        });
-    } else {
-        checkboxes.forEach((checkbox) => {
-            checkbox.disabled = false; // Enable all checkboxes if under limit
-        });
+    // Check if the selected count exceeds 10
+    if (selectedCount > 10) {
+        // Deselect the latest checked checkbox
+        const lastCheckedCheckbox = Array.from(checkboxes).reverse().find(checkbox => checkbox.checked);
+        if (lastCheckedCheckbox) {
+            lastCheckedCheckbox.checked = false; // Deselect the checkbox
+            selectedCount--; // Decrement the selected count since we deselected a checkbox
+            alert("You can only select up to 10 ingredients."); // Optional alert
+        }
     }
+
+    // Update displayed count
+    selectedCountElement.textContent = `${selectedCount}/10`; // Update displayed count
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Add event listener to checkboxes to update the count and enforce limit
-  document.querySelectorAll(".checkbox").forEach((checkbox) => {
-      checkbox.addEventListener("change", (event) => {
-          const checkedCount = document.querySelectorAll(".checkbox:checked").length;
-
-          if (checkedCount > 10) {
-              // Prevent the checkbox from being checked
-              event.target.checked = false; // Uncheck the checkbox that exceeded the limit
-              alert("You can only select up to 10 ingredients."); // Alert the user
-          } else {
-              updateSelectedCount(); // Update the count display if under limit
-          }
-      });
-  });
+// Add event listener to checkboxes to update the count and enforce limit
+document.querySelectorAll(".checkbox").forEach((checkbox) => {
+    checkbox.addEventListener("change", (event) => {
+        // Update the count and enforce the limit
+        updateSelectedCount();
+    });
 });
 
 // Initial call to set the count display
@@ -764,7 +805,6 @@ function displayImageName() {
   if (fileInput.files.length > 0) {
       const fileName = fileInput.files[0].name; // Get the name of the selected file
       // Display the file name in the span with a message
-      imageNameDisplay.textContent = `Selected file: ${fileName} (full path not accessible for security reasons)`; 
   } else {
       imageNameDisplay.textContent = ""; // Clear the display if no file is selected
   }
@@ -853,24 +893,27 @@ cocktailIngredientsContainer.innerHTML = "";
 // Fetch all ingredients data
 const ingredientsData = await fetchIngredientsData();
 
-// Loop through cocktail ingredient IDs and display them
-cocktail.PIng.forEach(ingredient => { 
-  const ingredientId = ingredient.ING_ID; 
-  const ingredientDetail = ingredientsData.find(ing => ing.ING_ID === ingredientId); 
-  if (ingredientDetail) { 
-      const ingredientItem = document.createElement("div"); 
-      ingredientItem.classList.add("ing-item"); 
-      ingredientItem.innerHTML = ` 
-          <label class="btn-checkbox"> 
-              <img src="img/ing2.gif" alt="Ingredient - ${ingredientDetail.ING_Name}" /> 
-              <p>${ingredientDetail.ING_Name}</p> 
-          </label> 
-      `; 
-      cocktailIngredientsContainer.appendChild(ingredientItem); 
-  } 
+cocktail.PIng.forEach(ingredient => {
+    const ingredientId = ingredient.ING_ID;
+    const ingredientDetail = ingredientsData.find(ing => ing.ING_ID === String(ingredientId));    
+    console.log("Ingredient ID:", ingredientId);
+    console.log("Ingredient Detail Found:", ingredientDetail);
+    if (ingredientDetail) { // Check if ingredientDetail is found
+        const ingredientItem = document.createElement("div");
+        ingredientItem.classList.add("ing-item");
+        ingredientItem.innerHTML = `
+            <label class="btn-checkbox">
+                <img src="img/ing2.gif" alt="Ingredient - ${ingredientDetail.ING_Name}" />
+                <p>${ingredientDetail.ING_Name}</p>
+            </label>
+        `;
+        cocktailIngredientsContainer.appendChild(ingredientItem);
+    } else {
+        console.warn(`Ingredient with ID ${ingredientId} not found in ingredients data.`);
+    }
 });
+
 howToMake.textContent = cocktail.PHtm; // Set the how to make instructions
-console.log("Ingredients Data:", ingredientsData);
 console.log("Cocktail Ingredients IDs:", cocktail.PIng);
 console.log("How to Make Instructions:", howToMake.innerHTML); // Log the instructions
 }

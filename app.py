@@ -5,11 +5,11 @@ import subprocess
 import threading
 import time
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+import serial  # Import the serial library
 
 # Define the base directory as the directory where this script is located
 base_dir = os.path.dirname(__file__)
 web_dir = os.path.join(base_dir, "static")  # Define `static` folder path
-
 
 class CustomHandler(SimpleHTTPRequestHandler):
     def translate_path(self, path):
@@ -69,6 +69,10 @@ class CustomHandler(SimpleHTTPRequestHandler):
 
         elif self.path == "/addIngredient":
             self.add_ingredient(post_data)
+            
+        elif self.path == "/send-pipes":
+            self.handle_send_pipes(post_data)
+            return
 
         else:
             self.send_response(404)
@@ -108,6 +112,49 @@ class CustomHandler(SimpleHTTPRequestHandler):
             self.send_response(500)  # Internal Server Error
             self.end_headers()
             self.wfile.write(f"Error saving ingredient: {str(e)}".encode())
+    
+    def handle_send_pipes(self, post_data):
+        # Parse the incoming data
+        assigned_pipes = json.loads(post_data)
+
+        # Send data to serial output and get the response
+        response = self.send_to_serial_output(assigned_pipes)
+
+        if response == "OK":
+            # Respond back to the client with 'OK'
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"OK")  # Send 'OK' response back to JavaScript
+        else:
+            # If there was an error, respond with the error message
+            self.send_response(500)  # Internal Server Error
+            self.end_headers()
+            self.wfile.write(response.encode())  # Send the error message back to JavaScript
+
+    def send_to_serial_output(self, assigned_pipes):
+        # Open the serial port (adjust the port and baudrate as necessary)
+        try:
+            with serial.Serial('/dev/ttyUSB0', 9600, timeout=1) as ser:  # Example for Linux
+                for ingredient, pipe in assigned_pipes.items():
+                    message = f"{ingredient}: {pipe}\n"
+                    ser.write(message.encode('utf-8'))  # Send the message to the serial port
+                    print(f"Sent to serial: {message.strip()}")  # Log the sent message
+
+                # Wait for an 'OK' response from the serial machine
+                while True:
+                    if ser.in_waiting > 0:
+                        response = ser.readline().decode('utf-8').strip()  # Read response from serial
+                        if response == 'OK':  # Check if the response is 'OK'
+                            print("Received OK from serial machine.")
+                            return "OK"  # Return OK to indicate success
+        except serial.SerialException as e:
+            error_message = f"Serial error: {str(e)}"
+            print(error_message)
+            return error_message  # Return the error message for the frontend
+        except Exception as e:
+            error_message = f"Error sending to serial output: {str(e)}"
+            print(error_message)
+            return error_message  # Return the error message for the frontend
 
 
 def start_http_server():
@@ -135,12 +182,18 @@ def start_electron_app():
         ]
     )
     electron_process.communicate()
+    
+def start_image_handler():
+    """Start the image handler script in a separate thread."""
+    subprocess.Popen(["python", os.path.join(base_dir, "image_handler.py")])
 
 
 if __name__ == "__main__":
     # Start the HTTP server in a separate thread
     http_thread = threading.Thread(target=start_http_server)
     http_thread.start()
+    
+    start_image_handler()
 
     # Start the Electron app after a slight delay to ensure the server is up
     start_electron_app()
