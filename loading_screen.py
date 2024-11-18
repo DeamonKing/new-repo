@@ -2,6 +2,9 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 import itertools
+import os
+import platform
+
 
 def create_loading_screen():
     root = tk.Tk()
@@ -15,7 +18,11 @@ def create_loading_screen():
 
     # Load the logo image without resizing
     try:
-        logo_image = Image.open("D:/new-repo/static/img/logo.png")
+        if platform.system() == "Linux":
+            logo_image = Image.open("home/jecon/new-repo/static/img/logo.png")
+        else:
+            logo_image = Image.open("D:home/jecon/new-repo/static/img/logo.png")
+        
         logo_photo = ImageTk.PhotoImage(logo_image)  # No resizing or scaling
     except Exception as e:
         print(f"Error loading logo: {e}")
