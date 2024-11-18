@@ -737,8 +737,24 @@ function showAssignPipeline(cocktail) {
       ingredientDiv.appendChild(ingredientLabel);
       ingredientDiv.appendChild(pipeSelect);
       selectedIngredientsContainer.appendChild(ingredientDiv);
-  });
 
+      // Add event listener to track selected pipelines
+      pipeSelect.addEventListener("change", (event) => {
+        const selectedPipe = event.target.value;
+                  // If a pipe is selected, add it to the selectedPipelines object
+                  if (selectedPipe) {
+                    selectedPipelines[ingredient] = selectedPipe;
+                } else {
+                    // If no pipe is selected, remove it from the selectedPipelines object
+                    delete selectedPipelines[ingredient];
+                }
+      
+                // Update dropdowns to disable already selected pipelines
+                updatePipelineDropdowns();
+            });
+        });
+      
+      
   // Update button states
   assignPipelineBtn.classList.add("active");
   assignPipelineBtn.classList.remove("deactive");
