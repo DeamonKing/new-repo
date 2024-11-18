@@ -471,101 +471,96 @@ function resetIngredientForm() {
 
 let ingredientsData = []; // Global variable to store ingredients data
 
-async function fetchIngredients(searchTerm = "") {
+let selectedIngredients = []; // Global array to keep track of selected ingredients
+
+async function fetchIngredients() {
   try {
-    const response = await fetch("db.json"); // Ensure this path is correct
-    const data = await response.json(); // Parse JSON data
-    ingredientsData = data[0].data; // Store the data globally
+      const response = await fetch("db.json");
+      const data = await response.json();
+      ingredientsData = data[0].data;
 
-    const container = document.getElementById("ingredients-container");
-    container.innerHTML = ""; // Clear existing ingredients
+      // Sort ingredients alphabetically by name
+      ingredientsData.sort((a, b) => a.ING_Name.localeCompare(b.ING_Name));
 
-    // Loop through each ingredient and create divs
-    data[0].data.forEach((ingredient) => {
-      const ingredientName = ingredient.ING_Name.toLowerCase(); // Convert to lower case for case-insensitive comparison
+      const container = document.getElementById("ingredients-container");
+      container.innerHTML = ""; // Clear existing ingredients
 
-      // Check if searchTerm is empty or if the ingredient name includes the search term
-      if (
-        searchTerm === "" ||
-        ingredientName.includes(searchTerm.toLowerCase())
-      ) {
-        const ingDiv = document.createElement("div");
-        ingDiv.classList.add("ing-item");
+      // Loop through each ingredient and create divs
+      ingredientsData.forEach((ingredient) => {
+          const ingDiv = document.createElement("div");
+          ingDiv.classList.add("ing-item");
 
-        const label = document.createElement("label");
-        label.classList.add("btn-checkbox");
+          const label = document.createElement("label");
+          label.classList.add("btn-checkbox");
 
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.classList.add("checkbox");
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.classList.add("checkbox");
 
-        // Add event listener to update selected count when checkbox changes
-        checkbox.addEventListener("change", updateSelectedCount);
+          const imgSrc = ingredient.ING_IMG && ingredient.ING_IMG.trim() !== "" ? ingredient.ING_IMG : "img/ing2.gif";
+          const img = document.createElement("img");
+          img.src = imgSrc;
+          img.alt = `Ingredient - ${ingredient.ING_Name}`;
 
-        // Create the ingredient image
-        const imgSrc =
-          ingredient.ING_IMG && ingredient.ING_IMG.trim() !== ""
-            ? ingredient.ING_IMG
-            : "img/ing2.gif";
-        const img = document.createElement("img");
-        img.src = imgSrc;
-        img.alt = `Ingredient - ${ingredient.ING_Name}`;
+          const para = document.createElement("p");
+          para.textContent = ingredient.ING_Name;
 
-        const para = document.createElement("p");
-        para.textContent = ingredient.ING_Name;
+          label.appendChild(checkbox);
+          label.appendChild(img);
+          label.appendChild(para);
+          ingDiv.appendChild(label);
+          container.appendChild(ingDiv);
+      });
 
-        label.appendChild(checkbox);
-        label.appendChild(img);
-        label.appendChild(para);
-        ingDiv.appendChild(label);
-        container.appendChild(ingDiv);
-      }
-    });
-
-    // Call updateSelectedCount to initialize the count
-    updateSelectedCount();
+      updateSelectedCount(); // Update the selected count
   } catch (error) {
-    console.error(`Error fetching ingredients: ${error.message}`); // Log error to server
+      console.error(`Error fetching ingredients: ${error.message}`);
   }
+}
+
+
+// Function to handle checkbox changes
+function handleCheckboxChange(event) {
+    const ingredientName = event.target.closest(".ing-item").querySelector("p").textContent;
+
+    if (event.target.checked) {
+        // If the checkbox is checked, check if we can add it
+        if (selectedIngredients.length < 10) {
+            selectedIngredients.push(ingredientName);
+            console.log(selectedIngredients);
+        } else {
+            event.target.checked = false; // Uncheck the checkbox
+            console.log(selectedIngredients);
+            alert("You can only select up to 10 ingredients."); // Alert the user
+        }
+    } else {
+        // If the checkbox is unchecked, remove it from the selectedIngredients array
+        selectedIngredients = selectedIngredients.filter(name => name !== ingredientName);
+    }
+
+    // Update the count display based on selectedIngredients
+    updateSelectedCount();
 }
 
 // Function to update the selected count
 function updateSelectedCount() {
-    const checkboxes = document.querySelectorAll(".checkbox");
+    const selectedCount = selectedIngredients.length; // Get count from selectedIngredients array
     const selectedCountElement = document.querySelector(".fi-top p span");
-    let selectedCount = 0;
-
-    checkboxes.forEach((checkbox) => {
-        if (checkbox.checked) {
-            selectedCount++;
-        }
-    });
-
-    // Check if the selected count exceeds 10
-    if (selectedCount > 10) {
-        // Deselect the latest checked checkbox
-        const lastCheckedCheckbox = Array.from(checkboxes).reverse().find(checkbox => checkbox.checked);
-        if (lastCheckedCheckbox) {
-            lastCheckedCheckbox.checked = false; // Deselect the checkbox
-            selectedCount--; // Decrement the selected count since we deselected a checkbox
-            alert("You can only select up to 10 ingredients."); // Optional alert
-        }
-    }
 
     // Update displayed count
-    selectedCountElement.textContent = `${selectedCount}/10`; // Update displayed count
+    selectedCountElement.textContent = `${Math.min(selectedCount, 10)}/10`; // Display count, max 10
 }
 
-// Add event listener to checkboxes to update the count and enforce limit
-document.querySelectorAll(".checkbox").forEach((checkbox) => {
-    checkbox.addEventListener("change", (event) => {
-        // Update the count and enforce the limit
-        updateSelectedCount();
+// Add event delegation to the ingredients container
+document.addEventListener("DOMContentLoaded", () => {
+    const ingredientsContainer = document.querySelector('.ing-grid');
+
+    ingredientsContainer.addEventListener('change', (event) => {
+        if (event.target.matches('.checkbox')) {
+            handleCheckboxChange(event);
+        }
     });
 });
-
-// Initial call to set the count display
-updateSelectedCount();
 
 document.addEventListener("DOMContentLoaded", () => {
   // Function to handle input changes in the search box
@@ -582,6 +577,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("ingredient-search")
     .addEventListener("input", handleSearchInput);
 });
+
 
 async function fetchIngredientsTypes() {
   try {
@@ -619,26 +615,41 @@ async function fetchIngredientsTypes() {
 // Function to filter ingredients by type
 function filterIngredientsByType(type) {
   const checkboxes = document.querySelectorAll(".checkbox");
-  const selectedCountElement = document.querySelector(".fi-top p span");
-  let selectedCount = 0;
 
+  // Loop through all checkboxes (ingredients)
   checkboxes.forEach((checkbox, index) => {
       const ingredientItem = checkbox.closest(".ing-item");
-      const ingredientType = ingredientsData[index].ING_Type; // Assuming you have a global ingredientsData array
 
-      // Show all ingredients if 'all' is selected, otherwise filter by type
-      if (type === "all" || ingredientType.toLowerCase() === type.toLowerCase()) {
-          ingredientItem.style.display = "flex"; // Show the ingredient item
+      // Check if the index is within the bounds of ingredientsData
+      if (index < ingredientsData.length) {
+          const ingredientType = ingredientsData[index].ING_Type; // Get the ingredient type
+
+          // Show all ingredients if 'all' is selected, otherwise filter by type
+          if (type === "all" || ingredientType.toLowerCase() === type.toLowerCase()) {
+              ingredientItem.style.display = "flex"; // Show the ingredient item
+          } else {
+              ingredientItem.style.display = "none"; // Hide the ingredient item
+          }
       } else {
+          // If the index is out of bounds, simply hide the item
           ingredientItem.style.display = "none"; // Hide the ingredient item
-      }
-
-      if (checkbox.checked) {
-          selectedCount++;
       }
   });
 
-  selectedCountElement.textContent = `${selectedCount}/10`; // Update displayed count
+  // Update button states to reflect the active filter
+  document.querySelectorAll(".ing-filter a").forEach((btn) => {
+      btn.classList.remove("active"); // Remove active class from all buttons
+      btn.classList.add("deactive"); // Add deactive class to all buttons
+      updateButtonStyles()
+  });
+
+  // Set the active class on the selected type button
+  const activeButton = document.querySelector(`.ing-filter a[data-type="${type}"]`);
+  if (activeButton) {
+      activeButton.classList.add("active"); // Add active class to the clicked button
+      activeButton.classList.remove("deactive"); // Remove deactive class from the clicked button
+      updateButtonStyles()
+    }
 }
 
 // Add event listeners to filter buttons
@@ -646,6 +657,8 @@ document.querySelectorAll(".ing-filter a").forEach((button) => {
   button.addEventListener("click", (event) => {
       event.preventDefault(); // Prevent default anchor behavior
       const selectedType = button.getAttribute("data-type");
+      // Call filter function with the selected type
+      filterIngredientsByType(selectedType);
 
       // Remove active class from all buttons and add it to the clicked button
       document
@@ -653,8 +666,7 @@ document.querySelectorAll(".ing-filter a").forEach((button) => {
           .forEach((btn) => btn.classList.remove("active"));
       button.classList.add("active");
 
-      // Call filter function with the selected type
-      filterIngredientsByType(selectedType);
+      
   });
 });
 
@@ -681,7 +693,7 @@ document.getElementById("back-button1").addEventListener("click", (event) => {
 
 let selectedPipelines = {}; // Global object to keep track of selected pipelines
 
-function showAssignPipeline() {
+function showAssignPipeline(cocktail) {
   findIngSection.style.display = "none";
   addIngSection.style.display = "none";
   addCocktailSection.style.display = "none";
@@ -689,21 +701,11 @@ function showAssignPipeline() {
   cocktailDetailsSection.style.display = "none";
   selectPipelineSection.style.display = "block"; // Show Assign Pipeline section
 
-  // Get the selected ingredients container
   const selectedIngredientsContainer = document.querySelector(".selected-ingredients-container");
+  selectedIngredientsContainer.innerHTML = ""; // Clear previous entries
 
-  // Clear previous entries
-  selectedIngredientsContainer.innerHTML = "";
-
-  // Get selected ingredients
-  const selectedIngredients = Array.from(document.querySelectorAll(".checkbox:checked"))
-      .map(checkbox => {
-          const ingredientItem = checkbox.closest(".ing-item");
-          return ingredientItem.querySelector("p").textContent; // Get the ingredient name
-      });
-
-  // Populate the selected ingredients container
-  selectedIngredients.forEach(ingredient => {
+// Populate the selected ingredients container with the cocktail ingredients
+  cocktail.PIng.forEach(ingredient => {
       const ingredientDiv = document.createElement("div");
       ingredientDiv.style.display = "flex"; // Flexbox for layout
       ingredientDiv.style.alignItems = "center"; // Center items vertically
@@ -711,7 +713,7 @@ function showAssignPipeline() {
 
       // Create a label for the ingredient
       const ingredientLabel = document.createElement("span");
-      ingredientLabel.textContent = ingredient; // Display the ingredient name
+      ingredientLabel.textContent = ingredient.ING_Name; // Display the ingredient name
 
       // Create a dropdown for assigning a pipe
       const pipeSelect = document.createElement("select");
@@ -735,24 +737,9 @@ function showAssignPipeline() {
       ingredientDiv.appendChild(ingredientLabel);
       ingredientDiv.appendChild(pipeSelect);
       selectedIngredientsContainer.appendChild(ingredientDiv);
-
-      // Add event listener to track selected pipelines
-      pipeSelect.addEventListener("change", (event) => {
-          const selectedPipe = event.target.value;
-
-          // If a pipe is selected, add it to the selectedPipelines object
-          if (selectedPipe) {
-              selectedPipelines[ingredient] = selectedPipe;
-          } else {
-              // If no pipe is selected, remove it from the selectedPipelines object
-              delete selectedPipelines[ingredient];
-          }
-
-          // Update dropdowns to disable already selected pipelines
-          updatePipelineDropdowns();
-      });
   });
 
+  // Update button states
   assignPipelineBtn.classList.add("active");
   assignPipelineBtn.classList.remove("deactive");
   findCocktailBtn.classList.remove("active");
@@ -788,18 +775,15 @@ dropdowns.forEach(dropdown => {
 }
 
 
-// Assuming this is within the DOMContentLoaded event listener
 document.getElementById("clear-all-button").addEventListener("click", () => {
-  // Select all checkboxes in the find cocktail section
-  const checkboxes = document.querySelectorAll(".find-ing .checkbox");
-
-  // Loop through each checkbox and uncheck it
+  // Clear all selected checkboxes
+  const checkboxes = document.querySelectorAll(".checkbox");
   checkboxes.forEach(checkbox => {
-      checkbox.checked = false; // Uncheck the checkbox
+      checkbox.checked = false; // Uncheck each checkbox
   });
 
-  // Update the selected count display
-  updateSelectedCount(); // Call the function to update the displayed count
+  selectedIngredients = []; // Clear the global selected ingredients array
+  updateSelectedCount(); // Update the displayed count
 });
 
 // Add event listener for the "Clear All" button in the Assign Pipeline section
@@ -860,86 +844,75 @@ updateButtonStyles();
 await fetchCocktails();
 }
 
-// Function to fetch and display cocktails from products.json
 async function fetchCocktails() {
-try {
-    const response = await fetch("products.json"); // Fetch the products data
-    const cocktails = await response.json(); // Parse the JSON data
+  try {
+      const response = await fetch("products.json");
+      const cocktails = await response.json();
+      
+      const cocktailListContainer = document.querySelector(".cocktail-list");
+      cocktailListContainer.innerHTML = ""; // Clear existing content
 
-    const cocktailListContainer = document.querySelector(".cocktail-list"); // Select the cocktail list container
-    cocktailListContainer.innerHTML = ""; // Clear existing content
+      // Loop through each cocktail and create HTML elements
+      cocktails.forEach(cocktail => {
+          const cocktailItem = document.createElement("div");
+          cocktailItem.classList.add("cl-item");
+          cocktailItem.id = `cocktail-${cocktail.PID}`; // Set the ID for each cocktail item
 
-    // Loop through each cocktail and create HTML elements
-    cocktails.forEach(cocktail => {
-        const cocktailItem = document.createElement("div");
-        cocktailItem.classList.add("cl-item");
-        cocktailItem.id = `cocktail-${cocktail.PID}`; // Set the ID for each cocktail item
+          cocktailItem.innerHTML = `
+              <img src="${cocktail.PImage}" alt="${cocktail.PName}" />
+              <p>${cocktail.PName}</p>
+          `;
 
-        cocktailItem.innerHTML = `
-            <img src="${cocktail.PImage}" alt="${cocktail.PName}" />
-            <p>${cocktail.PName}</p>
-        `;
+          // Append the cocktail item to the cocktail list container
+          cocktailListContainer.appendChild(cocktailItem);
 
-        // Append the cocktail item to the cocktail list container
-        cocktailListContainer.appendChild(cocktailItem);
-
-        // Add click event to show cocktail details
-        cocktailItem.addEventListener("click", () => {
-            wshowCocktailDetails(cocktail);
-        });
-    });
-} catch (error) {
-    console.error("Error fetching cocktails:", error); // Log any errors
+          // Add click event to show cocktail details
+          cocktailItem.addEventListener("click", () => {
+              showCocktailDetails(cocktail); // Show details of the clicked cocktail
+          });
+      });
+  } catch (error) {
+      console.error("Error fetching cocktails:", error);
+  }
 }
-}
 
-async function wshowCocktailDetails(cocktail) {
-findIngSection.style.display = "none";
-addIngSection.style.display = "none";
-addCocktailSection.style.display = "none";
-allCocktailSection.style.display = "none";
-cocktailDetailsSection.style.display = "block"; // Show Cocktail Details section
-selectPipelineSection.style.display = "none";
+async function showCocktailDetails(cocktail) {
+  findIngSection.style.display = "none";
+  addIngSection.style.display = "none";
+  addCocktailSection.style.display = "none";
+  allCocktailSection.style.display = "none";
+  cocktailDetailsSection.style.display = "block"; // Show Cocktail Details section
 
-// Update the cocktail image and name
-const cocktailImage = document.getElementById("cocktail-image");
-const cocktailName = document.getElementById("cocktail-name");
-const cocktailDescription = document.getElementById("cocktail-description");
-const cocktailIngredientsContainer = document.getElementById("cocktail-ingredients-container");
-const howToMake = document.getElementById("htm");
+  // Update the cocktail image and name
+  const cocktailImage = document.getElementById("cocktail-image");
+  const cocktailName = document.getElementById("cocktail-name");
+  const cocktailDescription = document.getElementById("cocktail-description");
+  const cocktailIngredientsContainer = document.getElementById("cocktail-ingredients-container");
 
-cocktailImage.src = cocktail.PImage; // Set the image source
-cocktailName.textContent = cocktail.PName; // Set the cocktail name
-cocktailDescription.textContent = cocktail.PDesc; // Set the description
-howToMake.innerHTML = cocktail.PHtm; // Use innerHTML if PHtm contains HTML// Clear previous ingredients
-cocktailIngredientsContainer.innerHTML = "";
+  cocktailImage.src = cocktail.PImage; // Set the image source
+  cocktailName.textContent = cocktail.PName; // Set the cocktail name
+  cocktailDescription.textContent = cocktail.PDesc; // Set the description
 
-// Fetch all ingredients data
-const ingredientsData = await fetchIngredientsData();
+  // Clear previous ingredients
+  cocktailIngredientsContainer.innerHTML = "";
 
-cocktail.PIng.forEach(ingredient => {
-    const ingredientId = ingredient.ING_ID;
-    const ingredientDetail = ingredientsData.find(ing => ing.ING_ID === String(ingredientId));    
-    console.log("Ingredient ID:", ingredientId);
-    console.log("Ingredient Detail Found:", ingredientDetail);
-    if (ingredientDetail) { // Check if ingredientDetail is found
-        const ingredientItem = document.createElement("div");
-        ingredientItem.classList.add("ing-item");
-        ingredientItem.innerHTML = `
-            <label class="btn-checkbox">
-                <img src="img/ing2.gif" alt="Ingredient - ${ingredientDetail.ING_Name}" />
-                <p>${ingredientDetail.ING_Name}</p>
-            </label>
-        `;
-        cocktailIngredientsContainer.appendChild(ingredientItem);
-    } else {
-        console.warn(`Ingredient with ID ${ingredientId} not found in ingredients data.`);
-    }
-});
+  // Populate the ingredients
+  cocktail.PIng.forEach(ingredient => {
+      const ingredientItem = document.createElement("div");
+      ingredientItem.classList.add("ing-item");
+      ingredientItem.innerHTML = `
+          <label class="btn-checkbox">
+              <img src="img/ing2.gif" alt="Ingredient - ${ingredient.ING_Name}" />
+              <p>${ingredient.ING_Name}</p>
+          </label>
+      `;
+      cocktailIngredientsContainer.appendChild(ingredientItem);
+  });
 
-howToMake.textContent = cocktail.PHtm; // Set the how to make instructions
-console.log("Cocktail Ingredients IDs:", cocktail.PIng);
-console.log("How to Make Instructions:", howToMake.innerHTML); // Log the instructions
+  // Add event listener for the Start Making button
+  document.getElementById("startMaking").onclick = () => {
+      showAssignPipeline(cocktail); // Pass the cocktail to the Assign Pipeline section
+  };
 }
 
 // Function to fetch all ingredients from db.json
@@ -948,3 +921,4 @@ const response = await fetch('db.json');
 const data = await response.json();
 return data[0].data; // Access the 'data' array within the first object
 }
+

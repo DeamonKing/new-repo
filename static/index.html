@@ -85,8 +85,8 @@
                     <button id="clear-all-button" class="btn active btns">
                       Clear All
                     </button>
-                    <button id="assignPipeline" class="btn active btns">
-                      Assign Pipeline
+                    <button id="showProducts" class="btn active btns">
+                      Show Products
                     </button>
                   </div>
                 </div>
@@ -259,14 +259,15 @@
                     <div class="ing-box">
                       <div class="ing-grid">
                         <div id="cocktail-ingredients-container1">
-                          <div class="ing-item" bis_skin_checked="1">
+                          <div class="ing-item">
                             <label class="btn-checkbox"
-                              ><input type="checkbox" class="checkbox" /><img
+                              ><input type="checkbox" class="checkbox" />
+                              <img
                                 src="img/ing2.gif"
                                 alt="Ingredient - Vodka"
                               />
-                              <p>Vodka</p></label
-                            >
+                              <p>Vodka</p>
+                              </label>
                           </div>
                         </div>
                       </div>
@@ -300,6 +301,21 @@
                 </div>
                 </div>
               </div>
+              <div class="select-pipeline">
+                <div class="selected-ingredients-container">
+                  <!-- This will be populated with selected ingredients and their pipe options -->
+              </div>
+              <div class="sp-form">
+                  <div class="footer-btn">
+                      <button id="back-button1" class="btn deactive">Back</button>
+                      <button id="clear-all-buttonpipe" class="btn active btns">Clear All</button>
+                      <button id="assignPipeline" class="btn active">Select Product</button>
+                  </div>
+                  <div id="cocktail-ingredients-container2">
+                      <!-- Filtered products will be displayed here -->
+                  </div>
+              </div>
+          </div>
             </div>
             <div class="all-cocktail">
               <div class="cocktail-box">
