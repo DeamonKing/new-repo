@@ -1135,3 +1135,7 @@ select {
 #loading-page button:hover {
     background-color: #2a6b5d; /* Darker green on hover */
 }
+
+#product-list-container {
+    display: block; /* Ensure it is visible */
+}

@@ -289,10 +289,6 @@ cotailInfoBtn.addEventListener("click", function (event) {
   showCocktailDetails(); // Show Cocktail Details section
 });
 
-assignPipelineBtn.addEventListener("click", function (event) {
-  event.preventDefault();
-  showAssignPipeline();
-});
 
 document
   .getElementById("add-new-btn")
@@ -300,7 +296,6 @@ document
     event.preventDefault();
     showAddIngredients();
   });
-
 
 
 document
@@ -470,52 +465,73 @@ function resetIngredientForm() {
 });
 
 let ingredientsData = []; // Global variable to store ingredients data
-
 let selectedIngredients = []; // Global array to keep track of selected ingredients
 
-async function fetchIngredients() {
-  try {
-      const response = await fetch("db.json");
-      const data = await response.json();
-      ingredientsData = data[0].data;
+async function fetchIngredients(searchTerm = "") {
+    try {
+        const response = await fetch("db.json");
+        const data = await response.json();
+        ingredientsData = data[0].data;
 
-      // Sort ingredients alphabetically by name
-      ingredientsData.sort((a, b) => a.ING_Name.localeCompare(b.ING_Name));
+        // Sort ingredients alphabetically by name
+        ingredientsData.sort((a, b) => a.ING_Name.localeCompare(b.ING_Name));
 
-      const container = document.getElementById("ingredients-container");
-      container.innerHTML = ""; // Clear existing ingredients
+        const container = document.getElementById("ingredients-container");
+        container.innerHTML = ""; // Clear existing ingredients
 
-      // Loop through each ingredient and create divs
-      ingredientsData.forEach((ingredient) => {
-          const ingDiv = document.createElement("div");
-          ingDiv.classList.add("ing-item");
+        // Loop through each ingredient and create divs
+        ingredientsData.forEach((ingredient) => {
+            const ingredientName = ingredient.ING_Name.toLowerCase();
 
-          const label = document.createElement("label");
-          label.classList.add("btn-checkbox");
+            // Check if searchTerm is empty or if the ingredient name includes the search term
+            if (searchTerm === "" || ingredientName.includes(searchTerm.toLowerCase())) {
+                const ingDiv = document.createElement("div");
+                ingDiv.classList.add("ing-item");
 
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.classList.add("checkbox");
+                const label = document.createElement("label");
+                label.classList.add("btn-checkbox");
 
-          const imgSrc = ingredient.ING_IMG && ingredient.ING_IMG.trim() !== "" ? ingredient.ING_IMG : "img/ing2.gif";
-          const img = document.createElement("img");
-          img.src = imgSrc;
-          img.alt = `Ingredient - ${ingredient.ING_Name}`;
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.classList.add("checkbox");
 
-          const para = document.createElement("p");
-          para.textContent = ingredient.ING_Name;
+                // Check if this ingredient was previously selected
+                if (selectedIngredients.includes(ingredient.ING_Name)) {
+                    checkbox.checked = true; // Keep it checked
+                }
 
-          label.appendChild(checkbox);
-          label.appendChild(img);
-          label.appendChild(para);
-          ingDiv.appendChild(label);
-          container.appendChild(ingDiv);
-      });
+                // Add event listener to handle checkbox changes
+                checkbox.addEventListener("change", (event) => {
+                    const ingredientName = ingredient.ING_Name;
+                    if (event.target.checked) {
+                        // If checked, add to selectedIngredients
+                    } else {
+                        // If unchecked, remove from selectedIngredients
+                        selectedIngredients = selectedIngredients.filter(name => name !== ingredientName);
+                    }
+                    updateSelectedCount(); // Update the selected count
+                });
 
-      updateSelectedCount(); // Update the selected count
-  } catch (error) {
-      console.error(`Error fetching ingredients: ${error.message}`);
-  }
+                const imgSrc = ingredient.ING_IMG && ingredient.ING_IMG.trim() !== "" ? ingredient.ING_IMG : "img/ing2.gif";
+                const img = document.createElement("img");
+                img.src = imgSrc;
+                img.alt = `Ingredient - ${ingredient.ING_Name}`;
+
+                const para = document.createElement("p");
+                para.textContent = ingredient.ING_Name;
+
+                label.appendChild(checkbox);
+                label.appendChild(img);
+                label.appendChild(para);
+                ingDiv.appendChild(label);
+                container.appendChild(ingDiv);
+            }
+        });
+
+        updateSelectedCount(); // Update the selected count
+    } catch (error) {
+        console.error(`Error fetching ingredients: ${error.message}`);
+    }
 }
 
 
@@ -687,7 +703,7 @@ console.log("Cocktail Details section displayed");
 document.getElementById("back-button1").addEventListener("click", (event) => {
   event.preventDefault(); // Prevent default button behavior
   console.log("Back button 1 clicked");
-  showFindCocktail(); // Call the function to show the Find Cocktail section
+  showAllCocktails(); // Call the function to show the Find Cocktail section
   console.log("Find Cocktail section displayed");
 });
 
@@ -790,7 +806,6 @@ dropdowns.forEach(dropdown => {
 });
 }
 
-
 document.getElementById("clear-all-button").addEventListener("click", () => {
   // Clear all selected checkboxes
   const checkboxes = document.querySelectorAll(".checkbox");
@@ -806,15 +821,11 @@ document.getElementById("clear-all-button").addEventListener("click", () => {
 document.getElementById("clear-all-buttonpipe").addEventListener("click", () => {
   // Select all dropdowns in the selected ingredients container
   const dropdowns = document.querySelectorAll(".selected-ingredients-container select");
-
-  // Loop through each dropdown and reset its value
   dropdowns.forEach(dropdown => {
       dropdown.value = ""; // Reset the dropdown to the default option
   });
-
   // Clear the selected pipelines object
   selectedPipelines = {}; // Reset the selected pipelines tracking
-
   // Optionally, you can also update the dropdowns to reflect the cleared state
   updatePipelineDropdowns(); // Call the function to update dropdowns
 });
@@ -884,7 +895,7 @@ async function fetchCocktails() {
 
           // Add click event to show cocktail details
           cocktailItem.addEventListener("click", () => {
-              showCocktailDetails(cocktail); // Show details of the clicked cocktail
+              wshowCocktailDetails(cocktail); // Show details of the clicked cocktail
           });
       });
   } catch (error) {
@@ -892,7 +903,7 @@ async function fetchCocktails() {
   }
 }
 
-async function showCocktailDetails(cocktail) {
+async function wshowCocktailDetails(cocktail) {
   findIngSection.style.display = "none";
   addIngSection.style.display = "none";
   addCocktailSection.style.display = "none";
@@ -926,7 +937,7 @@ async function showCocktailDetails(cocktail) {
   });
 
   // Add event listener for the Start Making button
-  document.getElementById("startMaking").onclick = () => {
+  document.getElementById("assignPipeline").onclick = () => {
       showAssignPipeline(cocktail); // Pass the cocktail to the Assign Pipeline section
   };
 }
