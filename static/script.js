@@ -16,7 +16,11 @@ document.addEventListener("DOMContentLoaded", () => {
           // Call filter function with the selected type
           filterIngredientsByType(selectedType);
       });
-  });
+  // Add click event listener for the "Show Products" button
+  document.getElementById("showProducts").addEventListener("click", () => {
+    showAllCocktails(selectedIngredients);
+});
+});
 
   // Check which menu should be active
   if (activeMenu === "addIngredients") {
@@ -845,62 +849,80 @@ function displayImageName() {
   }
 }
 
-// Function to show the "All Cocktails" section
-async function showAllCocktails() {
-findIngSection.style.display = "none";
-addIngSection.style.display = "none";
-addCocktailSection.style.display = "none";
-allCocktailSection.style.display = "block"; // Show All Cocktails section
-cocktailDetailsSection.style.display = "none";
-selectPipelineSection.style.display = "none";
-allCocktailsBtn.classList.add("active");
-allCocktailsBtn.classList.remove("deactive");
-findCocktailBtn.classList.remove("active");
-findCocktailBtn.classList.add("deactive");
-addIngredientsBtn.classList.remove("active");
-addIngredientsBtn.classList.add("deactive");
-addCocktailBtn.classList.remove("active");
-addCocktailBtn.classList.add("deactive");
-assignPipelineBtn.classList.remove("active");
-assignPipelineBtn.classList.add("deactive");
-cotailInfoBtn.classList.remove("active");
-cotailInfoBtn.classList.add("deactive");
-updateButtonStyles();
+async function showAllCocktails(selectedIngredients = []) {
+  findIngSection.style.display = "none";
+  addIngSection.style.display = "none";
+  addCocktailSection.style.display = "none";
+  allCocktailSection.style.display = "block"; // Show All Cocktails section
+  cocktailDetailsSection.style.display = "none";
+  selectPipelineSection.style.display = "none";
+  allCocktailsBtn.classList.add("active");
+  allCocktailsBtn.classList.remove("deactive");
+  findCocktailBtn.classList.remove("active");
+  findCocktailBtn.classList.add("deactive");
+  addIngredientsBtn.classList.remove("active");
+  addIngredientsBtn.classList.add("deactive");
+  addCocktailBtn.classList.remove("active");
+  addCocktailBtn.classList.add("deactive");
+  assignPipelineBtn.classList.remove("active");
+  assignPipelineBtn.classList.add("deactive");
+  cotailInfoBtn.classList.remove("active");
+  cotailInfoBtn.classList.add("deactive");
+  updateButtonStyles();
 
-// Fetch and display cocktails
-await fetchCocktails();
+  // Fetch cocktails and filter if ingredients are provided
+  const cocktails = await fetchCocktails();
+
+  if (selectedIngredients.length > 0) {
+      // Filter cocktails based on selected ingredients
+      const filteredCocktails = cocktails.filter(cocktail => {
+          const cocktailIngredients = cocktail.PIng.map(ingredient => ingredient.ING_Name);
+          return selectedIngredients.every(selectedIngredient => cocktailIngredients.includes(selectedIngredient));
+      });
+      displayCocktails(filteredCocktails);
+  } else {
+      // Display all cocktails if no ingredients are selected
+      displayCocktails(cocktails);
+  }
 }
 
+
+
+// Function to fetch cocktails from products.json
 async function fetchCocktails() {
   try {
       const response = await fetch("products.json");
       const cocktails = await response.json();
-      
-      const cocktailListContainer = document.querySelector(".cocktail-list");
-      cocktailListContainer.innerHTML = ""; // Clear existing content
-
-      // Loop through each cocktail and create HTML elements
-      cocktails.forEach(cocktail => {
-          const cocktailItem = document.createElement("div");
-          cocktailItem.classList.add("cl-item");
-          cocktailItem.id = `cocktail-${cocktail.PID}`; // Set the ID for each cocktail item
-
-          cocktailItem.innerHTML = `
-              <img src="${cocktail.PImage}" alt="${cocktail.PName}" />
-              <p>${cocktail.PName}</p>
-          `;
-
-          // Append the cocktail item to the cocktail list container
-          cocktailListContainer.appendChild(cocktailItem);
-
-          // Add click event to show cocktail details
-          cocktailItem.addEventListener("click", () => {
-              wshowCocktailDetails(cocktail); // Show details of the clicked cocktail
-          });
-      });
+      return cocktails; // Return the fetched cocktails
   } catch (error) {
       console.error("Error fetching cocktails:", error);
+      return []; // Return an empty array on error
   }
+}
+
+// Function to display cocktails in the UI
+function displayCocktails(cocktails) {
+  const cocktailListContainer = document.querySelector(".cocktail-list");
+  cocktailListContainer.innerHTML = ""; // Clear existing content
+
+  cocktails.forEach(cocktail => {
+      const cocktailItem = document.createElement("div");
+      cocktailItem.classList.add("cl-item");
+      cocktailItem.id = `cocktail-${cocktail.PID}`; // Set the ID for each cocktail item
+
+      cocktailItem.innerHTML = `
+          <img src="${cocktail.PImage}" alt="${cocktail.PName}" />
+          <p>${cocktail.PName}</p>
+      `;
+
+      // Append the cocktail item to the cocktail list container
+      cocktailListContainer.appendChild(cocktailItem);
+
+      // Add click event to show cocktail details
+      cocktailItem.addEventListener("click", () => {
+          wshowCocktailDetails(cocktail); // Show details of the clicked cocktail
+      });
+  });
 }
 
 async function wshowCocktailDetails(cocktail) {
