@@ -9,10 +9,14 @@ function createWindow() {
     height: 1080,  // Initial height
     fullscreen: false,  // Make sure the window is not in fullscreen by default
     webPreferences: {
-      nodeIntegration: true,
-      preload: path.join(__dirname, 'preload.js'),  // If you're using a preload.js file
-      webSecurity: false
-    }
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+      preload: path.join(__dirname, 'preload.js'),
+      webSecurity: true
+    },
+    autoHideMenuBar: true,
+    icon: path.join(__dirname, 'img/logo.png')
   });
 
   // Maximize the window after creation

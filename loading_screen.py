@@ -7,17 +7,30 @@ import platform
 
 
 def create_loading_screen():
-    root = tk.Tk()
-    root.title("Loading...")
-    root.attributes("-fullscreen", True)  # Fullscreen
-    root.configure(bg="black")  # Set background color
-
-    # Create a frame to center the content
-    center_frame = tk.Frame(root, bg="black")
-    center_frame.pack(expand=True)  # Center the frame in the middle of the screen
-
-    # Load the logo image without resizing
     try:
+        root = tk.Tk()
+        root.title("Loading...")
+        root.attributes("-fullscreen", True)
+        root.configure(bg="black")
+        
+        # Add error handling for ESC key to exit
+        root.bind('<Escape>', lambda e: root.destroy())
+        
+        # Add loading progress
+        progress_var = tk.DoubleVar()
+        progress_bar = tk.ttk.Progressbar(
+            root, 
+            variable=progress_var,
+            maximum=100,
+            mode='determinate'
+        )
+        progress_bar.pack(pady=10)
+
+        # Create a frame to center the content
+        center_frame = tk.Frame(root, bg="black")
+        center_frame.pack(expand=True)  # Center the frame in the middle of the screen
+
+        # Load the logo image without resizing
         if platform.system() == "Linux":
             logo_image = Image.open("/home/jecon/new-repo/static/img/logo.png")
         else:

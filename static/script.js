@@ -1,26 +1,44 @@
+// Constants
+const MAX_INGREDIENTS = 10;
+const DEBOUNCE_DELAY = 300;
+
+// State management
+let ingredientsData = [];
+let selectedIngredients = [];
+let activeMenu = "findCocktail";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Load all ingredients initially
-  fetchIngredients(); 
+  initializeApp();
+});
+
+function initializeApp() {
+  fetchIngredients();
+  setupEventListeners();
+  checkActiveMenu();
+}
+
+function setupEventListeners() {
+  // Ingredient filter buttons
   document.querySelectorAll(".ing-filter a").forEach((button) => {
-      button.addEventListener("click", (event) => {
-          event.preventDefault(); // Prevent default anchor behavior
-          const selectedType = button.getAttribute("data-type");
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      const selectedType = button.getAttribute("data-type");
       
-        // Remove active class from all buttons and add it to the clicked button
-          document
-          .querySelectorAll(".ing-filter a")
-          .forEach((btn) => btn.classList.remove("active"));
-          button.classList.add("active");
-  
-          // Call filter function with the selected type
-          filterIngredientsByType(selectedType);
-      });
+      // Remove active class from all buttons and add it to the clicked button
+      document
+        .querySelectorAll(".ing-filter a")
+        .forEach((btn) => btn.classList.remove("active"));
+      button.classList.add("active");
+
+      // Call filter function with the selected type
+      filterIngredientsByType(selectedType);
+    });
+  });
+
   // Add click event listener for the "Show Products" button
   document.getElementById("showProducts").addEventListener("click", () => {
     showAllCocktails(selectedIngredients);
-});
-});
+  });
 
   // Check which menu should be active
   if (activeMenu === "addIngredients") {
@@ -64,9 +82,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Fetch ingredients ID when the DOM is loaded
   fetchIngredientsID();
-});
+}; // Close setupEventListeners
 
-let activeMenu = "findCocktail"; // Default active menu
+// activeMenu is already declared at the top of the file
 
 // Toggle visibility of sections
 const findCocktailBtn = document.getElementById("findCocktailBtn");
@@ -467,9 +485,6 @@ function resetIngredientForm() {
   document.getElementById("image-name").textContent = ""; // Clear the displayed image name
 }
 });
-
-let ingredientsData = []; // Global variable to store ingredients data
-let selectedIngredients = []; // Global array to keep track of selected ingredients
 
 async function fetchIngredients(searchTerm = "") {
     try {
@@ -970,4 +985,3 @@ const response = await fetch('db.json');
 const data = await response.json();
 return data[0].data; // Access the 'data' array within the first object
 }
-

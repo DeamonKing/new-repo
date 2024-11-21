@@ -4,8 +4,20 @@ import platform
 import subprocess
 import threading
 import time
+import logging
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-import serial  # Import the serial library
+import serial
+from logging.handlers import RotatingFileHandler
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[
+        RotatingFileHandler('app.log', maxBytes=1024*1024, backupCount=5),
+        logging.StreamHandler()
+    ],
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 # Define the base directory as the directory where this script is located
 base_dir = os.path.dirname(__file__)
@@ -132,21 +144,27 @@ class CustomHandler(SimpleHTTPRequestHandler):
             self.wfile.write(response.encode())  # Send the error message back to JavaScript
 
     def send_to_serial_output(self, assigned_pipes):
-        # Open the serial port (adjust the port and baudrate as necessary)
+        port = '/dev/ttyUSB0' if platform.system() == 'Linux' else 'COM1'
         try:
-            with serial.Serial('/dev/ttyUSB0', 9600, timeout=1) as ser:  # Example for Linux
+            with serial.Serial(port, 9600, timeout=5) as ser:
                 for ingredient, pipe in assigned_pipes.items():
                     message = f"{ingredient}: {pipe}\n"
-                    ser.write(message.encode('utf-8'))  # Send the message to the serial port
-                    print(f"Sent to serial: {message.strip()}")  # Log the sent message
-
-                # Wait for an 'OK' response from the serial machine
-                while True:
-                    if ser.in_waiting > 0:
-                        response = ser.readline().decode('utf-8').strip()  # Read response from serial
-                        if response == 'OK':  # Check if the response is 'OK'
-                            print("Received OK from serial machine.")
-                            return "OK"  # Return OK to indicate success
+                    logging.info(f"Sending to serial: {message.strip()}")
+                    ser.write(message.encode('utf-8'))
+                    
+                    # Wait for acknowledgment with timeout
+                    start_time = time.time()
+                    while time.time() - start_time < 5:  # 5 second timeout
+                        if ser.in_waiting > 0:
+                            response = ser.readline().decode('utf-8').strip()
+                            if response == 'OK':
+                                logging.info("Received OK from serial machine")
+                                return "OK"
+                            elif response:
+                                logging.warning(f"Unexpected response: {response}")
+                    
+                    logging.error("Timeout waiting for serial response")
+                    return "Error: Serial communication timeout"
         except serial.SerialException as e:
             error_message = f"Serial error: {str(e)}"
             print(error_message)
