@@ -15,7 +15,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       webSecurity: true
     },
-    autoHideMenuBar: true,
+    autoHideMenuBar: false,
     icon: path.join(__dirname, 'img/logo.png'),
     alwaysOnTop: false,  // This ensures other windows can appear on top
     focusable: true      // Allows focus to shift to other windows
