@@ -242,32 +242,24 @@
                           type="text"
                           placeholder="Search Ingredients..."
                           name="search"
+                          id="cocktail-ingredient-search"
                         />
                         <p><span>0/10</span></p>
                       </div>
                     </div>
-                    <div class="ing-filter" id="" ing-filter1>
-                      <a href="#" class="btn active">All Ingredients</a>
-                      <a href="#" class="btn deactive">Liquid</a>
-                      <a href="#" class="btn deactive">Liquor</a>
-                      <a href="#" class="btn deactive">Garnish</a>
-                      <a href="#" class="btn deactive">Other</a>
+                    <div class="ing-filter" id="ing-filter-cocktail">
+                      <a href="#" class="btn active" data-type="all">All Ingredients</a>
+                      <a href="#" class="btn deactive" data-type="Liquid">Liquid</a>
+                      <a href="#" class="btn deactive" data-type="Liquor">Liquor</a>
+                      <a href="#" class="btn deactive" data-type="Garnish">Garnish</a>
+                      <a href="#" class="btn deactive" data-type="Other">Other</a>
                     </div>
                   </div>
                   <div class="fi-bottom cocktail-fi-bottom">
                     <div class="ing-box">
                       <div class="ing-grid">
                         <div id="cocktail-ingredients-container1">
-                          <div class="ing-item">
-                            <label class="btn-checkbox"
-                              ><input type="checkbox" class="checkbox" />
-                              <img
-                                src="img/ing2.gif"
-                                alt="Ingredient - Vodka"
-                              />
-                              <p>Vodka</p>
-                              </label>
-                          </div>
+                          <!-- Ingredients will be dynamically populated here -->
                         </div>
                       </div>
                     </div>
@@ -294,9 +286,11 @@
                     </button>
                   </div>
                   <div id="loading-page">
-                    <h1>Loading...</h1>
-                    <p>Please wait while we process your request.</p>
+                    <h1>Processing Image...</h1>
+                    <p>Please wait while we process and save your image.</p>
+                    <div class="loading-spinner"></div>
                     <button id="cancel-button">Cancel</button>
+                    <div id="progress-status"></div>
                 </div>
                 </div>
               </div>

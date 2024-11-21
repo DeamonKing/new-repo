@@ -283,7 +283,15 @@ select {
   scrollbar-color: #4b3d2e rgba(245, 222, 179, 0.1); /* Thumb color and track color */
 }
 
-div#ingredients-container,
+div#ingredients-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(125px, auto));
+  gap: 15px;
+  width: 100%;
+  height: auto;
+  padding-top: 5px;
+}
+
 div#cocktail-ingredients-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(125px, auto));
@@ -659,6 +667,16 @@ button#reset-defaults:hover {
 .add-cocktail-find-ing .cocktail-fi-top,
 .add-cocktail-find-ing .ing-grid {
   padding: 0px;
+}
+
+/* Add grid layout for ingredients in Add Cocktail section */
+.add-cocktail-find-ing div#ingredients-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(125px, auto));
+  gap: 15px;
+  width: 100%;
+  height: auto;
+  padding-top: 5px;
 }
 .form-group {
   display: flex;
@@ -1150,6 +1168,21 @@ select {
 
 #loading-page button:hover {
     background-color: #2a6b5d; /* Darker green on hover */
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #359267;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 #product-list-container {

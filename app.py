@@ -5,9 +5,11 @@ import subprocess
 import threading
 import time
 import logging
+from image_handler import processing_complete
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import serial
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 
 # Configure logging
 logging.basicConfig(
@@ -32,11 +34,56 @@ class CustomHandler(SimpleHTTPRequestHandler):
         # For all other paths, serve files from `web_dir` (static folder)
         return os.path.join(web_dir, path.lstrip("/"))
 
+    def send_no_cache_headers(self):
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
+        self.send_header('Access-Control-Allow-Origin', '*')
+
     def do_GET(self):
-        # Use default GET behavior with the updated `translate_path`
+        if self.path == 'processing_complete':
+            try:
+                # Check if processing is complete by checking the event
+                if processing_complete.is_set():
+                    self.send_response(200)
+                    self.send_no_cache_headers()
+                    self.end_headers()
+                else:
+                    self.send_response(404)
+                    self.send_no_cache_headers()
+                    self.end_headers()
+            except Exception as e:
+                self.send_response(500)
+                self.send_no_cache_headers()
+                self.end_headers()
+                self.wfile.write(str(e).encode())
+            return
+        
+        # For db.json and image requests, prevent caching
+        if self.path.endswith('.json') or self.path.endswith('.png') or self.path.endswith('.jpg'):
+            self.send_response(200)
+            self.send_no_cache_headers()
+            with open(self.translate_path(self.path), 'rb') as f:
+                content = f.read()
+            self.end_headers()
+            self.wfile.write(content)
+            return
+
+        # Use default GET behavior with the updated `translate_path` for other paths
         super().do_GET()
 
     def do_POST(self):
+        if self.path == '/delete_processing_flag':
+            try:
+                processing_complete.clear()
+                self.send_response(200)
+                self.end_headers()
+            except Exception as e:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(str(e).encode())
+            return
+
         content_length = int(self.headers["Content-Length"])
         post_data = self.rfile.read(content_length)
 
@@ -82,6 +129,9 @@ class CustomHandler(SimpleHTTPRequestHandler):
         elif self.path == "/addIngredient":
             self.add_ingredient(post_data)
             
+        elif self.path == "/addCocktail":
+            self.add_cocktail(post_data)
+            
         elif self.path == "/send-pipes":
             self.handle_send_pipes(post_data)
             return
@@ -100,25 +150,100 @@ class CustomHandler(SimpleHTTPRequestHandler):
         else:
             print(f"Unsupported operating system for script execution.")
 
-    def add_ingredient(self, post_data):
-        # Load the existing ingredients from db.json
+    def add_cocktail(self, post_data):
         try:
-            with open(os.path.join(web_dir, "db.json"), "r") as file:
-                data = json.load(file)
+            products_path = os.path.join(web_dir, "products.json")
+            logging.info("Starting to add cocktail")
+            if not os.path.exists(products_path):
+                logging.error(f"products.json not found at {products_path}")
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(b"Error: products.json file not found")
+                return
+
+            # Load existing cocktails from products.json
+            with open(products_path, "r") as file:
+                file_content = file.read()
+                if not file_content:
+                    cocktails = []
+                else:
+                    cocktails = json.loads(file_content)
+
+            # Parse the new cocktail data
+            new_cocktail = json.loads(post_data)
+
+            # Append the new cocktail to the existing data
+            cocktails.append(new_cocktail)
+
+            # Write the updated data back to products.json
+            with open(os.path.join(web_dir, "products.json"), "w") as file:
+                json.dump(cocktails, file, indent=2)
+
+            # Send success response immediately after saving JSON
+            self.send_response(201)
+            self.end_headers()
+            self.wfile.write(b"Cocktail added successfully")
+            logging.info("Cocktail added successfully")
+        except Exception as e:
+            print(f"Error adding cocktail: {e}")
+            self.send_response(500)
+            self.end_headers()
+            self.wfile.write(f"Error saving cocktail: {str(e)}".encode())
+
+    def add_ingredient(self, post_data):
+        try:
+            # Reset the completion event before starting
+            processing_complete.clear()
+            logging.info("Processing new ingredient request")
+            
+            # Validate post data
+            try:
+                new_ingredient = json.loads(post_data)
+                logging.info(f"Received ingredient data: {new_ingredient}")
+            except json.JSONDecodeError as je:
+                logging.error(f"Invalid POST data format: {str(je)}")
+                self.send_response(400)
+                self.end_headers()
+                self.wfile.write(b"Invalid ingredient data format")
+                return
+
+            # Load existing ingredients from db.json
+            db_path = os.path.join(web_dir, "db.json")
+            if not os.path.exists(db_path):
+                logging.error(f"db.json not found at {db_path}")
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(b"Error: db.json file not found")
+                return
+
+            with open(db_path, "r") as file:
+                file_content = file.read()
+                if not file_content:
+                    data = []
+                else:
+                    data = json.loads(file_content)
 
             # Parse the new ingredient data
             new_ingredient = json.loads(post_data)
 
             # Append the new ingredient to the existing data
-            data[0]["data"].append(new_ingredient)
+            if not isinstance(data, list):
+                data = []
+            data.append(new_ingredient)
 
             # Write the updated data back to db.json
             with open(os.path.join(web_dir, "db.json"), "w") as file:
                 json.dump(data, file, indent=2)
 
-            self.send_response(201)
-            self.end_headers()
-            self.wfile.write(b"Ingredient added successfully")
+            # Wait for image processing to complete (with timeout)
+            if processing_complete.wait(timeout=30):  # 30 second timeout
+                self.send_response(201)
+                self.end_headers()
+                self.wfile.write(b"Ingredient added successfully")
+            else:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(b"Timeout waiting for image processing")
         except Exception as e:
             print(f"Error adding ingredient: {e}")  # Log the error to the console
             self.send_response(500)  # Internal Server Error

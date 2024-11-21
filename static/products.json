@@ -7,9 +7,18 @@
     "PDesc": "The Aperol Spritz is one of the most popular aperitif cocktails in Italy.",
     "PHtm": "Add lime wedgesugar to the old fashioned glass\nCrush lime wedgesugar with muddler\nFill up the glass with crushed ice\nPour cachaca into the glass\nStir together\nGarnish with lime wedge",
     "PIng": [
-      { "ING_ID": 12, "ING_Name": "Aperol" },
-      { "ING_ID": 33, "ING_Name": "Club Soda" },
-      { "ING_ID": 66, "ING_Name": "Prosecco" }
+      {
+        "ING_ID": 12,
+        "ING_Name": "Aperol"
+      },
+      {
+        "ING_ID": 33,
+        "ING_Name": "Club Soda"
+      },
+      {
+        "ING_ID": 66,
+        "ING_Name": "Prosecco"
+      }
     ]
   },
   {
@@ -17,13 +26,25 @@
     "PName": "Caipirinha",
     "PImage": "img/product_2.png",
     "PCat": "Cocktail",
-    "PDesc": "The classic Caipirinha cocktail features cachaça, lime and sugar. Muddle one up, and you'll be transported in a snap to a beach in Rio.",
+    "PDesc": "The classic Caipirinha cocktail features cacha\u00c3\u00a7a, lime and sugar. Muddle one up, and you'll be transported in a snap to a beach in Rio.",
     "PHtm": "Add lime wedgesugar to the old fashioned glass\nCrush lime wedgesugar with muddler\nFill up the glass with crushed ice\nPour cachaca into the glass\nStir together\nGarnish with lime wedge",
     "PIng": [
-      { "ING_ID": 104, "ING_Name": "Lime Wedges" },
-      { "ING_ID": 28, "ING_Name": "Sugar" },
-      { "ING_ID": 82, "ING_Name": "Cachaca" },
-      { "ING_ID": 102, "ING_Name": "Crushed Ice" }
+      {
+        "ING_ID": 104,
+        "ING_Name": "Lime Wedges"
+      },
+      {
+        "ING_ID": 28,
+        "ING_Name": "Sugar"
+      },
+      {
+        "ING_ID": 82,
+        "ING_Name": "Cachaca"
+      },
+      {
+        "ING_ID": 102,
+        "ING_Name": "Crushed Ice"
+      }
     ]
   },
   {
@@ -31,13 +52,39 @@
     "PName": "Pina Colada",
     "PImage": "img/product_3.png",
     "PCat": "Cocktail",
-    "PDesc": "A tropical blend of rich coconut cream, white rum and tangy pineapple – serve with an umbrella for kitsch appeal.",
+    "PDesc": "A tropical blend of rich coconut cream, white rum and tangy pineapple \u00e2\u20ac\u201c serve with an umbrella for kitsch appeal.",
     "PHtm": "Add ice to the blender\nAdd pineapple juice coconut liqueurwhite rum to the blender\nBlend together\nStrain into the hurricane glass\nGarnish with cocktail cherry pinapple wedges",
     "PIng": [
-      { "ING_ID": 103, "ING_Name": "White Rum" },
-      { "ING_ID": 48, "ING_Name": "Coconut Milk" },
-      { "ING_ID": 19, "ING_Name": "Pineapple Juice" },
-      { "ING_ID": 102, "ING_Name": "Crushed Ice" }
+      {
+        "ING_ID": 103,
+        "ING_Name": "White Rum"
+      },
+      {
+        "ING_ID": 48,
+        "ING_Name": "Coconut Milk"
+      },
+      {
+        "ING_ID": 19,
+        "ING_Name": "Pineapple Juice"
+      },
+      {
+        "ING_ID": 102,
+        "ING_Name": "Crushed Ice"
+      }
+    ]
+  },
+  {
+    "PID": 4,
+    "PName": "dwq",
+    "PImage": "/upload/dwq.png",
+    "PCat": "Cocktail",
+    "PDesc": "32",
+    "PHtm": "few",
+    "PIng": [
+      {
+        "ING_ID": "68",
+        "ING_Name": "Absinthe"
+      }
     ]
   }
 ]

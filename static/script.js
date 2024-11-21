@@ -7,14 +7,207 @@ let ingredientsData = [];
 let selectedIngredients = [];
 let activeMenu = "findCocktail";
 
+// Global variable for cocktail ingredients
+let selectedCocktailIngredients = [];
+
 document.addEventListener("DOMContentLoaded", () => {
   initializeApp();
+  setupCocktailIngredientHandlers();
+  fetchIngredientsForCocktail(); // Load cocktail ingredients
 });
+
+function debounce(func, delay) {
+  let timeoutId;
+  return function(...args) {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+}
+
+function checkActiveMenu() {
+  // Show the appropriate section based on activeMenu
+  if (activeMenu === "addIngredients") {
+    showAddIngredients();
+  } else if (activeMenu === "addCocktail") {
+    showAddCocktail();
+  } else if (activeMenu === "allCocktails") {
+    showAllCocktails();
+  } else if (activeMenu === "cocktailDetails") {
+    showCocktailDetails();
+  } else {
+    showFindCocktail(); // Default
+  }
+}
 
 function initializeApp() {
   fetchIngredients();
   setupEventListeners();
   checkActiveMenu();
+}
+
+function setupCocktailIngredientHandlers() {
+  // Setup search functionality for cocktail ingredients
+  const cocktailSearch = document.getElementById("cocktail-ingredient-search");
+  if (cocktailSearch) {
+    cocktailSearch.addEventListener("input", debounce(() => {
+      const searchInput = cocktailSearch.value;
+      fetchIngredientsForCocktail(searchInput);
+    }, DEBOUNCE_DELAY));
+  }
+
+  // Setup filter functionality for cocktail ingredients
+  document.querySelectorAll("#ing-filter-cocktail a").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      const selectedType = button.getAttribute("data-type");
+      
+      // Update active/deactive classes
+      document.querySelectorAll("#ing-filter-cocktail a").forEach((btn) => {
+        if (btn === button) {
+          btn.classList.add("active");
+          btn.classList.remove("deactive");
+        } else {
+          btn.classList.remove("active");
+          btn.classList.add("deactive");
+        }
+      });
+
+      filterCocktailIngredientsByType(selectedType);
+    });
+  });
+}
+
+async function getNextProductId() {
+  try {
+      const response = await fetch('products.json');
+      const products = await response.json();
+      
+      // Find the highest current ID
+      const highestId = products.reduce((max, product) => {
+          const productId = parseInt(product.PID); // Changed from product.id to product.PID
+          return productId > max ? productId : max;
+      }, 0);
+      
+      // Return the next available ID
+      const nextId = highestId + 1;
+      
+      // Update the input field with the next ID
+      const productIdInput = document.getElementById('product-id');
+      if (productIdInput) {
+          productIdInput.value = nextId; // Changed from value to textContent
+      }
+      
+      return nextId;
+  } catch (error) {
+      console.error('Error getting next product ID:', error);
+      return null;
+  }
+}
+
+// Call getNextProductId when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+  getNextProductId();
+});
+
+async function fetchIngredientsForCocktail(searchTerm = "") {
+  try {
+    const response = await fetch("db.json");
+    const ingredients = await response.json();
+    
+    // Sort ingredients alphabetically by name
+    ingredients.sort((a, b) => a.ING_Name.localeCompare(b.ING_Name));
+    
+    const container = document.getElementById("cocktail-ingredients-container1");
+    container.innerHTML = ""; // Clear existing ingredients
+
+    // Update the counter display
+    const counterElement = document.querySelector(".cocktail-fi-top .searchbar p span");
+    counterElement.textContent = `${selectedingforcocktail.length}/10`;
+
+    ingredients.forEach((ingredient) => {
+      if (searchTerm === "" || 
+          ingredient.ING_Name.toLowerCase().includes(searchTerm.toLowerCase())) {
+        const ingDiv = document.createElement("div");
+        ingDiv.classList.add("ing-item");
+        
+        const label = document.createElement("label");
+        label.classList.add("btn-checkbox");
+        
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.classList.add("checkbox");
+        checkbox.dataset.ingredientId = ingredient.ING_ID;
+        checkbox.dataset.ingredientName = ingredient.ING_Name;
+        
+        // Check if this ingredient is already selected
+        if (selectedCocktailIngredients.some(ing => ing.id === ingredient.ING_ID)) {
+          checkbox.checked = true;
+        }
+        
+        checkbox.addEventListener("change", (event) => {
+          handleCocktailIngredientSelection(event, ingredient);
+        });
+
+        const img = document.createElement("img");
+        img.src = ingredient.ING_IMG || "img/ing2.gif";
+        img.alt = `Ingredient - ${ingredient.ING_Name}`;
+
+        const para = document.createElement("p");
+        para.textContent = ingredient.ING_Name;
+
+        label.appendChild(checkbox);
+        label.appendChild(img);
+        label.appendChild(para);
+        ingDiv.appendChild(label);
+        container.appendChild(ingDiv);
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching ingredients for cocktail:", error);
+  }
+}
+
+function handleCocktailIngredientSelection(event, ingredient) {
+  if (event.target.checked) {
+    if (selectedCocktailIngredients.length < MAX_INGREDIENTS) {
+      selectedingforcocktail.push({
+        id: ingredient.ING_ID,
+        name: ingredient.ING_Name
+      });
+    } else {
+      event.target.checked = false;
+      alert("You can only select up to 10 ingredients.");
+    }
+  } else {
+    selectedingforcocktail = selectedingforcocktail.filter(
+      ing => ing.id !== ingredient.ING_ID
+    );
+  }
+  
+  // Update the counter display
+  const counterElement = document.querySelector(".cocktail-fi-top .searchbar p span");
+  counterElement.textContent = `${selectedCocktailIngredients.length}/10`;
+  
+  console.log("Selected cocktail ingredients:", selectedCocktailIngredients);
+}
+
+function filterCocktailIngredientsByType(type) {
+  const ingredients = document.querySelectorAll("#cocktail-ingredients-container1 .ing-item");
+  ingredients.forEach((item) => {
+    if (type === "all") {
+      item.style.display = "flex";
+    } else {
+      const ingredientType = ingredientsData.find(
+        ing => ing.ING_Name === item.querySelector("p").textContent
+      )?.ING_Type;
+      item.style.display = 
+        ingredientType?.toLowerCase() === type.toLowerCase() ? "flex" : "none";
+    }
+  });
 }
 
 function setupEventListeners() {
@@ -178,6 +371,9 @@ function showAddCocktail() {
   allCocktailSection.style.display = "none";
   cocktailDetailsSection.style.display = "none";
   selectPipelineSection.style.display = "none";
+  
+  // Load cocktail ingredients when showing add cocktail section
+  fetchIngredientsForCocktail();
   addCocktailBtn.classList.add("active");
   addCocktailBtn.classList.remove("deactive");
   findCocktailBtn.classList.remove("active");
@@ -371,7 +567,7 @@ async function fetchIngredientsID() {
 try {
   const response = await fetch("db.json");
   const data = await response.json();
-  const ingredients = data[0].data;
+  const ingredients = data.data;
 
   // Get the last ingredient ID and generate the new ID
   const lastId =
@@ -393,6 +589,9 @@ fetchIngredientsID();
 
 submitButton.addEventListener("click", async (event) => {
   event.preventDefault();
+  
+  // Show loading screen
+  document.getElementById("loading-page").style.display = "block";
 
   const ingredientId = document.getElementById("ingredient-id").textContent; // Get the ID from the span
   const ingredientName = document.getElementById("ingredient-name").value;
@@ -452,6 +651,12 @@ submitButton.addEventListener("click", async (event) => {
       });
 
       if (response.ok) {
+        // Wait for image processing to complete
+        await waitForImageProcessing();
+        
+        // Hide loading screen
+        document.getElementById("loading-page").style.display = "none";
+        
         alert("Ingredient added successfully!");
         console.log("Refreshing ingredient list after adding...");
         await fetchIngredients(); // Refresh the ingredient list after adding
@@ -621,7 +826,7 @@ async function fetchIngredientsTypes() {
     const types = new Set(); // Use a Set to avoid duplicates
 
     // Loop through each ingredient to collect types
-    data[0].data.forEach((ingredient) => {
+    data.data.forEach((ingredient) => {
       types.add(ingredient.ING_Type);
     });
 
@@ -952,11 +1157,12 @@ async function wshowCocktailDetails(cocktail) {
   const cocktailName = document.getElementById("cocktail-name");
   const cocktailDescription = document.getElementById("cocktail-description");
   const cocktailIngredientsContainer = document.getElementById("cocktail-ingredients-container");
-
+  const cocktailHtm = document.getElementById("htm")
   cocktailImage.src = cocktail.PImage; // Set the image source
   cocktailName.textContent = cocktail.PName; // Set the cocktail name
-  cocktailDescription.textContent = cocktail.PDesc; // Set the description
-
+  cocktailDescription.textContent = cocktail.PDesc
+  cocktailHtm.textContent = cocktail.PHtm
+  
   // Clear previous ingredients
   cocktailIngredientsContainer.innerHTML = "";
 
@@ -982,6 +1188,194 @@ async function wshowCocktailDetails(cocktail) {
 // Function to fetch all ingredients from db.json
 async function fetchIngredientsData() {
 const response = await fetch('db.json');
+if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+}
 const data = await response.json();
-return data[0].data; // Access the 'data' array within the first object
+if (!Array.isArray(data)) {
+    throw new Error('Invalid data structure in db.json');
+}
+return data;
+}
+
+// Function to fetch existing cocktails and get the next PID
+async function fetchNextCocktailId() {
+    try {
+        const response = await fetch("products.json");
+        const cocktails = await response.json();
+        const lastId = cocktails.length > 0 ? 
+            Math.max(...cocktails.map(cocktail => parseInt(cocktail.PID))) : 0;
+        return lastId + 1;
+    } catch (error) {
+        console.error("Error fetching cocktails:", error);
+        return 1;
+    }
+}
+
+// Global array to store selected cocktail ingredients
+let selectedingforcocktail = [];
+
+// Function to handle cocktail ingredient selection
+function handleCocktailIngredientSelection(event, ingredient) {
+    if (event.target.checked) {
+        if (selectedCocktailIngredients.length < MAX_INGREDIENTS) {
+            selectedCocktailIngredients.push({
+                ING_ID: ingredient.ING_ID,
+                ING_Name: ingredient.ING_Name
+            });
+            console.log('Added ingredient:', ingredient.ING_Name);
+            console.log('Current selected ingredients:', selectedCocktailIngredients);
+        } else {
+            event.target.checked = false;
+            alert("You can only select up to 10 ingredients.");
+        }
+    } else {
+        selectedCocktailIngredients = selectedCocktailIngredients.filter(
+            ing => ing.ING_ID !== ingredient.ING_ID
+        );
+        console.log('Removed ingredient:', ingredient.ING_Name);
+        console.log('Current selected ingredients:', selectedCocktailIngredients);
+    }
+    
+    // Update the counter display
+    const counterElement = document.querySelector(".cocktail-fi-top .searchbar p span");
+    counterElement.textContent = `${selectedCocktailIngredients.length}/10`;
+}
+
+// Function to handle cocktail form submission
+document.addEventListener("DOMContentLoaded", () => {
+    const cocktailSubmitButton = document.getElementById("add-cocktail-button");
+    if (cocktailSubmitButton) {
+        cocktailSubmitButton.addEventListener("click", async (event) => {
+            event.preventDefault();
+
+            const cocktailId = document.getElementById("product-id").value;
+            const cocktailName = document.getElementById("product-name").value;
+            const cocktailType = document.getElementById("product-type").value;
+            const cocktailDesc = document.getElementById("product-description").value;
+            const cocktailHtm = document.getElementById("how-to-make").value;
+            const cocktailImageInput = document.getElementById("product-image");
+            const cocktailImage = cocktailImageInput.files[0];
+
+            // Validate inputs
+            let errorMessages = [];
+            if (!cocktailId) errorMessages.push("Cocktail ID is required.");
+            if (!cocktailName) errorMessages.push("Cocktail Name is required.");
+            if (!cocktailType) errorMessages.push("Cocktail Type is required.");
+            if (!cocktailDesc) errorMessages.push("Description is required.");
+            if (!cocktailHtm) errorMessages.push("How to make instructions are required.");
+            if (!cocktailImage) errorMessages.push("Cocktail Image is required.");
+            if (selectedCocktailIngredients.length === 0) errorMessages.push("At least one ingredient is required.");
+
+            if (errorMessages.length > 0) {
+                alert(errorMessages.join("\n"));
+                return;
+            }
+
+            // Read the image file and convert it to Base64
+            const reader = new FileReader();
+            reader.readAsDataURL(cocktailImage);
+            reader.onload = async () => {
+                const newCocktail = {
+                    PID: parseInt(cocktailId),
+                    PName: cocktailName,
+                    PImage: reader.result,
+                    PCat: cocktailType,
+                    PDesc: cocktailDesc,
+                    PHtm: cocktailHtm,
+                    PIng: selectedCocktailIngredients
+                };
+                
+                console.log('Submitting cocktail with ingredients:', selectedCocktailIngredients);
+
+                try {
+                    const response = await fetch("/addCocktail", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(newCocktail),
+                    });
+
+                    if (response.ok) {
+                        // Wait for image processing to complete
+                        await waitForImageProcessing();
+                        
+                        // Hide loading screen
+                        document.getElementById("loading-page").style.display = "none";
+                        
+                        alert("Cocktail added successfully!");
+                        // Reset form and fetch new ID
+                        resetCocktailForm();
+                        await updateNextCocktailId(); // Update the ID first
+                        await fetchNextCocktailId(); // Refresh the ID again to ensure accuracy
+                        // Clear selected ingredients
+                        selectedCocktailIngredients = [];
+                        // Uncheck all ingredient checkboxes
+                        document.querySelectorAll('#cocktail-ingredients-container1 input[type="checkbox"]').forEach(checkbox => {
+                            checkbox.checked = false;
+                        });
+                        // Update the counter display
+                        const counterElement = document.querySelector(".cocktail-fi-top .searchbar p span");
+                        counterElement.textContent = "0/10";
+                        // Clear the product name field
+                        document.getElementById("product-name").value = "";
+                    } else {
+                        const errorText = await response.text();
+                        alert("Failed to add the cocktail. Server response: " + errorText);
+                    }
+                } catch (error) {
+                    console.error("Error adding cocktail:", error);
+                    alert("An error occurred while adding the cocktail: " + error.message);
+                }
+            };
+            await updateNextCocktailId();
+
+            reader.onerror = (error) => {
+                console.error("Error reading image file:", error);
+                alert("An error occurred while reading the image file: " + error.message);
+            };
+        });
+    }
+});
+
+// Function to reset the cocktail form
+function resetCocktailForm() {
+    document.getElementById("product-type").value = "Cocktail";
+    document.getElementById("product-description").value = "";
+    document.getElementById("how-to-make").value = "";
+    document.getElementById("product-image").value = "";
+}
+
+// Function to update the next cocktail ID
+async function updateNextCocktailId() {
+    const nextId = await fetchNextCocktailId();
+    const productIdInput = document.getElementById("product-id");
+    if (productIdInput) {
+        productIdInput.value = nextId;
+    }
+}
+
+async function waitForImageProcessing() {
+    const maxAttempts = 30; // Maximum number of attempts (30 * 500ms = 15 seconds max)
+    let attempts = 0;
+    
+    while (attempts < maxAttempts) {
+        try {
+            const response = await fetch('processing_complete');
+            if (response.ok) {
+                // Delete the flag file after successful check
+                await fetch('/delete_processing_flag', { method: 'POST' });
+                return true;
+            }
+        } catch (error) {
+            console.log('Waiting for image processing to complete...');
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms before next attempt
+        attempts++;
+    }
+    
+    console.warn('Image processing timed out');
+    return false;
 }
