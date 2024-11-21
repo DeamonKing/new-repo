@@ -7,7 +7,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1920,  // Initial width
     height: 1080,  // Initial height
-    fullscreen: false,  // Make sure the window is not in fullscreen by default
+    fullscreen: true,  // Make sure the window is not in fullscreen by default
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
