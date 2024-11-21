@@ -53,7 +53,7 @@
     "PImage": "img/product_3.png",
     "PCat": "Cocktail",
     "PDesc": "A tropical blend of rich coconut cream, white rum and tangy pineapple \u00e2\u20ac\u201c serve with an umbrella for kitsch appeal.",
-    "PHtm": "Add ice to the blender\nAdd pineapple juice coconut liqueurwhite rum to the blender\nBlend together\nStrain into the hurricane glass\nGarnish with cocktail cherry pinapple wedges",
+    "PHtm": "",
     "PIng": [
       {
         "ING_ID": 103,
@@ -70,20 +70,6 @@
       {
         "ING_ID": 102,
         "ING_Name": "Crushed Ice"
-      }
-    ]
-  },
-  {
-    "PID": 4,
-    "PName": "dwq",
-    "PImage": "/upload/dwq.png",
-    "PCat": "Cocktail",
-    "PDesc": "32",
-    "PHtm": "few",
-    "PIng": [
-      {
-        "ING_ID": "68",
-        "ING_Name": "Absinthe"
       }
     ]
   }

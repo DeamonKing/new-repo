@@ -75,11 +75,13 @@ function setupCocktailIngredientHandlers() {
           btn.classList.add("deactive");
         }
       });
+      updateButtonStyles();
 
       filterCocktailIngredientsByType(selectedType);
     });
   });
 }
+
 
 async function getNextProductId() {
   try {
@@ -115,8 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchIngredientsForCocktail(searchTerm = "") {
   try {
-    const response = await fetch("db.json");
-    const ingredients = await response.json();
+    const ingredients = await fetchIngredientsData();
     
     // Sort ingredients alphabetically by name
     ingredients.sort((a, b) => a.ING_Name.localeCompare(b.ING_Name));
@@ -196,18 +197,20 @@ function handleCocktailIngredientSelection(event, ingredient) {
 }
 
 function filterCocktailIngredientsByType(type) {
-  const ingredients = document.querySelectorAll("#cocktail-ingredients-container1 .ing-item");
-  ingredients.forEach((item) => {
-    if (type === "all") {
-      item.style.display = "flex";
-    } else {
-      const ingredientType = ingredientsData.find(
-        ing => ing.ING_Name === item.querySelector("p").textContent
-      )?.ING_Type;
-      item.style.display = 
-        ingredientType?.toLowerCase() === type.toLowerCase() ? "flex" : "none";
-    }
-  });
+    const ingredients = document.querySelectorAll("#cocktail-ingredients-container1 .ing-item");
+    ingredients.forEach((item) => {
+        if (type === "all") {
+            item.style.display = "flex";
+        } else {
+            const ingredientName = item.querySelector("p").textContent;
+            const ingredient = ingredientsData.find(ing => ing.ING_Name === ingredientName);
+            if (ingredient && ingredient.ING_Type.toLowerCase() === type.toLowerCase()) {
+                item.style.display = "flex";
+            } else {
+                item.style.display = "none";
+            }
+        }
+    });
 }
 
 function setupEventListeners() {
@@ -228,10 +231,26 @@ function setupEventListeners() {
     });
   });
 
-  // Add click event listener for the "Show Products" button
-  document.getElementById("showProducts").addEventListener("click", () => {
-    showAllCocktails(selectedIngredients);
+// Add click event listener for the "Show Products" button
+document.getElementById("showProducts").addEventListener("click", async () => {
+  // Check if no ingredients are selected
+  if (selectedIngredients.length === 0) {
+      alert('No ingredients selected. Please select at least one ingredient.');
+      return; // Exit the function early
+  }
+
+  const cocktails = await fetchCocktails();
+  const filteredCocktails = cocktails.filter(cocktail => {
+      const cocktailIngredients = cocktail.PIng.map(ingredient => ingredient.ING_Name);
+      return selectedIngredients.every(selectedIngredient => cocktailIngredients.includes(selectedIngredient));
   });
+
+  if (filteredCocktails.length === 0) {
+      alert('No cocktails found with the selected ingredients. Please try a different combination.');
+  } else {
+      showAllCocktails(selectedIngredients);
+  }
+});
 
   // Check which menu should be active
   if (activeMenu === "addIngredients") {
@@ -315,6 +334,7 @@ function showFindCocktail() {
   cotailInfoBtn.classList.add("deactive");
   updateButtonStyles();
 }
+
 
 // Function to show the "Add Ingredients" section
 function showAddIngredients() {
@@ -530,34 +550,36 @@ document
     event.preventDefault(); // Prevent default form submission
   });
 
-// Function to handle focus-in and focus-out events
 function checkFocus(event) {
-  const inputs = document.querySelectorAll("input, textarea");
-  let isAnyFieldFocused = false;
-
-  // Check if the current target (focused element) is an input or textarea
-  if (event.type === "focus") {
-    isAnyFieldFocused = true;
+  // Only handle focus events for specific elements that need server notification
+  const targetId = event.target.id;
+  const elementsToTrack = [
+    'ingredient-search',
+    'cocktail-ingredient-search',
+    'ingredient-name', // Add the ID for the Ingredient-name input field
+    'product-name',    // Add the ID for the Product-name input field
+    'product-desc',    // Add the ID for the Product-desc input field
+    'how-to-make'      // Add the ID for the How-to-make input field
+  ];
+  
+  if (!elementsToTrack.includes(targetId)) {
+    return; // Don't process focus events for other input fields
   }
 
   // Send POST request based on focus event type
-  if (isAnyFieldFocused) {
-    fetch("/focus-in", {
-      method: "POST",
-    })
-      .then((response) => response.text())
-      .then((data) => console.log(data));
-  } else {
-    fetch("/focus-out", {
-      method: "POST",
-    })
-      .then((response) => response.text())
-      .then((data) => console.log(data));
-  }
+  const endpoint = event.type === "focus" ? "/focus-in" : "/focus-out";
+  
+  fetch(endpoint, {
+    method: "POST",
+  })
+    .then((response) => response.text())
+    .then((data) => console.log(data))
+    .catch((error) => console.error('Focus event error:', error));
 }
 
-// Add event listeners for focus and blur events directly on input fields
-document.querySelectorAll("input, textarea").forEach((input) => {
+// Add event listeners to all relevant input fields
+const searchInputs = document.querySelectorAll("#ingredient-search, #cocktail-ingredient-search, #ingredient-name, #product-name, #product-desc, #how-to-make");
+searchInputs.forEach((input) => {
   input.addEventListener("focus", checkFocus);
   input.addEventListener("blur", checkFocus);
 });
@@ -567,7 +589,7 @@ async function fetchIngredientsID() {
 try {
   const response = await fetch("db.json");
   const data = await response.json();
-  const ingredients = data.data;
+  const ingredients = data;
 
   // Get the last ingredient ID and generate the new ID
   const lastId =
@@ -584,118 +606,137 @@ try {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-const submitButton = document.getElementById("submit-button");
-fetchIngredientsID();
+  const submitButton = document.getElementById("submit-button");
+  fetchIngredientsID();
 
-submitButton.addEventListener("click", async (event) => {
-  event.preventDefault();
-  
-  // Show loading screen
-  document.getElementById("loading-page").style.display = "block";
+  submitButton.addEventListener("click", async (event) => {
+    event.preventDefault();
+    
+    // Show loading screen
+    document.getElementById("loading-page").style.display = "block";
 
-  const ingredientId = document.getElementById("ingredient-id").textContent; // Get the ID from the span
-  const ingredientName = document.getElementById("ingredient-name").value;
-  const ingredientType = document.getElementById("ingredient-type").value;
-  const ingredientImageInput = document.getElementById("ingredient-image");
-  const ingredientImage = ingredientImageInput.files[0]; // Get the selected image file
+    const ingredientId = document.getElementById("ingredient-id").textContent; // Get the ID from the span
+    const ingredientName = document.getElementById("ingredient-name").value;
+    const ingredientType = document.getElementById("ingredient-type").value;
+    const ingredientImageInput = document.getElementById("ingredient-image");
+    const ingredientImage = ingredientImageInput.files[0]; // Get the selected image file
 
-  // Initialize an array to collect error messages
-  let errorMessages = [];
+    // Initialize an array to collect error messages
+    let errorMessages = [];
 
-  // Validate inputs
-  if (!ingredientId) {
-    errorMessages.push("Ingredient ID is required.");
-  }
-  if (!ingredientName) {
-    errorMessages.push("Ingredient Name is required.");
-  }
-  if (!ingredientType) {
-    errorMessages.push("Ingredient Type is required.");
-  }
-  if (!ingredientImage) {
-    errorMessages.push("Ingredient Image is required.");
-  }
+    // Validate inputs
+    if (!ingredientId) {
+      errorMessages.push("Ingredient ID is required.");
+    }
+    if (!ingredientName) {
+      errorMessages.push("Ingredient Name is required.");
+    }
+    if (!ingredientType) {
+      errorMessages.push("Ingredient Type is required.");
+    }
+    if (!ingredientImage) {
+      errorMessages.push("Ingredient Image is required.");
+    }
 
-  // If there are error messages, alert the user and return
-  if (errorMessages.length > 0) {
-    alert(errorMessages.join("\n")); // Display all error messages in an alert
-    return;
-  }
+    // If there are error messages, alert the user and return
+    if (errorMessages.length > 0) {
+      alert(errorMessages.join("\n")); // Display all error messages in an alert
+      return;
+    }
 
-  // Read the image file and convert it to a Base64 string
-  const reader = new FileReader();
-  reader.readAsDataURL(ingredientImage); // Convert image to Base64
-  reader.onload = async () => {
-    const newIngredient = {
-      ING_ID: ingredientId,
-      ING_Name: ingredientName,
-      ING_Type: ingredientType,
-      ING_IMG: reader.result, // Base64 string of the image
+    // Read the image file and convert it to a Base64 string
+    const reader = new FileReader();
+    reader.readAsDataURL(ingredientImage); // Convert image to Base64
+    reader.onload = async () => {
+      const newIngredient = {
+        ING_ID: ingredientId,
+        ING_Name: ingredientName,
+        ING_Type: ingredientType,
+        ING_IMG: reader.result, // Base64 string of the image
+      };
+
+      // Append new ingredient to db.json
+      try {
+        const response = await fetch("/addIngredient", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newIngredient),
+        })
+        .then((response) => {
+          console.log("Response received:", response);
+          return response;
+        })
+        .catch((error) => {
+          console.error("Error sending request:", error);
+        });
+
+        if (response.ok) {
+          // Wait for image processing to complete
+          await waitForImageProcessing();
+          
+          // Hide loading screen
+          document.getElementById("loading-page").style.display = "none";
+          
+          alert("Ingredient added successfully!");
+          console.log("Refreshing ingredient list after adding...");
+          await fetchIngredients(); // Refresh the ingredient list after adding
+          console.log("Clearing form fields...");
+          resetIngredientForm(); // Clear the form fields
+          console.log("Fetching new ID for the next ingredient...");
+          await fetchIngredientsID(); // Fetch new ID for the next ingredient
+          document.getElementById("ingredient-name").focus();
+        } else {
+          const errorText = await response.text();
+          alert("Failed to add the ingredient. Server response: " + errorText);
+        }
+      } catch (error) {
+        console.error("Error adding ingredient:", error);
+        alert(
+          "An error occurred while adding the ingredient: " + error.message
+        );
+      }
     };
 
-    // Append new ingredient to db.json
-    try {
-      const response = await fetch("/addIngredient", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newIngredient),
-      })
-      .then((response) => {
-        console.log("Response received:", response);
-        return response;
-      })
-      .catch((error) => {
-        console.error("Error sending request:", error);
-      });
+    reader.onerror = (error) => {
+      console.error("Error reading image file:", error);
+      alert("An error occurred while reading the image file: " + error.message);
+    };
+  });
 
-      if (response.ok) {
-        // Wait for image processing to complete
-        await waitForImageProcessing();
-        
-        // Hide loading screen
-        document.getElementById("loading-page").style.display = "none";
-        
-        alert("Ingredient added successfully!");
-        console.log("Refreshing ingredient list after adding...");
-        await fetchIngredients(); // Refresh the ingredient list after adding
-        console.log("Clearing form fields...");
-        resetIngredientForm(); // Clear the form fields
-        console.log("Fetching new ID for the next ingredient...");
-        await fetchIngredientsID(); // Fetch new ID for the next ingredient
-      } else {
-        const errorText = await response.text();
-        alert("Failed to add the ingredient. Server response: " + errorText);
-      }
-    } catch (error) {
-      console.error("Error adding ingredient:", error);
-      alert(
-        "An error occurred while adding the ingredient: " + error.message
-      );
-    }
-  };
-
-  reader.onerror = (error) => {
-    console.error("Error reading image file:", error);
-    alert("An error occurred while reading the image file: " + error.message);
-  };
+  // Function to reset the ingredient form fields
+  function resetIngredientForm() {
+    document.getElementById("ingredient-name").value = ""; // Clear the ingredient name
+    document.getElementById("ingredient-type").value = "Liquid"; // Reset to default type
+    document.getElementById("ingredient-image").value = ""; // Clear the image input
+    document.getElementById("image-name").textContent = ""; // Clear the displayed image name
+  }
+  function resetIngredientForm() {
+    enableForms(); // Enable inputs before resetting
+    document.getElementById("ingredient-name").value = ""; // Clear the ingredient name
+    document.getElementById("ingredient-type").value = "Liquid"; // Reset to default type
+    document.getElementById("ingredient-image").value = ""; // Clear the image input
+    document.getElementById("image-name").textContent = ""; // Clear the displayed image name
+  }
+  
+  
 });
 
-// Function to reset the ingredient form fields
-function resetIngredientForm() {
-  document.getElementById("ingredient-name").value = ""; // Clear the ingredient name
-  document.getElementById("ingredient-type").value = "Liquid"; // Reset to default type
-  document.getElementById("ingredient-image").value = ""; // Clear the image input
-  document.getElementById("image-name").textContent = ""; // Clear the displayed image name
+enableForms();
+
+function enableForms() {
+  const inputs = document.querySelectorAll('input, textarea, select'); // Select all input fields
+  inputs.forEach(input => {
+      input.disabled = false; // Enable each input field
+  });
 }
-});
 
 async function fetchIngredients(searchTerm = "") {
     try {
         const response = await fetch("db.json");
         const data = await response.json();
-        ingredientsData = data[0].data;
+        ingredientsData = data;
 
         // Sort ingredients alphabetically by name
         ingredientsData.sort((a, b) => a.ING_Name.localeCompare(b.ING_Name));
@@ -826,7 +867,7 @@ async function fetchIngredientsTypes() {
     const types = new Set(); // Use a Set to avoid duplicates
 
     // Loop through each ingredient to collect types
-    data.data.forEach((ingredient) => {
+    data.forEach((ingredient) => {
       types.add(ingredient.ING_Type);
     });
 
@@ -1099,13 +1140,18 @@ async function showAllCocktails(selectedIngredients = []) {
           const cocktailIngredients = cocktail.PIng.map(ingredient => ingredient.ING_Name);
           return selectedIngredients.every(selectedIngredient => cocktailIngredients.includes(selectedIngredient));
       });
-      displayCocktails(filteredCocktails);
+      
+      if (filteredCocktails.length === 0) {
+          alert('No cocktails found with the selected ingredients. Please try a different combination.');
+      }
+      else{
+        displayCocktails(filteredCocktails);
+      }
   } else {
       // Display all cocktails if no ingredients are selected
       displayCocktails(cocktails);
   }
 }
-
 
 
 // Function to fetch cocktails from products.json
@@ -1162,7 +1208,9 @@ async function wshowCocktailDetails(cocktail) {
   cocktailName.textContent = cocktail.PName; // Set the cocktail name
   cocktailDescription.textContent = cocktail.PDesc
   cocktailHtm.textContent = cocktail.PHtm
+  const htmTitle = document.getElementById("htm-title");
   
+
   // Clear previous ingredients
   cocktailIngredientsContainer.innerHTML = "";
 
@@ -1178,6 +1226,15 @@ async function wshowCocktailDetails(cocktail) {
       `;
       cocktailIngredientsContainer.appendChild(ingredientItem);
   });
+
+  if (cocktail.PHtm && cocktail.PHtm.trim() !== "") {
+    cocktailHtm.textContent = cocktail.PHtm;
+    htmTitle.style.display = "block";
+    cocktailHtm.style.display = "block";
+  } else {
+    htmTitle.style.display = "none";
+    cocktailHtm.style.display = "none";
+  }
 
   // Add event listener for the Start Making button
   document.getElementById("assignPipeline").onclick = () => {
@@ -1310,16 +1367,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         await updateNextCocktailId(); // Update the ID first
                         await fetchNextCocktailId(); // Refresh the ID again to ensure accuracy
                         // Clear selected ingredients
-                        selectedCocktailIngredients = [];
-                        // Uncheck all ingredient checkboxes
-                        document.querySelectorAll('#cocktail-ingredients-container1 input[type="checkbox"]').forEach(checkbox => {
-                            checkbox.checked = false;
-                        });
-                        // Update the counter display
-                        const counterElement = document.querySelector(".cocktail-fi-top .searchbar p span");
-                        counterElement.textContent = "0/10";
-                        // Clear the product name field
-                        document.getElementById("product-name").value = "";
+                        clearaddcocktailform();
                     } else {
                         const errorText = await response.text();
                         alert("Failed to add the cocktail. Server response: " + errorText);
@@ -1339,12 +1387,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Function to reset the cocktail form
+function clearaddcocktailform() {
+  resetCocktailForm();
+  updateNextCocktailId(); // Update the ID first
+  fetchNextCocktailId(); // Refresh the ID again to ensure accuracy
+
+  // Clear selected ingredients
+  selectedCocktailIngredients = [];
+  const counterElement = document.querySelector(".cocktail-fi-top .searchbar p span");
+  counterElement.textContent = "0/10";
+  document.querySelectorAll('#cocktail-ingredients-container1 input[type="checkbox"]').forEach(checkbox => {
+    checkbox.checked = false;
+  });
+enableForms();
+}
+
+document.getElementById("clear-all-add-cocktail").addEventListener("click", () => {
+  clearaddcocktailform();
+});
+
+
+
 function resetCocktailForm() {
-    document.getElementById("product-type").value = "Cocktail";
-    document.getElementById("product-description").value = "";
-    document.getElementById("how-to-make").value = "";
-    document.getElementById("product-image").value = "";
+  document.getElementById("product-type").value = "Cocktail";
+  document.getElementById("product-description").value = "";
+  document.getElementById("how-to-make").value = "";
+  document.getElementById("product-image").value = "";
+  document.getElementById("product-name").value = "";
+  
+  // Enable the inputs
+  enableForms(); 
+  
+  // Focus on the first input field
+  document.getElementById("product-name").focus(); // Adjust to your first input ID
 }
 
 // Function to update the next cocktail ID

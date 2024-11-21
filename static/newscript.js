@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
   // Load all ingredients initially
   fetchIngredients(); 
@@ -131,6 +130,12 @@ function showAddCocktail() {
   cotailInfoBtn.classList.remove("active");
   cotailInfoBtn.classList.add("deactive");
   updateButtonStyles();
+  
+  // Enable all input fields in the add-cocktail section
+  const addCocktailInputs = addCocktailSection.querySelectorAll('input, textarea');
+  addCocktailInputs.forEach(input => {
+    input.disabled = false;
+  });
 }
 
 // Function to show the "All Cocktails" section
@@ -479,15 +484,15 @@ let ingredientsData = []; // Global variable to store ingredients data
 
 async function fetchIngredients(searchTerm = "") {
   try {
-    const response = await fetch("db.json"); // Ensure this path is correct
-    const data = await response.json(); // Parse JSON data
-    ingredientsData = data[0].data; // Store the data globally
+    const response = await fetch("db.json");
+    const data = await response.json();
+    ingredientsData = data; // Store the data globally
 
     const container = document.getElementById("ingredients-container");
     container.innerHTML = ""; // Clear existing ingredients
 
     // Loop through each ingredient and create divs
-    data[0].data.forEach((ingredient) => {
+    data.forEach((ingredient) => {
       const ingredientName = ingredient.ING_Name.toLowerCase(); // Convert to lower case for case-insensitive comparison
 
       // Check if searchTerm is empty or if the ingredient name includes the search term
@@ -504,15 +509,15 @@ async function fetchIngredients(searchTerm = "") {
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.classList.add("checkbox");
+        checkbox.setAttribute("data-id", ingredient.ING_ID);
 
         // Add event listener to update selected count when checkbox changes
         checkbox.addEventListener("change", updateSelectedCount);
 
         // Create the ingredient image
-        const imgSrc =
-          ingredient.ING_IMG && ingredient.ING_IMG.trim() !== ""
-            ? ingredient.ING_IMG
-            : "img/ing2.gif";
+        const imgSrc = ingredient.ING_IMG && ingredient.ING_IMG.trim() !== "" 
+          ? ingredient.ING_IMG 
+          : "img/ing2.gif";
         const img = document.createElement("img");
         img.src = imgSrc;
         img.alt = `Ingredient - ${ingredient.ING_Name}`;
@@ -531,7 +536,10 @@ async function fetchIngredients(searchTerm = "") {
     // Call updateSelectedCount to initialize the count
     updateSelectedCount();
   } catch (error) {
-    console.error(`Error fetching ingredients: ${error.message}`); // Log error to server
+    console.error("Error fetching ingredients:", error);
+    // Display error message to user
+    const container = document.getElementById("ingredients-container");
+    container.innerHTML = `<p class="error">Failed to load ingredients. Please try again later.</p>`;
   }
 }
 
@@ -549,16 +557,16 @@ function updateSelectedCount() {
 
     selectedCountElement.textContent = `${selectedCount}/10`; // Update displayed count
 
-    // Disable checkboxes if the limit is reached
+    // Only disable checkboxes in the ingredients section
     if (selectedCount >= 10) {
-        checkboxes.forEach((checkbox) => {
-            if (!checkbox.checked) {
-                checkbox.disabled = true; // Disable unchecked checkboxes
-            }
+        const ingredientsCheckboxes = document.querySelector('.find-ing').querySelectorAll('.checkbox:not(:checked)');
+        ingredientsCheckboxes.forEach((checkbox) => {
+            checkbox.disabled = true; // Disable unchecked checkboxes only in ingredients section
         });
     } else {
-        checkboxes.forEach((checkbox) => {
-            checkbox.disabled = false; // Enable all checkboxes if under limit
+        const ingredientsCheckboxes = document.querySelector('.find-ing').querySelectorAll('.checkbox');
+        ingredientsCheckboxes.forEach((checkbox) => {
+            checkbox.disabled = false; // Enable checkboxes only in ingredients section
         });
     }
 }
@@ -671,4 +679,3 @@ document.querySelectorAll(".ing-filter a").forEach((button) => {
     filterIngredientsByType(selectedType);
   });
 });
-

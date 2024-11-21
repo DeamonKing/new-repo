@@ -193,7 +193,6 @@ class CustomHandler(SimpleHTTPRequestHandler):
     def add_ingredient(self, post_data):
         try:
             # Reset the completion event before starting
-            processing_complete.clear()
             logging.info("Processing new ingredient request")
             
             # Validate post data
@@ -236,14 +235,10 @@ class CustomHandler(SimpleHTTPRequestHandler):
                 json.dump(data, file, indent=2)
 
             # Wait for image processing to complete (with timeout)
-            if processing_complete.wait(timeout=30):  # 30 second timeout
-                self.send_response(201)
-                self.end_headers()
-                self.wfile.write(b"Ingredient added successfully")
-            else:
-                self.send_response(500)
-                self.end_headers()
-                self.wfile.write(b"Timeout waiting for image processing")
+            self.send_response(201)
+            self.end_headers()
+            self.wfile.write(b"Ingredient added successfully")
+        
         except Exception as e:
             print(f"Error adding ingredient: {e}")  # Log the error to the console
             self.send_response(500)  # Internal Server Error

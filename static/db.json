@@ -1,10 +1,10 @@
 [
   {
-      "ING_ID": "1",
-      "ING_Name": "Vodka", 
-      "ING_Type": "Liquid",
-      "ING_IMG": ""
-    },
+    "ING_ID": "1",
+    "ING_Name": "Vodka",
+    "ING_Type": "Liquid",
+    "ING_IMG": ""
+  },
   {
     "ING_ID": "2",
     "ING_Name": "Gin",
@@ -622,11 +622,5 @@
     "ING_Name": "Lime Wedges",
     "ING_Type": "Garnish",
     "ING_IMG": ""
-  },
-  {
-    "ING_ID": "105",
-    "ING_Name": "fwwd",
-    "ING_Type": "liquor",
-    "ING_IMG": "/upload/fwwd.png"
   }
 ]
