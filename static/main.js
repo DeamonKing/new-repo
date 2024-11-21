@@ -7,7 +7,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1920,  // Initial width
     height: 1080,  // Initial height
-    fullscreen: true,  // Make sure the window is not in fullscreen by default
+    fullscreen: false,  // Make sure the window is not in fullscreen by default
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -15,7 +15,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       webSecurity: true
     },
-    autoHideMenuBar: false,
+    autoHideMenuBar: true,
     icon: path.join(__dirname, 'img/logo.png'),
     alwaysOnTop: false,  // This ensures other windows can appear on top
     focusable: true      // Allows focus to shift to other windows
