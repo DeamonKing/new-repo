@@ -181,7 +181,7 @@ function handleCocktailIngredientSelection(event, ingredient) {
       });
     } else {
       event.target.checked = false;
-      alert("You can only select up to 10 ingredients.");
+      showCustomAlert("You can only select up to 10 ingredients.");
     }
   } else {
     selectedingforcocktail = selectedingforcocktail.filter(
@@ -235,7 +235,7 @@ function setupEventListeners() {
 document.getElementById("showProducts").addEventListener("click", async () => {
   // Check if no ingredients are selected
   if (selectedIngredients.length === 0) {
-      alert('No ingredients selected. Please select at least one ingredient.');
+      showCustomAlert('No ingredients selected. Please select at least one ingredient.');
       return; // Exit the function early
   }
 
@@ -246,7 +246,7 @@ document.getElementById("showProducts").addEventListener("click", async () => {
   });
 
   if (filteredCocktails.length === 0) {
-      alert('No cocktails found with the selected ingredients. Please try a different combination.');
+      showCustomAlert('No cocktails found with the selected ingredients. Please try a different combination.');
   } else {
       showAllCocktails(selectedIngredients);
   }
@@ -429,7 +429,7 @@ document.getElementById("serial-out-button").addEventListener("click", () => {
 
     // Display error messages if any
     if (errorMessages.length > 0) {
-        alert(errorMessages.join("\n")); // Display all error messages in an alert
+        showCustomAlert(errorMessages.join("\n")); // Display all error messages in an showCustomAlert
         return; // Prevent further processing if there are errors
     }
 
@@ -556,10 +556,10 @@ function checkFocus(event) {
   const elementsToTrack = [
     'ingredient-search',
     'cocktail-ingredient-search',
-    'ingredient-name', // Add the ID for the Ingredient-name input field
-    'product-name',    // Add the ID for the Product-name input field
-    'product-desc',    // Add the ID for the Product-desc input field
-    'how-to-make'      // Add the ID for the How-to-make input field
+    'ingredient-name', 
+    'product-name',    
+    'product-desc',
+    'how-to-make'
   ];
   
   if (!elementsToTrack.includes(targetId)) {
@@ -638,9 +638,9 @@ document.addEventListener("DOMContentLoaded", () => {
       errorMessages.push("Ingredient Image is required.");
     }
 
-    // If there are error messages, alert the user and return
+    // If there are error messages, showCustomAlert the user and return
     if (errorMessages.length > 0) {
-      alert(errorMessages.join("\n")); // Display all error messages in an alert
+      showCustomAlert(errorMessages.join("\n")); // Display all error messages in an showCustomAlert
       return;
     }
 
@@ -679,7 +679,7 @@ document.addEventListener("DOMContentLoaded", () => {
           // Hide loading screen
           document.getElementById("loading-page").style.display = "none";
           
-          alert("Ingredient added successfully!");
+          showCustomAlert("Ingredient added successfully!");
           console.log("Refreshing ingredient list after adding...");
           await fetchIngredients(); // Refresh the ingredient list after adding
           console.log("Clearing form fields...");
@@ -689,11 +689,11 @@ document.addEventListener("DOMContentLoaded", () => {
           document.getElementById("ingredient-name").focus();
         } else {
           const errorText = await response.text();
-          alert("Failed to add the ingredient. Server response: " + errorText);
+          showCustomAlert("Failed to add the ingredient. Server response: " + errorText);
         }
       } catch (error) {
         console.error("Error adding ingredient:", error);
-        alert(
+        showCustomAlert(
           "An error occurred while adding the ingredient: " + error.message
         );
       }
@@ -701,7 +701,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     reader.onerror = (error) => {
       console.error("Error reading image file:", error);
-      alert("An error occurred while reading the image file: " + error.message);
+      showCustomAlert("An error occurred while reading the image file: " + error.message);
     };
   });
 
@@ -812,7 +812,7 @@ function handleCheckboxChange(event) {
         } else {
             event.target.checked = false; // Uncheck the checkbox
             console.log(selectedIngredients);
-            alert("You can only select up to 10 ingredients."); // Alert the user
+            showCustomAlert("You can only select up to 10 ingredients."); // showCustomAlert the user
         }
     } else {
         // If the checkbox is unchecked, remove it from the selectedIngredients array
@@ -1142,7 +1142,7 @@ async function showAllCocktails(selectedIngredients = []) {
       });
       
       if (filteredCocktails.length === 0) {
-          alert('No cocktails found with the selected ingredients. Please try a different combination.');
+          showCustomAlert('No cocktails found with the selected ingredients. Please try a different combination.');
       }
       else{
         displayCocktails(filteredCocktails);
@@ -1284,7 +1284,7 @@ function handleCocktailIngredientSelection(event, ingredient) {
             console.log('Current selected ingredients:', selectedCocktailIngredients);
         } else {
             event.target.checked = false;
-            alert("You can only select up to 10 ingredients.");
+            showCustomAlert("You can only select up to 10 ingredients.");
         }
     } else {
         selectedCocktailIngredients = selectedCocktailIngredients.filter(
@@ -1325,7 +1325,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (selectedCocktailIngredients.length === 0) errorMessages.push("At least one ingredient is required.");
 
             if (errorMessages.length > 0) {
-                alert(errorMessages.join("\n"));
+                showCustomAlert(errorMessages.join("\n"));
                 return;
             }
 
@@ -1361,7 +1361,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         // Hide loading screen
                         document.getElementById("loading-page").style.display = "none";
                         
-                        alert("Cocktail added successfully!");
+                        showCustomAlert("Cocktail added successfully!");
                         // Reset form and fetch new ID
                         resetCocktailForm();
                         await updateNextCocktailId(); // Update the ID first
@@ -1370,18 +1370,18 @@ document.addEventListener("DOMContentLoaded", () => {
                         clearaddcocktailform();
                     } else {
                         const errorText = await response.text();
-                        alert("Failed to add the cocktail. Server response: " + errorText);
+                        showCustomAlert("Failed to add the cocktail. Server response: " + errorText);
                     }
                 } catch (error) {
                     console.error("Error adding cocktail:", error);
-                    alert("An error occurred while adding the cocktail: " + error.message);
+                    showCustomAlert("An error occurred while adding the cocktail: " + error.message);
                 }
             };
             await updateNextCocktailId();
 
             reader.onerror = (error) => {
                 console.error("Error reading image file:", error);
-                alert("An error occurred while reading the image file: " + error.message);
+                showCustomAlert("An error occurred while reading the image file: " + error.message);
             };
         });
     }
@@ -1454,3 +1454,15 @@ async function waitForImageProcessing() {
     console.warn('Image processing timed out');
     return false;
 }
+
+function showCustomAlert(title, message) {
+  document.getElementById('alert-title').textContent = title; // Set the title
+  document.getElementById('alert-message').textContent = message; // Set the message
+  document.getElementById('custom-alert').style.display = 'block'; // Show the alert
+}
+
+
+// Close the alert when the OK button is clicked
+document.getElementById('alert-ok').onclick = function() {
+  document.getElementById('custom-alert').style.display = 'none'; // Hide the alert
+};
