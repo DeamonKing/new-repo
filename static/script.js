@@ -561,6 +561,8 @@ const elementsToTrack = [
 
 let lastFocusState = false;
 
+let lastActiveElement = null;
+
 function checkFocus(event) {
   // Only handle focus events for specific elements that need server notification
   const targetId = event.target.id;
@@ -569,27 +571,51 @@ function checkFocus(event) {
     return; // Don't process focus events for other input fields
   }
 
-  updateFocusState(event.type === "focus");
+  // For blur events, check if we're switching to another tracked input
+  if (event.type === "blur") {
+    // Use setTimeout to check after the new element receives focus
+    setTimeout(() => {
+      const newActiveElement = document.activeElement;
+      if (!elementsToTrack.includes(newActiveElement.id)) {
+        updateFocusState(false);
+      }
+    }, 0);
+  } else if (event.type === "focus") {
+    updateFocusState(true);
+  }
 }
 
 function updateFocusState(isFocused) {
   if (lastFocusState === isFocused) return; // Avoid duplicate requests
   
   lastFocusState = isFocused;
-  const endpoint = isFocused ? "/focus-in" : "/focus-out";
-  
-  fetch(endpoint, {
-    method: "POST",
-  })
-    .then((response) => response.text())
-    .then((data) => console.log(data))
-    .catch((error) => console.error('Focus event error:', error));
+  if (isFocused) {
+    fetch("/focus-in", {
+      method: "POST",
+    })
+      .then((response) => response.text())
+      .then((data) => console.log(data))
+      .catch((error) => console.error('Focus event error:', error));
+  } else {
+    // Only send focus-out if we're not focused on any tracked input
+    const activeElement = document.activeElement;
+    if (!elementsToTrack.includes(activeElement.id)) {
+      fetch("/focus-out", {
+        method: "POST",
+      })
+        .then((response) => response.text())
+        .then((data) => console.log(data))
+        .catch((error) => console.error('Focus event error:', error));
+    }
+  }
 }
 
 function pollFocusState() {
   const activeElement = document.activeElement;
   const isFocused = elementsToTrack.includes(activeElement.id);
-  updateFocusState(isFocused);
+  if (isFocused !== lastFocusState) {
+    updateFocusState(isFocused);
+  }
 }
 
 // Add event listeners to all relevant input fields
