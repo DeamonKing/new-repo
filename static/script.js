@@ -550,24 +550,33 @@ document
     event.preventDefault(); // Prevent default form submission
   });
 
+const elementsToTrack = [
+  'ingredient-search',
+  'cocktail-ingredient-search',
+  'ingredient-name', 
+  'product-name',    
+  'product-desc',
+  'how-to-make'
+];
+
+let lastFocusState = false;
+
 function checkFocus(event) {
   // Only handle focus events for specific elements that need server notification
   const targetId = event.target.id;
-  const elementsToTrack = [
-    'ingredient-search',
-    'cocktail-ingredient-search',
-    'ingredient-name', 
-    'product-name',    
-    'product-desc',
-    'how-to-make'
-  ];
   
   if (!elementsToTrack.includes(targetId)) {
     return; // Don't process focus events for other input fields
   }
 
-  // Send POST request based on focus event type
-  const endpoint = event.type === "focus" ? "/focus-in" : "/focus-out";
+  updateFocusState(event.type === "focus");
+}
+
+function updateFocusState(isFocused) {
+  if (lastFocusState === isFocused) return; // Avoid duplicate requests
+  
+  lastFocusState = isFocused;
+  const endpoint = isFocused ? "/focus-in" : "/focus-out";
   
   fetch(endpoint, {
     method: "POST",
@@ -577,12 +586,21 @@ function checkFocus(event) {
     .catch((error) => console.error('Focus event error:', error));
 }
 
+function pollFocusState() {
+  const activeElement = document.activeElement;
+  const isFocused = elementsToTrack.includes(activeElement.id);
+  updateFocusState(isFocused);
+}
+
 // Add event listeners to all relevant input fields
 const searchInputs = document.querySelectorAll("#ingredient-search, #cocktail-ingredient-search, #ingredient-name, #product-name, #product-desc, #how-to-make");
 searchInputs.forEach((input) => {
   input.addEventListener("focus", checkFocus);
   input.addEventListener("blur", checkFocus);
 });
+
+// Start polling focus state every 200ms
+setInterval(pollFocusState, 200);
 
 // Function to fetch existing ingredients and set up the form
 async function fetchIngredientsID() {
