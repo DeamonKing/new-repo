@@ -16,7 +16,9 @@ function createWindow() {
       webSecurity: true
     },
     autoHideMenuBar: true,
-    icon: path.join(__dirname, 'img/logo.png')
+    icon: path.join(__dirname, 'img/logo.png'),
+    alwaysOnTop: false,  // This ensures other windows can appear on top
+    focusable: true      // Allows focus to shift to other windows
   });
 
   // Maximize the window after creation
