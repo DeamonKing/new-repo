@@ -8,18 +8,8 @@ import logging
 from image_handler import processing_complete
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import serial
-from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    handlers=[
-        RotatingFileHandler('app.log', maxBytes=1024*1024, backupCount=5),
-        logging.StreamHandler()
-    ],
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
 
 # Define the base directory as the directory where this script is located
 base_dir = os.path.dirname(__file__)
