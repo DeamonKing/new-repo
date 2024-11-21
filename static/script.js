@@ -555,7 +555,7 @@ const elementsToTrack = [
   'cocktail-ingredient-search',
   'ingredient-name', 
   'product-name',    
-  'product-desc',
+  'product-description',
   'how-to-make'
 ];
 
