@@ -235,9 +235,9 @@ class CustomHandler(SimpleHTTPRequestHandler):
                 json.dump(data, file, indent=2)
 
             # Wait for image processing to complete (with timeout)
-            self.send_response(201)
-            self.end_headers()
-            self.wfile.write(b"Ingredient added successfully")
+                self.send_response(201)
+                self.end_headers()
+                self.wfile.write(b"Ingredient added successfully")
         
         except Exception as e:
             print(f"Error adding ingredient: {e}")  # Log the error to the console
