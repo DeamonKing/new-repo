@@ -9,6 +9,7 @@ let activeMenu = "findCocktail";
 
 // Global variable for cocktail ingredients
 let selectedCocktailIngredients = [];
+let selectedingforcocktail = [];
 
 let extraIngredients = []; // Global array to hold extra ingredients
 
@@ -117,85 +118,91 @@ document.addEventListener('DOMContentLoaded', () => {
   getNextProductId();
 });
 
+
 async function fetchIngredientsForCocktail(searchTerm = "") {
   try {
-    const ingredients = await fetchIngredientsData();
-    
-    // Sort ingredients alphabetically by name
-    ingredients.sort((a, b) => a.ING_Name.localeCompare(b.ING_Name));
-    
-    const container = document.getElementById("cocktail-ingredients-container1");
-    container.innerHTML = ""; // Clear existing ingredients
+      const ingredients = await fetchIngredientsData();
 
-    // Update the counter display
-    const counterElement = document.querySelector(".cocktail-fi-top .searchbar p span");
-    counterElement.textContent = `${selectedingforcocktail.length}/10`;
+      // Sort ingredients alphabetically by name
+      ingredients.sort((a, b) => a.ING_Name.localeCompare(b.ING_Name));
 
-    ingredients.forEach((ingredient) => {
-      if (searchTerm === "" || 
-          ingredient.ING_Name.toLowerCase().includes(searchTerm.toLowerCase())) {
-        const ingDiv = document.createElement("div");
-        ingDiv.classList.add("ing-item");
-        
-        const label = document.createElement("label");
-        label.classList.add("btn-checkbox");
-        
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.classList.add("checkbox");
-        checkbox.dataset.ingredientId = ingredient.ING_ID;
-        checkbox.dataset.ingredientName = ingredient.ING_Name;
-        
-        // Check if this ingredient is already selected
-        if (selectedCocktailIngredients.some(ing => ing.id === ingredient.ING_ID)) {
-          checkbox.checked = true;
-        }
-        
-        checkbox.addEventListener("change", (event) => {
-          handleCocktailIngredientSelection(event, ingredient);
-        });
+      const container = document.getElementById("cocktail-ingredients-container1");
+      container.innerHTML = ""; // Clear existing ingredients
 
-        const img = document.createElement("img");
-        img.src = ingredient.ING_IMG || "img/ing2.gif";
-        img.alt = `Ingredient - ${ingredient.ING_Name}`;
+      // Clear previous selections when fetching new ingredients
+      selectedingforcocktail = [];
 
-        const para = document.createElement("p");
-        para.textContent = ingredient.ING_Name;
+      ingredients.forEach((ingredient) => {
+          if (searchTerm === "" || ingredient.ING_Name.toLowerCase().includes(searchTerm.toLowerCase())) {
+              const ingDiv = document.createElement("div");
+              ingDiv.classList.add("ing-item");
 
-        label.appendChild(checkbox);
-        label.appendChild(img);
-        label.appendChild(para);
-        ingDiv.appendChild(label);
-        container.appendChild(ingDiv);
-      }
-    });
+              const label = document.createElement("label");
+              label.classList.add("btn-checkbox");
+
+              const checkbox = document.createElement("input");
+              checkbox.type = "checkbox";
+              checkbox.classList.add("checkbox");
+              checkbox.dataset.ingredientId = ingredient.ING_ID;
+              checkbox.dataset.ingredientName = ingredient.ING_Name;
+
+              // Check if this ingredient is already selected
+              if (selectedCocktailIngredients.some(ing => ing.ING_Name === ingredient.ING_Name)) {
+                  checkbox.checked = true; // Set checkbox to checked if selected
+                  selectedingforcocktail.push(ingredient.ING_Name); // Add to selectedingforcocktail
+                  console.log(`Ingredient ${ingredient.ING_Name} is already selected.`);
+              }
+
+              checkbox.addEventListener("change", (event) => {
+                  handleCocktailIngredientSelection(event, ingredient);
+                  // Update selectedingforcocktail array
+                  if (event.target.checked) {
+                      if (!selectedingforcocktail.includes(ingredient.ING_Name)) {
+                          selectedingforcocktail.push(ingredient.ING_Name);
+                      }
+                  } else {
+                      selectedingforcocktail = selectedingforcocktail.filter(name => name !== ingredient.ING_Name);
+                  }
+                  const counterElement = document.getElementById("cicount");
+                  counterElement.textContent = `${selectedingforcocktail.length}/10`;
+              });
+
+              const img = document.createElement("img");
+              img.src = ingredient.ING_IMG || "img/ing2.gif";
+              img.alt = `Ingredient - ${ingredient.ING_Name}`;
+
+              const para = document.createElement("p");
+              para.textContent = ingredient.ING_Name;
+
+              label.appendChild(checkbox);
+              label.appendChild(img);
+              label.appendChild(para);
+              ingDiv.appendChild(label);
+              container.appendChild(ingDiv);
+          }
+      });
   } catch (error) {
-    console.error("Error fetching ingredients for cocktail:", error);
+      console.error("Error fetching ingredients for cocktail:", error);
   }
 }
 
 function handleCocktailIngredientSelection(event, ingredient) {
-  if (event.target.checked) {
-    if (selectedCocktailIngredients.length < MAX_INGREDIENTS) {
-      selectedingforcocktail.push({
-        id: ingredient.ING_ID,
-        name: ingredient.ING_Name
-      });
+    if (event.target.checked) {
+        if (selectedCocktailIngredients.length < MAX_INGREDIENTS) {
+            selectedCocktailIngredients.push({
+                ING_ID: ingredient.ING_ID,
+                ING_Name: ingredient.ING_Name
+            });
+            console.log('Added ingredient to selectedCocktailIngredients:', ingredient.ING_Name);
+        } else {
+            event.target.checked = false; // Uncheck if max ingredients reached
+            alert(`You can only select up to ${MAX_INGREDIENTS} ingredients.`);
+            console.log('Max ingredients limit reached.');
+        }
     } else {
-      event.target.checked = false;
-      showCustomAlert("You can only select up to 10 ingredients.");
+        selectedCocktailIngredients = selectedCocktailIngredients.filter(ing => ing.ING_ID !== ingredient.ING_ID);
+        console.log('Removed ingredient from selectedCocktailIngredients:', ingredient.ING_Name);
     }
-  } else {
-    selectedingforcocktail = selectedingforcocktail.filter(
-      ing => ing.id !== ingredient.ING_ID
-    );
-  }
-  
-  // Update the counter display
-  const counterElement = document.querySelector(".cocktail-fi-top .searchbar p span");
-  counterElement.textContent = `${selectedCocktailIngredients.length}/10`;
-  
-  console.log("Selected cocktail ingredients:", selectedCocktailIngredients);
 }
 
 function filterCocktailIngredientsByType(type) {
@@ -1345,36 +1352,6 @@ async function fetchNextCocktailId() {
         console.error("Error fetching cocktails:", error);
         return 1;
     }
-}
-
-// Global array to store selected cocktail ingredients
-let selectedingforcocktail = [];
-
-// Function to handle cocktail ingredient selection
-function handleCocktailIngredientSelection(event, ingredient) {
-    if (event.target.checked) {
-        if (selectedCocktailIngredients.length < MAX_INGREDIENTS) {
-            selectedCocktailIngredients.push({
-                ING_ID: ingredient.ING_ID,
-                ING_Name: ingredient.ING_Name
-            });
-            console.log('Added ingredient:', ingredient.ING_Name);
-            console.log('Current selected ingredients:', selectedCocktailIngredients);
-        } else {
-            event.target.checked = false;
-            showCustomAlert("You can only select up to 10 ingredients.");
-        }
-    } else {
-        selectedCocktailIngredients = selectedCocktailIngredients.filter(
-            ing => ing.ING_ID !== ingredient.ING_ID
-        );
-        console.log('Removed ingredient:', ingredient.ING_Name);
-        console.log('Current selected ingredients:', selectedCocktailIngredients);
-    }
-    
-    // Update the counter display
-    const counterElement = document.querySelector(".cocktail-fi-top .searchbar p span");
-    counterElement.textContent = `${selectedCocktailIngredients.length}/10`;
 }
 
 // Function to handle cocktail form submission
