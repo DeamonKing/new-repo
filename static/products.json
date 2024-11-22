@@ -75,15 +75,19 @@
   },
   {
     "PID": 4,
-    "PName": "New",
-    "PImage": "/upload/new.png",
+    "PName": "Cirtus",
+    "PImage": "/upload/cirtus.png",
     "PCat": "Cocktail",
-    "PDesc": "wad",
-    "PHtm": "wad",
+    "PDesc": "New Strawberry",
+    "PHtm": "Don't Know",
     "PIng": [
       {
-        "ING_ID": "68",
-        "ING_Name": "Absinthe"
+        "ING_ID": "79",
+        "ING_Name": "Strawberry Liqueur"
+      },
+      {
+        "ING_ID": "2",
+        "ING_Name": "Gin"
       }
     ]
   }

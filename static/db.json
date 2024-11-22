@@ -622,5 +622,11 @@
     "ING_Name": "Lime Wedges",
     "ING_Type": "Garnish",
     "ING_IMG": ""
+  },
+  {
+    "ING_ID": "105",
+    "ING_Name": "New Stawberry",
+    "ING_Type": "Liquid",
+    "ING_IMG": "/upload/new_stawberry.png"
   }
 ]

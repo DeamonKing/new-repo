@@ -1449,7 +1449,7 @@ function clearaddcocktailform() {
 
   // Clear selected ingredients
   selectedCocktailIngredients = [];
-  const counterElement = document.querySelector(".cocktail-fi-top .searchbar p span");
+  const counterElement = document.getElementById("cicount");
   counterElement.textContent = "0/10";
   document.querySelectorAll('#cocktail-ingredients-container1 input[type="checkbox"]').forEach(checkbox => {
     checkbox.checked = false;
