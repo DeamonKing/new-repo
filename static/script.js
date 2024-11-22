@@ -164,8 +164,12 @@ async function fetchIngredientsForCocktail(searchTerm = "") {
                       selectedingforcocktail = selectedingforcocktail.filter(name => name !== ingredient.ING_Name);
                   }
                   const counterElement = document.getElementById("cicount");
-                  counterElement.textContent = `${selectedingforcocktail.length}/10`;
+                  counterElement.textContent = `${selectedCocktailIngredients.length}/10`;
+                  console.log(`SelectedCocktailIngredients ${selectedCocktailIngredients.length}`);
+                  console.log(`selectedingforcocktail ${selectedingforcocktail.length}`);
               });
+
+
 
               const img = document.createElement("img");
               img.src = ingredient.ING_IMG || "img/ing2.gif";
@@ -1460,7 +1464,6 @@ enableForms();
 document.getElementById("clear-all-add-cocktail").addEventListener("click", () => {
   clearaddcocktailform();
 });
-
 
 
 function resetCocktailForm() {
