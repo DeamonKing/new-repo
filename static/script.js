@@ -10,6 +10,8 @@ let activeMenu = "findCocktail";
 // Global variable for cocktail ingredients
 let selectedCocktailIngredients = [];
 
+let extraIngredients = []; // Global array to hold extra ingredients
+
 document.addEventListener("DOMContentLoaded", () => {
   initializeApp();
   setupCocktailIngredientHandlers();
@@ -231,41 +233,52 @@ function setupEventListeners() {
     });
   });
 
-document.getElementById("showProducts").addEventListener("click", async () => {
-  findIngSection.style.display = "none";
-  addIngSection.style.display = "none";
-  addCocktailSection.style.display = "none";
-  allCocktailSection.style.display = "block"; // Show All Cocktails section
-  cocktailDetailsSection.style.display = "none";
-  selectPipelineSection.style.display = "none";
-  allCocktailsBtn.classList.remove("active");
-  allCocktailsBtn.classList.add("deactive");
-  findCocktailBtn.classList.remove("active");
-  findCocktailBtn.classList.add("deactive");
-  addIngredientsBtn.classList.remove("active");
-  addIngredientsBtn.classList.add("deactive");
-  addCocktailBtn.classList.remove("active");
-  addCocktailBtn.classList.add("deactive");
-  assignPipelineBtn.classList.remove("active");
-  assignPipelineBtn.classList.add("deactive");
-  cotailInfoBtn.classList.remove("active");
-  cotailInfoBtn.classList.add("deactive");
-  updateButtonStyles();
+async function ShowProductsFunc() {
   const cocktails = await fetchCocktails();
+  
+  // Filter cocktails to find those whose ingredients match all selected ingredients
   const filteredCocktails = cocktails.filter(cocktail => {
     const cocktailIngredients = cocktail.PIng.map(ingredient => ingredient.ING_Name);
-    return selectedIngredients.some(selectedIngredient => cocktailIngredients.includes(selectedIngredient));
+    // Check if all cocktail ingredients are included in the selected ingredients
+    return cocktailIngredients.every(cocktailIngredient => selectedIngredients.includes(cocktailIngredient));
   });
+
+  if (selectedIngredients.length === 0) {
+    showCustomAlert('No ingredients selected. Please select at least one ingredient.');
+    return;
+  }
+
+  // If no cocktails match the selected ingredients, show an alert
+  if (filteredCocktails.length === 0) {
+    showCustomAlert('No cocktails found that match all selected ingredients. Please try a different combination.');
+    return; // Exit the function
+  }
+
+  // Determine extra selected ingredients that do not match any cocktails
+  const cocktailIngredientNames = new Set(filteredCocktails.flatMap(cocktail => cocktail.PIng.map(ingredient => ingredient.ING_Name)));
+  const extraSelectedIngredients = selectedIngredients.filter(ingredient => !cocktailIngredientNames.has(ingredient));
+
+  // Update the global extraIngredients array
+  extraIngredients = extraSelectedIngredients; // Store the extra ingredients in the global array
+
+  // Create a new element to display extra selected ingredients
+  const extraSelectedIngredientsContainer = document.getElementById("extra-selected-ingredients");
+  extraSelectedIngredientsContainer.innerHTML = ""; // Clear previous contents
+
+  if (extraSelectedIngredients.length > 0) {
+    extraSelectedIngredientsContainer.innerHTML = `<h3>Extra Selected Ingredients:</h3><p>${extraSelectedIngredients.join(', ')}</p>`;
+  } else {
+    extraSelectedIngredientsContainer.innerHTML = ""; // Clear if no extra ingredients
+  }
+
   console.log(filteredCocktails);
   console.log(selectedIngredients);
 
-  if (filteredCocktails.length === 0) {
-    showCustomAlert('No cocktails found with the selected ingredients. Please try a different combination.');
-  } else if (selectedIngredients.length === 0) {
-    showCustomAlert('No ingredients selected. Please select at least one ingredient.');
-  } else {
-    displayCocktails(filteredCocktails);
-  }
+  displayCocktails(filteredCocktails);
+}
+
+document.getElementById("showProducts").addEventListener("click", async () => {
+    ShowProductsFunc();
 });
 
   // Check which menu should be active
@@ -1045,8 +1058,11 @@ function showAssignPipeline(cocktail) {
   const selectedIngredientsContainer = document.querySelector(".selected-ingredients-container");
   selectedIngredientsContainer.innerHTML = ""; // Clear previous entries
 
-// Populate the selected ingredients container with the cocktail ingredients
-  cocktail.PIng.forEach(ingredient => {
+  // Combine cocktail ingredients and extra ingredients
+  const combinedIngredients = cocktail.PIng.concat(extraIngredients.map(ing => ({ ING_Name: ing })));
+
+  // Populate the selected ingredients container with the combined ingredients
+  combinedIngredients.forEach(ingredient => {
       const ingredientDiv = document.createElement("div");
       ingredientDiv.style.display = "flex"; // Flexbox for layout
       ingredientDiv.style.alignItems = "center"; // Center items vertically
@@ -1081,21 +1097,20 @@ function showAssignPipeline(cocktail) {
 
       // Add event listener to track selected pipelines
       pipeSelect.addEventListener("change", (event) => {
-        const selectedPipe = event.target.value;
-                  // If a pipe is selected, add it to the selectedPipelines object
-                  if (selectedPipe) {
-                    selectedPipelines[ingredient] = selectedPipe;
-                } else {
-                    // If no pipe is selected, remove it from the selectedPipelines object
-                    delete selectedPipelines[ingredient];
-                }
-      
-                // Update dropdowns to disable already selected pipelines
-                updatePipelineDropdowns();
-            });
-        });
-      
-      
+          const selectedPipe = event.target.value;
+          // If a pipe is selected, add it to the selectedPipelines object
+          if (selectedPipe) {
+              selectedPipelines[ingredient.ING_Name] = selectedPipe; // Use ingredient name as key
+          } else {
+              // If no pipe is selected, remove it from the selectedPipelines object
+              delete selectedPipelines[ingredient.ING_Name];
+          }
+
+          // Update dropdowns to disable already selected pipelines
+          updatePipelineDropdowns();
+      });
+  });
+
   // Update button states
   assignPipelineBtn.classList.add("active");
   assignPipelineBtn.classList.remove("deactive");
@@ -1212,6 +1227,25 @@ async function fetchCocktails() {
 
 // Function to display cocktails in the UI
 function displayCocktails(cocktails) {
+  findIngSection.style.display = "none";
+  addIngSection.style.display = "none";
+  addCocktailSection.style.display = "none";
+  allCocktailSection.style.display = "block"; // Show All Cocktails section
+  cocktailDetailsSection.style.display = "none";
+  selectPipelineSection.style.display = "none";
+  allCocktailsBtn.classList.add("active");
+  allCocktailsBtn.classList.remove("deactive");
+  findCocktailBtn.classList.remove("active");
+  findCocktailBtn.classList.add("deactive");
+  addIngredientsBtn.classList.remove("active");
+  addIngredientsBtn.classList.add("deactive");
+  addCocktailBtn.classList.remove("active");
+  addCocktailBtn.classList.add("deactive");
+  assignPipelineBtn.classList.remove("active");
+  assignPipelineBtn.classList.add("deactive");
+  cotailInfoBtn.classList.remove("active");
+  cotailInfoBtn.classList.add("deactive");
+  updateButtonStyles();
   const cocktailListContainer = document.querySelector(".cocktail-list");
   cocktailListContainer.innerHTML = ""; // Clear existing content
 
