@@ -265,22 +265,12 @@ async function ShowProductsFunc() {
     return; // Exit the function
   }
 
-  // Determine extra selected ingredients that do not match any cocktails
+  // Determine `extra` selected ingredients that do not match any cocktails
   const cocktailIngredientNames = new Set(filteredCocktails.flatMap(cocktail => cocktail.PIng.map(ingredient => ingredient.ING_Name)));
   const extraSelectedIngredients = selectedIngredients.filter(ingredient => !cocktailIngredientNames.has(ingredient));
 
   // Update the global extraIngredients array
   extraIngredients = extraSelectedIngredients; // Store the extra ingredients in the global array
-
-  // Create a new element to display extra selected ingredients
-  const extraSelectedIngredientsContainer = document.getElementById("extra-selected-ingredients");
-  extraSelectedIngredientsContainer.innerHTML = ""; // Clear previous contents
-
-  if (extraSelectedIngredients.length > 0) {
-    extraSelectedIngredientsContainer.innerHTML = `<h3>Extra Selected Ingredients:</h3><p>${extraSelectedIngredients.join(', ')}</p>`;
-  } else {
-    extraSelectedIngredientsContainer.innerHTML = ""; // Clear if no extra ingredients
-  }
 
   console.log(filteredCocktails);
   console.log(selectedIngredients);

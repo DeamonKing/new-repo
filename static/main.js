@@ -7,7 +7,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1920,  // Initial width
     height: 1080,  // Initial height
-    fullscreen: false,  // Make sure the window is not in fullscreen by default
+    fullscreen: false,  // Ensure the window is not in fullscreen
+    frame: false,  // Make the window borderless
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -31,7 +32,6 @@ function createWindow() {
 
   // Load the HTML page served by your Python HTTP server
   mainWindow.loadURL('http://127.0.0.1:5000/home');  // Ensure this is the correct URL for the 'home' endpoint
-
 
   // Reload the window when it gets focus to ensure fresh content
   mainWindow.on('focus', () => {
