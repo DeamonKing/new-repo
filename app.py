@@ -272,7 +272,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
                     message = f"{ingredient}: {pipe}\n"
                     print(f"Sending to serial: {message.strip()}")
                     ser.write(message.encode("utf-8"))
-                    return "OK"
+                    
 
                     # # Wait for acknowledgment with timeout
                     # start_time = time.time()
@@ -287,6 +287,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
 
                     # print("Timeout waiting for serial response")
                     # return "Error: Serial communication timeout"
+                return "OK"
         except serial.SerialException as e:
             error_message = f"Serial error: {str(e)}"
             print(error_message)
