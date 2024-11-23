@@ -7,7 +7,7 @@ import threading
 import time
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
-
+import serial.tools.list_ports
 
 import serial
 
@@ -264,8 +264,23 @@ class CustomHandler(SimpleHTTPRequestHandler):
                 response.encode()
             )  # Send the error message back to JavaScript
 
+    
+
     def send_to_serial_output(self, assigned_pipes):
-        port = "/dev/ttyACM0" if platform.system() == "Linux" else "COM1"
+        # Find the appropriate serial port
+        port = None
+        available_ports = serial.tools.list_ports.comports()
+        
+        # Check for available ports and set the appropriate one
+        for p in available_ports:
+            if p.device == "/dev/ttyACM0" or p.device == "/dev/ttyUSB0":
+                port = p.device
+                break  # Exit the loop once we find a suitable port
+
+        if port is None:
+            print("No suitable serial port found.")
+            return "Error: No suitable serial port found"
+
         try:
             with serial.Serial(port, 9600, timeout=5) as ser:
                 for ingredient, pipe in assigned_pipes.items():
@@ -273,21 +288,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
                     print(f"Sending to serial: {message.strip()}")
                     ser.write(message.encode("utf-8"))
                     
-
-                    # # Wait for acknowledgment with timeout
-                    # start_time = time.time()
-                    # while time.time() - start_time < 10:  # 5 second timeout
-                    #     if ser.in_waiting > 0:
-                    #         response = ser.readline().decode("utf-8").strip()
-                    #         if response == "OK":
-                    #             print("Received OK from serial machine")
-                    #             return "OK"
-                    #         elif response:
-                    #             logging.warning(f"Unexpected response: {response}")
-
-                    # print("Timeout waiting for serial response")
-                    # return "Error: Serial communication timeout"
-                return "OK"
+                return "OK"  # Indicate successful sending
         except serial.SerialException as e:
             error_message = f"Serial error: {str(e)}"
             print(error_message)
