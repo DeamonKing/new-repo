@@ -451,7 +451,7 @@ document.getElementById("serial-out-button").addEventListener("click", () => {
 
         // Check if a pipe has been assigned
         if (!selectedPipe) {
-            errorMessages.push(`Please assign a pipeline for ${ingredientName}.`);
+            errorMessages.push(`Please assign a pipeline for ${ingredientName}.\n`);
         } else {
             assignedPipes[ingredientName] = selectedPipe; // Store the assigned pipe for each ingredient
         }
@@ -1369,7 +1369,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!cocktailName) errorMessages.push("Cocktail Name is required.");
             if (!cocktailType) errorMessages.push("Cocktail Type is required.");
             if (!cocktailDesc) errorMessages.push("Description is required.");
-            if (!cocktailHtm) errorMessages.push("How to make instructions are required.");
             if (!cocktailImage) errorMessages.push("Cocktail Image is required.");
             if (selectedCocktailIngredients.length === 0) errorMessages.push("At least one ingredient is required.");
 
@@ -1503,12 +1502,14 @@ async function waitForImageProcessing() {
     return false;
 }
 
-function showCustomAlert(title, message) {
-  document.getElementById('alert-title').textContent = title; // Set the title
-  document.getElementById('alert-message').textContent = message; // Set the message
-  document.getElementById('custom-alert').style.display = 'block'; // Show the alert
+function showCustomAlert(message) { 
+  if (message) {
+      document.getElementById('alert-message').innerHTML = message.replace(/\n/g, '<br>'); // Replace \n with <br>
+  } else {
+      document.getElementById('alert-message').innerHTML = ""; // Clear message if undefined
+  }
+  document.getElementById('custom-alert').style.display = 'block'; // Show the alert 
 }
-
 
 // Close the alert when the OK button is clicked
 document.getElementById('alert-ok').onclick = function() {
