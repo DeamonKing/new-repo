@@ -271,20 +271,21 @@ class CustomHandler(SimpleHTTPRequestHandler):
                     message = f"{ingredient}: {pipe}\n"
                     logging.info(f"Sending to serial: {message.strip()}")
                     ser.write(message.encode("utf-8"))
+                    return "OK"
 
-                    # Wait for acknowledgment with timeout
-                    start_time = time.time()
-                    while time.time() - start_time < 5:  # 5 second timeout
-                        if ser.in_waiting > 0:
-                            response = ser.readline().decode("utf-8").strip()
-                            if response == "OK":
-                                logging.info("Received OK from serial machine")
-                                return "OK"
-                            elif response:
-                                logging.warning(f"Unexpected response: {response}")
+                    # # Wait for acknowledgment with timeout
+                    # start_time = time.time()
+                    # while time.time() - start_time < 10:  # 5 second timeout
+                    #     if ser.in_waiting > 0:
+                    #         response = ser.readline().decode("utf-8").strip()
+                    #         if response == "OK":
+                    #             logging.info("Received OK from serial machine")
+                    #             return "OK"
+                    #         elif response:
+                    #             logging.warning(f"Unexpected response: {response}")
 
-                    logging.error("Timeout waiting for serial response")
-                    return "Error: Serial communication timeout"
+                    # logging.error("Timeout waiting for serial response")
+                    # return "Error: Serial communication timeout"
         except serial.SerialException as e:
             error_message = f"Serial error: {str(e)}"
             print(error_message)
