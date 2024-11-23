@@ -7,6 +7,8 @@ let ingredientsData = [];
 let selectedIngredients = [];
 let activeMenu = "findCocktail";
 
+let selectedCocktailID = 1;
+
 // Global variable for cocktail ingredients
 let selectedCocktailIngredients = [];
 let selectedingforcocktail = [];
@@ -341,6 +343,7 @@ const allCocktailSection = document.querySelector(".all-cocktail");
 const cocktailDetailsSection = document.querySelector(".cocktail-details"); // New section for cocktail details
 const assignPipelineBtn = document.getElementById("assignPipeline");
 const selectPipelineSection = document.querySelector(".select-pipeline");
+const cocktailIDEle = document.getElementById("cocktail-id");
 
 // Function to show the "Find Cocktail" section
 function showFindCocktail() {
@@ -450,13 +453,19 @@ document.getElementById("serial-out-button").addEventListener("click", () => {
 
 // Function to send assigned pipelines to the Python script
 function sendPipesToPython(assignedPipes) {
-  console.log(`assigned pipes ${JSON.stringify(assignedPipes)}`);
+  const drinkType = document.querySelector('input[name="drink-type"]:checked').value; // Get the selected drink type
+  const dataToSend = {
+    productId: selectedCocktailID,
+    ingredients: assignedPipes,
+    drinkType: drinkType
+}; 
+  console.log(`assigned pipes ${JSON.stringify(dataToSend)}`);
   fetch("/send-pipes", {
       method: "POST",
       headers: {
           "Content-Type": "application/json",
       },
-      body: JSON.stringify(assignedPipes), // Send the entire object
+      body: JSON.stringify(dataToSend), // Send the entire object
   })
   .then(response => {
       if (response.ok) {
@@ -1252,6 +1261,7 @@ async function wshowCocktailDetails(cocktail) {
   cocktailDetailsSection.style.display = "block"; // Show Cocktail Details section
 
   // Update the cocktail image and name
+  const cocktailID = document.getElementById("cocktail-id");
   const cocktailImage = document.getElementById("cocktail-image");
   const cocktailName = document.getElementById("cocktail-name");
   const cocktailDescription = document.getElementById("cocktail-description");
@@ -1292,6 +1302,7 @@ async function wshowCocktailDetails(cocktail) {
   // Add event listener for the Start Making button
   document.getElementById("assignPipeline").onclick = () => {
       showAssignPipeline(cocktail); // Pass the cocktail to the Assign Pipeline section
+      selectedCocktailID = cocktail.PID;
   };
 }
 

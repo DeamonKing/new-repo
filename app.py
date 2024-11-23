@@ -264,7 +264,6 @@ class CustomHandler(SimpleHTTPRequestHandler):
                 response.encode()
             )  # Send the error message back to JavaScript
 
-    
 
     def send_to_serial_output(self, assigned_pipes):
         # Find the appropriate serial port
