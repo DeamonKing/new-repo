@@ -10,7 +10,7 @@ let activeMenu = "findCocktail";
 // Global variable for cocktail ingredients
 let selectedCocktailIngredients = [];
 let selectedingforcocktail = [];
-
+let assignedPipelines = {}; // Global object to keep track of assigned pipelines
 let extraIngredients = []; // Global array to hold extra ingredients
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -441,70 +441,42 @@ function showAddCocktail() {
 
 
 document.getElementById("serial-out-button").addEventListener("click", () => {
-    const assignedPipes = {};
-    const ingredientDivs = document.querySelectorAll(".selected-ingredients-container > div");
-    let errorMessages = []; // Array to collect error messages
+  // Show loading page
+  showLoadingPage();
 
-    ingredientDivs.forEach(div => {
-        const ingredientName = div.querySelector("span").textContent;
-        const selectedPipe = div.querySelector("select").value;
-
-        // Check if a pipe has been assigned
-        if (!selectedPipe) {
-            errorMessages.push(`Please assign a pipeline for ${ingredientName}.\n`);
-        } else {
-            assignedPipes[ingredientName] = selectedPipe; // Store the assigned pipe for each ingredient
-        }
-    });
-
-    // Display error messages if any
-    if (errorMessages.length > 0) {
-        showCustomAlert(errorMessages.join("\n")); // Display all error messages in an showCustomAlert
-        return; // Prevent further processing if there are errors
-    }
-
-    // Show loading page
-    showLoadingPage();
-
-    // Send the assigned pipes to the Python server
-    sendPipesToPython(assignedPipes);
+  // Send the assigned pipelines to the Python server
+  sendPipesToPython(assignedPipelines);
 });
 
 // Function to send assigned pipelines to the Python script
 function sendPipesToPython(assignedPipes) {
-    fetch("/send-pipes", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(assignedPipes),
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.text(); // Get the response text if the response is OK
-        } else {
-            // If the response is not OK, throw an error with the status
-            return response.text().then(errorText => {
-                throw new Error(errorText); // Throw the error text from the server
-            });
-        }
-    })
-    .then(data => {
-        // Check for 'OK' response
-        if (data.trim() === 'OK') {
-            console.log("Received OK from Python. Continuing...");
-            // Hide loading page
-            hideLoadingPage();
-        }
-    })
-    .catch(error => {
-        console.error("Error sending data to Python:", error);
-        // Hide loading page
-        hideLoadingPage();
-
-        // Display the error message on the loading page
-        displayErrorMessage(error.message);
-    });
+  fetch("/send-pipes", {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json",
+      },
+      body: JSON.stringify(assignedPipes), // Send the entire object
+  })
+  .then(response => {
+      if (response.ok) {
+          return response.text();
+      } else {
+          return response.text().then(errorText => {
+              throw new Error(errorText);
+          });
+      }
+  })
+  .then(data => {
+      if (data.trim() === 'OK') {
+          console.log("Received OK from Python. Continuing...");
+          hideLoadingPage();
+      }
+  })
+  .catch(error => {
+      console.error("Error sending data to Python:", error);
+      hideLoadingPage();
+      displayErrorMessage(error.message);
+  });
 }
 
 // Function to show the loading page
@@ -1098,18 +1070,18 @@ function showAssignPipeline(cocktail) {
 
       // Add event listener to track selected pipelines
       pipeSelect.addEventListener("change", (event) => {
-          const selectedPipe = event.target.value;
-          // If a pipe is selected, add it to the selectedPipelines object
-          if (selectedPipe) {
-              selectedPipelines[ingredient.ING_Name] = selectedPipe; // Use ingredient name as key
-          } else {
-              // If no pipe is selected, remove it from the selectedPipelines object
-              delete selectedPipelines[ingredient.ING_Name];
-          }
-
-          // Update dropdowns to disable already selected pipelines
-          updatePipelineDropdowns();
-      });
+        const selectedPipe = event.target.value;
+        const ingredientName = ingredient.ING_Name; // Get the ingredient name
+    
+        if (selectedPipe) {
+            assignedPipelines[ingredientName] = selectedPipe; // Use ingredient name as key
+        } else {
+            delete assignedPipelines[ingredientName]; // Remove from assigned pipelines if no pipe is selected
+        }
+    
+        // Optionally, update dropdowns to disable already selected pipelines
+        updatePipelineDropdowns(); 
+    });
   });
 
   // Update button states
