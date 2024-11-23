@@ -264,7 +264,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
             )  # Send the error message back to JavaScript
 
     def send_to_serial_output(self, assigned_pipes):
-        port = "/dev/ttyUSB0" if platform.system() == "Linux" else "COM1"
+        port = "/dev/ttyACM0" if platform.system() == "Linux" else "COM1"
         try:
             with serial.Serial(port, 9600, timeout=5) as ser:
                 for ingredient, pipe in assigned_pipes.items():
