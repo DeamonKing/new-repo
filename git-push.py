@@ -2,7 +2,7 @@ import os
 import subprocess
 
 # Path to your local repository
-repo_dir = "C:/Users/karan/Downloads/NR_APP"
+repo_dir = "C:/Users/karan/Downloads/RASP_APP"
 
 
 # Change directory to the repository

@@ -285,7 +285,8 @@ select {
 
 div#ingredients-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(125px, auto));
+  /* grid-template-columns: repeat(auto-fill, minmax(125px, auto)); */
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 15px;
   width: 100%;
   height: auto;
@@ -294,7 +295,8 @@ div#ingredients-container {
 
 div#cocktail-ingredients-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(125px, auto));
+  /* grid-template-columns: repeat(auto-fill, minmax(125px, auto)); */
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 15px;
   width: 100%;
   height: auto;
@@ -334,7 +336,7 @@ label.btn-checkbox img {
 label.btn-checkbox p {
   text-align: center;
   width: 100%;
-  font-size: 12px;
+  font-size: 13px;
 }
 label.btn-checkbox:hover p {
   color: #fff;
@@ -846,7 +848,8 @@ button#back-button3 {
 }
 .cocktail-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(125px, auto));
+  /* grid-template-columns: repeat(auto-fill, minmax(125px, auto)); */
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 15px;
   width: 100%;
   height: auto;
@@ -880,7 +883,7 @@ button#back-button3 {
 .cl-item p {
   text-align: center;
   width: 100%;
-  font-size: 12px;
+  font-size: 14px;
 }
 .add-cocktail-form .form-group label {
   width: 30%;
@@ -1102,91 +1105,96 @@ select {
 }
 
 .cdr-txt {
-    margin-bottom: 20px; /* Space below the section */
+  margin-bottom: 20px; /* Space below the section */
 }
 
-.cdr-txt h2 {
-    font-size: 20px; /* Font size for the heading */
-    margin-bottom: 10px; /* Space below the heading */
-    color: #359267; /* Heading color */
+.cdr-txt h2,
+.sp-txt h2 {
+  font-size: 20px; /* Font size for the heading */
+  margin-bottom: 10px; /* Space below the heading */
+  color: #359267; /* Heading color */
 }
 
 .cdr-txt label {
-    display: flex; /* Flexbox for alignment */
-    align-items: center; /* Center vertically */
-    margin-right: 15px; /* Space between radio buttons */
-    cursor: pointer; /* Change cursor on hover */
+  display: flex; /* Flexbox for alignment */
+  align-items: center; /* Center vertically */
+  margin-right: 15px; /* Space between radio buttons */
+  cursor: pointer; /* Change cursor on hover */
 }
 
 .cdr-txt input[type="radio"] {
-    margin-right: 5px; /* Space between radio button and label text */
-    accent-color: #359267; /* Change radio button color */
+  margin-right: 5px; /* Space between radio button and label text */
+  accent-color: #359267; /* Change radio button color */
 }
 
 /* Optional: Add hover effect on label */
 .cdr-txt label:hover {
-    color: #2a6b5d; /* Darker color on hover */
+  color: #2a6b5d; /* Darker color on hover */
 }
 
 #loading-page {
-    display: none; /* Initially hidden */
-    position: fixed; /* Stay in place */
-    top: 0; /* Align to the top */
-    left: 0; /* Align to the left */
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    background: rgba(0, 0, 0, 0.8); /* Dark background with opacity */
-    color: white; /* White text color for all text */
-    text-align: center; /* Center text */
-    padding-top: 20%; /* Space from the top */
-    z-index: 1000; /* Sit on top */
-    font-family: 'Nunito', sans-serif; /* Font family for better typography */
+  display: none; /* Initially hidden */
+  position: fixed; /* Stay in place */
+  top: 0; /* Align to the top */
+  left: 0; /* Align to the left */
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  background: rgba(0, 0, 0, 0.8); /* Dark background with opacity */
+  color: white; /* White text color for all text */
+  text-align: center; /* Center text */
+  padding-top: 20%; /* Space from the top */
+  z-index: 1000; /* Sit on top */
+  font-family: "Nunito", sans-serif; /* Font family for better typography */
 }
 
 #loading-page h1 {
-    font-size: 36px; /* Larger font size for the heading */
-    margin-bottom: 20px; /* Space below the heading */
-    color: white; /* Ensure heading text is white */
+  font-size: 36px; /* Larger font size for the heading */
+  margin-bottom: 20px; /* Space below the heading */
+  color: white; /* Ensure heading text is white */
 }
 
 #loading-page p {
-    font-size: 18px; /* Font size for the message */
-    margin-bottom: 30px; /* Space below the message */
-    color: white; /* Ensure paragraph text is white */
+  font-size: 18px; /* Font size for the message */
+  margin-bottom: 30px; /* Space below the message */
+  color: white; /* Ensure paragraph text is white */
 }
 
 #loading-page button {
-    background-color: #359267; /* Green background for the button */
-    color: white; /* White text color for the button */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    padding: 10px 20px; /* Padding inside the button */
-    font-size: 16px; /* Font size for the button */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
+  background-color: #359267; /* Green background for the button */
+  color: white; /* White text color for the button */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  padding: 10px 20px; /* Padding inside the button */
+  font-size: 16px; /* Font size for the button */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
 }
 
 #loading-page button:hover {
-    background-color: #2a6b5d; /* Darker green on hover */
+  background-color: #2a6b5d; /* Darker green on hover */
 }
 
 .loading-spinner {
-    width: 50px;
-    height: 50px;
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid #359267;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 20px auto;
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #359267;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 #product-list-container {
-    display: block; /* Ensure it is visible */
+  display: block; /* Ensure it is visible */
 }
 
 /* Custom Alert Modal Styles */
@@ -1212,7 +1220,6 @@ select {
   text-align: center; /* Center text */
 }
 
-
 #alert-ok {
   background-color: #359267; /* Button background */
   color: white; /* Button text color */
@@ -1225,4 +1232,103 @@ select {
 
 #alert-ok:hover {
   background-color: #2a6b5d; /* Darker green on hover */
+}
+
+.col-pop {
+  margin: 0 auto;
+  max-width: unset;
+  text-align: left;
+  width: 50%;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.all-product,
+.cocktail-details {
+  background: #ffffff30;
+  border-radius: 15px;
+}
+.cdr-txt label {
+  margin-right: 0px;
+}
+.drink-type {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.drink-type label {
+  border-radius: 5px;
+  background: #ffffff50;
+  box-shadow: 0px 0px 5px #00000010;
+  width: max-content;
+  padding: 10px 15px;
+}
+.add-cocktail-find-ing div#cocktail-ingredients-container1 {
+  display: grid;
+  /* grid-template-columns: repeat(auto-fill, minmax(115px, auto)); */
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 15px;
+  width: 100%;
+  height: auto;
+  padding: 5px;
+  padding-top: 5px;
+}
+.add-cocktail-find-ing .ing-box {
+  height: 88%;
+}
+div#custom-alert .modal-content {
+  display: block;
+  width: 50%;
+  margin: 0 auto;
+  max-width: 350px;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+div#custom-alert {
+  height: 100vh;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+button#assignPipeline {
+  background-color: #3d3229 !important;
+}
+.act-bg {
+  background-color: #3d3229 !important;
+}
+.new-bg {
+  background: #ffffff30;
+  border-radius: 15px;
+}
+.cdr-txt {
+  margin-bottom: 5px;
+}
+.add-cocktail-form input#product-id {
+  background: transparent;
+  box-shadow: none;
+}
+.add-cocktail-form {
+  overflow: hidden;
+  padding: 15px;
+}
+form#cocktail-form {
+  height: 100%;
+  overflow-y: scroll;
+  padding: 10px;
+  padding-bottom: 50px;
+}
+.add-cocktail-form .form-group textarea {
+  width: 70% !important;
+}
+.add-cocktail-form .footer-btn {
+  background: #ffffff50;
+  backdrop-filter: blur(5px);
+}
+select:focus-visible {
+  outline: none;
 }
