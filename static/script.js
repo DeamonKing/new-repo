@@ -450,7 +450,7 @@ document.getElementById("serial-out-button").addEventListener("click", () => {
 
 // Function to send assigned pipelines to the Python script
 function sendPipesToPython(assignedPipes) {
-  console.log(`assigned pipes ${assignedPipes}`);
+  console.log(`assigned pipes ${json.stringify(assignedPipes)}`);
   fetch("/send-pipes", {
       method: "POST",
       headers: {
