@@ -1,19 +1,21 @@
 import json
+import logging
 import os
 import platform
 import subprocess
 import threading
 import time
-import logging
-from image_handler import processing_complete
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-import serial
 from pathlib import Path
 
+import serial
+
+from image_handler import processing_complete
 
 # Define the base directory as the directory where this script is located
 base_dir = os.path.dirname(__file__)
 web_dir = os.path.join(base_dir, "static")  # Define `static` folder path
+
 
 class CustomHandler(SimpleHTTPRequestHandler):
     def translate_path(self, path):
@@ -25,13 +27,15 @@ class CustomHandler(SimpleHTTPRequestHandler):
         return os.path.join(web_dir, path.lstrip("/"))
 
     def send_no_cache_headers(self):
-        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
-        self.send_header('Pragma', 'no-cache')
-        self.send_header('Expires', '0')
-        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header(
+            "Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"
+        )
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
+        self.send_header("Access-Control-Allow-Origin", "*")
 
     def do_GET(self):
-        if self.path == 'processing_complete':
+        if self.path == "processing_complete":
             try:
                 # Check if processing is complete by checking the event
                 if processing_complete.is_set():
@@ -48,12 +52,16 @@ class CustomHandler(SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(str(e).encode())
             return
-        
+
         # For db.json and image requests, prevent caching
-        if self.path.endswith('.json') or self.path.endswith('.png') or self.path.endswith('.jpg'):
+        if (
+            self.path.endswith(".json")
+            or self.path.endswith(".png")
+            or self.path.endswith(".jpg")
+        ):
             self.send_response(200)
             self.send_no_cache_headers()
-            with open(self.translate_path(self.path), 'rb') as f:
+            with open(self.translate_path(self.path), "rb") as f:
                 content = f.read()
             self.end_headers()
             self.wfile.write(content)
@@ -63,7 +71,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
         super().do_GET()
 
     def do_POST(self):
-        if self.path == '/delete_processing_flag':
+        if self.path == "/delete_processing_flag":
             try:
                 processing_complete.clear()
                 self.send_response(200)
@@ -118,10 +126,10 @@ class CustomHandler(SimpleHTTPRequestHandler):
 
         elif self.path == "/addIngredient":
             self.add_ingredient(post_data)
-            
+
         elif self.path == "/addCocktail":
             self.add_cocktail(post_data)
-            
+
         elif self.path == "/send-pipes":
             self.handle_send_pipes(post_data)
             return
@@ -184,7 +192,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
         try:
             # Reset the completion event before starting
             logging.info("Processing new ingredient request")
-            
+
             # Validate post data
             try:
                 new_ingredient = json.loads(post_data)
@@ -224,17 +232,17 @@ class CustomHandler(SimpleHTTPRequestHandler):
             with open(os.path.join(web_dir, "db.json"), "w") as file:
                 json.dump(data, file, indent=2)
 
-            # Wait for image processing to complete (with timeout)
+                # Wait for image processing to complete (with timeout)
                 self.send_response(201)
                 self.end_headers()
                 self.wfile.write(b"Ingredient added successfully")
-        
+
         except Exception as e:
             print(f"Error adding ingredient: {e}")  # Log the error to the console
             self.send_response(500)  # Internal Server Error
             self.end_headers()
             self.wfile.write(f"Error saving ingredient: {str(e)}".encode())
-    
+
     def handle_send_pipes(self, post_data):
         # Parse the incoming data
         assigned_pipes = json.loads(post_data)
@@ -251,28 +259,30 @@ class CustomHandler(SimpleHTTPRequestHandler):
             # If there was an error, respond with the error message
             self.send_response(500)  # Internal Server Error
             self.end_headers()
-            self.wfile.write(response.encode())  # Send the error message back to JavaScript
+            self.wfile.write(
+                response.encode()
+            )  # Send the error message back to JavaScript
 
     def send_to_serial_output(self, assigned_pipes):
-        port = '/dev/ttyUSB0' if platform.system() == 'Linux' else 'COM1'
+        port = "/dev/ttyUSB0" if platform.system() == "Linux" else "COM1"
         try:
             with serial.Serial(port, 9600, timeout=5) as ser:
                 for ingredient, pipe in assigned_pipes.items():
                     message = f"{ingredient}: {pipe}\n"
                     logging.info(f"Sending to serial: {message.strip()}")
-                    ser.write(message.encode('utf-8'))
-                    
+                    ser.write(message.encode("utf-8"))
+
                     # Wait for acknowledgment with timeout
                     start_time = time.time()
                     while time.time() - start_time < 5:  # 5 second timeout
                         if ser.in_waiting > 0:
-                            response = ser.readline().decode('utf-8').strip()
-                            if response == 'OK':
+                            response = ser.readline().decode("utf-8").strip()
+                            if response == "OK":
                                 logging.info("Received OK from serial machine")
                                 return "OK"
                             elif response:
                                 logging.warning(f"Unexpected response: {response}")
-                    
+
                     logging.error("Timeout waiting for serial response")
                     return "Error: Serial communication timeout"
         except serial.SerialException as e:
@@ -296,7 +306,7 @@ def start_electron_app():
     time.sleep(2)
     os.environ["DISPLAY"] = ":0"
     if platform.system() == "Windows":
-        electron_executable = r"C:\Users\LOQ\AppData\Roaming\npm\node_modules\electron\dist\electron.exe"
+        electron_executable = r"C:\Users\karan\AppData\Roaming\npm\node_modules\electron\dist\electron.exe"
     elif platform.system() == "Linux":
         electron_executable = "/usr/local/bin/electron"
     else:
@@ -310,7 +320,8 @@ def start_electron_app():
         ]
     )
     electron_process.communicate()
-    
+
+
 def start_image_handler():
     """Start the image handler script in a separate thread."""
     subprocess.Popen(["python", os.path.join(base_dir, "image_handler.py")])
@@ -320,7 +331,7 @@ if __name__ == "__main__":
     # Start the HTTP server in a separate thread
     http_thread = threading.Thread(target=start_http_server)
     http_thread.start()
-    
+
     start_image_handler()
 
     # Start the Electron app after a slight delay to ensure the server is up
