@@ -8,6 +8,7 @@ import time
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 
+
 import serial
 
 from image_handler import processing_complete
@@ -151,9 +152,9 @@ class CustomHandler(SimpleHTTPRequestHandler):
     def add_cocktail(self, post_data):
         try:
             products_path = os.path.join(web_dir, "products.json")
-            logging.info("Starting to add cocktail")
+            print("Starting to add cocktail")
             if not os.path.exists(products_path):
-                logging.error(f"products.json not found at {products_path}")
+                print(f"products.json not found at {products_path}")
                 self.send_response(500)
                 self.end_headers()
                 self.wfile.write(b"Error: products.json file not found")
@@ -181,7 +182,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
             self.send_response(201)
             self.end_headers()
             self.wfile.write(b"Cocktail added successfully")
-            logging.info("Cocktail added successfully")
+            print("Cocktail added successfully")
         except Exception as e:
             print(f"Error adding cocktail: {e}")
             self.send_response(500)
@@ -191,14 +192,14 @@ class CustomHandler(SimpleHTTPRequestHandler):
     def add_ingredient(self, post_data):
         try:
             # Reset the completion event before starting
-            logging.info("Processing new ingredient request")
+            print("Processing new ingredient request")
 
             # Validate post data
             try:
                 new_ingredient = json.loads(post_data)
-                logging.info(f"Received ingredient data: {new_ingredient}")
+                print(f"Received ingredient data: {new_ingredient}")
             except json.JSONDecodeError as je:
-                logging.error(f"Invalid POST data format: {str(je)}")
+                print(f"Invalid POST data format: {str(je)}")
                 self.send_response(400)
                 self.end_headers()
                 self.wfile.write(b"Invalid ingredient data format")
@@ -207,7 +208,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
             # Load existing ingredients from db.json
             db_path = os.path.join(web_dir, "db.json")
             if not os.path.exists(db_path):
-                logging.error(f"db.json not found at {db_path}")
+                print(f"db.json not found at {db_path}")
                 self.send_response(500)
                 self.end_headers()
                 self.wfile.write(b"Error: db.json file not found")
@@ -269,7 +270,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
             with serial.Serial(port, 9600, timeout=5) as ser:
                 for ingredient, pipe in assigned_pipes.items():
                     message = f"{ingredient}: {pipe}\n"
-                    logging.info(f"Sending to serial: {message.strip()}")
+                    print(f"Sending to serial: {message.strip()}")
                     ser.write(message.encode("utf-8"))
                     return "OK"
 
@@ -279,12 +280,12 @@ class CustomHandler(SimpleHTTPRequestHandler):
                     #     if ser.in_waiting > 0:
                     #         response = ser.readline().decode("utf-8").strip()
                     #         if response == "OK":
-                    #             logging.info("Received OK from serial machine")
+                    #             print("Received OK from serial machine")
                     #             return "OK"
                     #         elif response:
                     #             logging.warning(f"Unexpected response: {response}")
 
-                    # logging.error("Timeout waiting for serial response")
+                    # print("Timeout waiting for serial response")
                     # return "Error: Serial communication timeout"
         except serial.SerialException as e:
             error_message = f"Serial error: {str(e)}"
