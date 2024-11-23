@@ -1268,7 +1268,7 @@ async function wshowCocktailDetails(cocktail) {
   const cocktailIngredientsContainer = document.getElementById("cocktail-ingredients-container");
   const cocktailHtm = document.getElementById("htm")
   cocktailImage.src = cocktail.PImage; // Set the image source
-  cocktailId.textContent = cocktail.PID;
+  cocktailID.textContent = cocktail.PID;
   cocktailName.textContent = cocktail.PName; // Set the cocktail name
   cocktailDescription.textContent = cocktail.PDesc
   cocktailHtm.textContent = cocktail.PHtm
