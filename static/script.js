@@ -450,7 +450,7 @@ document.getElementById("serial-out-button").addEventListener("click", () => {
 
 // Function to send assigned pipelines to the Python script
 function sendPipesToPython(assignedPipes) {
-  console.log(assignedPipes);
+  console.log(`assigned pipes ${assignedPipes}`);
   fetch("/send-pipes", {
       method: "POST",
       headers: {
@@ -1076,6 +1076,7 @@ function showAssignPipeline(cocktail) {
     
         if (selectedPipe) {
             assignedPipelines[ingredientName] = selectedPipe; // Use ingredient name as key
+            console.log(`${ingredientName} Assigned to ${selectedPipe}`);
         } else {
             delete assignedPipelines[ingredientName]; // Remove from assigned pipelines if no pipe is selected
         }
