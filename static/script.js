@@ -1031,82 +1031,85 @@ document.getElementById("back-button1").addEventListener("click", (event) => {
 let selectedPipelines = {}; // Global object to keep track of selected pipelines
 
 function showAssignPipeline(cocktail) {
-  findIngSection.style.display = "none";
-  addIngSection.style.display = "none";
-  addCocktailSection.style.display = "none";
-  allCocktailSection.style.display = "none";
-  cocktailDetailsSection.style.display = "none";
-  selectPipelineSection.style.display = "block"; // Show Assign Pipeline section
+  // Clear the previous assigned pipelines
+  assignedPipelines = {}; // Reset the assigned pipelines object
 
-  const selectedIngredientsContainer = document.querySelector(".selected-ingredients-container");
-  selectedIngredientsContainer.innerHTML = ""; // Clear previous entries
+  findIngSection.style.display = "none"; 
+  addIngSection.style.display = "none"; 
+  addCocktailSection.style.display = "none"; 
+  allCocktailSection.style.display = "none"; 
+  cocktailDetailsSection.style.display = "none"; 
+  selectPipelineSection.style.display = "block"; // Show Assign Pipeline section 
 
-  // Combine cocktail ingredients and extra ingredients
-  const combinedIngredients = cocktail.PIng.concat(extraIngredients.map(ing => ({ ING_Name: ing })));
+  const selectedIngredientsContainer = document.querySelector(".selected-ingredients-container"); 
+  selectedIngredientsContainer.innerHTML = ""; // Clear previous entries 
 
-  // Populate the selected ingredients container with the combined ingredients
-  combinedIngredients.forEach(ingredient => {
-      const ingredientDiv = document.createElement("div");
-      ingredientDiv.style.display = "flex"; // Flexbox for layout
-      ingredientDiv.style.alignItems = "center"; // Center items vertically
-      ingredientDiv.style.justifyContent = "space-between"; // Space between ingredient name and dropdown
+  // Combine cocktail ingredients and extra ingredients 
+  const combinedIngredients = cocktail.PIng.concat(extraIngredients.map(ing => ({ ING_Name: ing }))); 
 
-      // Create a label for the ingredient
-      const ingredientLabel = document.createElement("span");
-      ingredientLabel.textContent = ingredient.ING_Name; // Display the ingredient name
+  // Populate the selected ingredients container with the combined ingredients 
+  combinedIngredients.forEach(ingredient => { 
+      const ingredientDiv = document.createElement("div"); 
+      ingredientDiv.style.display = "flex"; // Flexbox for layout 
+      ingredientDiv.style.alignItems = "center"; // Center items vertically 
+      ingredientDiv.style.justifyContent = "space-between"; // Space between ingredient name and dropdown 
 
-      // Create a dropdown for assigning a pipe
-      const pipeSelect = document.createElement("select");
-      pipeSelect.innerHTML = `
-          <option value="">Select Pipe</option>
-          <option value="Pipe 1">Pipe 1</option>
-          <option value="Pipe 2">Pipe 2</option>
-          <option value="Pipe 3">Pipe 3</option>
-          <option value="Pipe 4">Pipe 4</option>
-          <option value="Pipe 5">Pipe 5</option>
-          <option value="Pipe 6">Pipe 6</option>
-          <option value="Pipe 7">Pipe 7</option>
-          <option value="Pipe 8">Pipe 8</option>
-          <option value="Pipe 9">Pipe 9</option>
-          <option value="Pipe 10">Pipe 10</option>
-          <option value="Pipe 11">Pipe 11</option>
-          <option value="Pipe 12">Pipe 12</option>
-      `;
+      // Create a label for the ingredient 
+      const ingredientLabel = document.createElement("span"); 
+      ingredientLabel.textContent = ingredient.ING_Name; // Display the ingredient name 
 
-      // Append the label and dropdown to the ingredient div
-      ingredientDiv.appendChild(ingredientLabel);
-      ingredientDiv.appendChild(pipeSelect);
-      selectedIngredientsContainer.appendChild(ingredientDiv);
+      // Create a dropdown for assigning a pipe 
+      const pipeSelect = document.createElement("select"); 
+      pipeSelect.innerHTML = ` 
+          <option value="">Select Pipe</option> 
+          <option value="Pipe 1">Pipe 1</option> 
+          <option value="Pipe 2">Pipe 2</option> 
+          <option value="Pipe 3">Pipe 3</option> 
+          <option value="Pipe 4">Pipe 4</option> 
+          <option value="Pipe 5">Pipe 5</option> 
+          <option value="Pipe 6">Pipe 6</option> 
+          <option value="Pipe 7">Pipe 7</option> 
+          <option value="Pipe 8">Pipe 8</option> 
+          <option value="Pipe 9">Pipe 9</option> 
+          <option value="Pipe 10">Pipe 10</option> 
+          <option value="Pipe 11">Pipe 11</option> 
+          <option value="Pipe 12">Pipe 12</option> 
+      `; 
 
-      // Add event listener to track selected pipelines
-      pipeSelect.addEventListener("change", (event) => {
-        const selectedPipe = event.target.value;
-        const ingredientName = ingredient.ING_Name; // Get the ingredient name
-    
-        if (selectedPipe) {
-            assignedPipelines[ingredientName] = selectedPipe; // Use ingredient name as key
-            console.log(`${ingredientName} Assigned to ${selectedPipe}`);
-        } else {
-            delete assignedPipelines[ingredientName]; // Remove from assigned pipelines if no pipe is selected
-        }
-    
-        // Optionally, update dropdowns to disable already selected pipelines
-        updatePipelineDropdowns(); 
-    });
-  });
+      // Append the label and dropdown to the ingredient div 
+      ingredientDiv.appendChild(ingredientLabel); 
+      ingredientDiv.appendChild(pipeSelect); 
+      selectedIngredientsContainer.appendChild(ingredientDiv); 
 
-  // Update button states
-  assignPipelineBtn.classList.add("active");
-  assignPipelineBtn.classList.remove("deactive");
-  findCocktailBtn.classList.remove("active");
-  findCocktailBtn.classList.add("deactive");
-  addIngredientsBtn.classList.remove("active");
-  addIngredientsBtn.classList.add("deactive");
-  addCocktailBtn.classList.remove("active");
-  addCocktailBtn.classList.add("deactive");
-  allCocktailsBtn.classList.remove("active");
-  allCocktailsBtn.classList.add("deactive");
-  updateButtonStyles();
+      // Add event listener to track selected pipelines 
+      pipeSelect.addEventListener("change", (event) => { 
+          const selectedPipe = event.target.value; 
+          const ingredientName = ingredient.ING_Name; // Get the ingredient name 
+
+          if (selectedPipe) { 
+              assignedPipelines[ingredientName] = selectedPipe; // Use ingredient name as key 
+              console.log(`${ingredientName} Assigned to ${selectedPipe}`); 
+          } else { 
+              delete assignedPipelines[ingredientName]; // Remove from assigned pipelines if no pipe is selected 
+          } 
+
+          // Optionally, update dropdowns to disable already selected pipelines 
+          updatePipelineDropdowns(); 
+      }); 
+  }); 
+
+  // Update button states 
+  assignPipelineBtn.classList.add("active"); 
+  assignPipelineBtn.classList.remove("deactive"); 
+  findCocktailBtn.classList.remove("active"); 
+  findCocktailBtn.classList.add("deactive"); 
+  addIngredientsBtn.classList.remove("active"); 
+  addIngredientsBtn.classList.add("deactive"); 
+  addCocktailBtn.classList.remove("active"); 
+  addCocktailBtn.classList.add("deactive"); 
+  allCocktailsBtn.classList.remove("active"); 
+  allCocktailsBtn.classList.add("deactive"); 
+  updateButtonStyles(); 
 }
 
 // Function to update the pipeline dropdowns based on selected pipelines
