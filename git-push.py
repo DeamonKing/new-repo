@@ -98,7 +98,7 @@ def update_git_repo(commit_message):
 
 
 # Example commit message
-commit_message = "New UI Fix"
+commit_message = "UI UPDATED"
 
 # Call the update function with a commit message
 update_git_repo(commit_message)

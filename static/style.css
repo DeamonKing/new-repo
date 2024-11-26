@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"); */
 
 *,
 *::before,
@@ -30,7 +31,7 @@ input,
 textarea,
 select {
   font-family: "Nunito", sans-serif;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 400;
   line-height: normal;
   letter-spacing: normal;
@@ -92,7 +93,7 @@ select {
   cursor: pointer;
 }
 .picker-setting img {
-  width: 50px;
+  width: 70px;
   height: auto;
   object-fit: contain;
   object-position: center;
@@ -114,7 +115,7 @@ select {
 }
 
 .app-sidebar {
-  width: 200px;
+  width: 225px;
   flex-shrink: 0;
   /* background: #ffffff30; */
   border-radius: 15px;
@@ -124,7 +125,7 @@ select {
 .navbar a {
   /* background: #ffffff30; */
   border-radius: 10px;
-  padding: 10px;
+  padding: 15px 25px;
   width: 100%;
   display: block;
   text-align: center;
@@ -144,6 +145,7 @@ select {
   /* background: #ffffff30; */
   border-radius: 15px;
   height: 100%;
+  overflow: hidden;
 }
 .find-ing {
   width: 100%;
@@ -160,6 +162,7 @@ select {
 }
 .search-box svg {
   width: 5%;
+  height: 23px;
 }
 .search-box .searchbar {
   width: 85%;
@@ -198,7 +201,7 @@ select {
   border-radius: 10px;
   /* color: #fff; */
   text-align: center;
-  padding: 15px;
+  padding: 15px 25px;
 }
 .search-box a:hover {
   background: #359267;
@@ -215,11 +218,11 @@ select {
 }
 .ing-filter a {
   /* background: #ffffff30; */
-  border-radius: 6px;
-  padding: 10px 15px;
+  border-radius: 10px;
+  padding: 15px 25px;
   text-align: center;
   /* color: #57492c; */
-  font-size: 15px;
+  font-size: 20px;
   transition: background 0.3s ease;
 }
 .ing-filter .active,
@@ -232,7 +235,7 @@ select {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  height: 83.5%;
+  height: 92%;
   overflow: hidden;
 }
 .ing-grid {
@@ -241,7 +244,7 @@ select {
   overflow-y: auto;
   scrollbar-width: thin;
   padding: 0px 15px;
-  padding-bottom: 25px;
+  padding-bottom: 100px;
 }
 .fi-top {
   width: 100%;
@@ -286,7 +289,7 @@ select {
 div#ingredients-container {
   display: grid;
   /* grid-template-columns: repeat(auto-fill, minmax(125px, auto)); */
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
   gap: 15px;
   width: 100%;
   height: auto;
@@ -296,7 +299,7 @@ div#ingredients-container {
 div#cocktail-ingredients-container {
   display: grid;
   /* grid-template-columns: repeat(auto-fill, minmax(125px, auto)); */
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(157px, 1fr));
   gap: 15px;
   width: 100%;
   height: auto;
@@ -310,6 +313,8 @@ div#cocktail-ingredients-container {
   background: #ffffff50;
   overflow: hidden;
   box-shadow: 0px 0px 5px #00000010;
+  height: auto;
+  min-height: 170px;
 }
 label.btn-checkbox {
   width: 100%;
@@ -317,7 +322,8 @@ label.btn-checkbox {
   padding: 10px;
   display: flex;
   align-items: flex-start;
-  justify-content: center;
+  /* justify-content: center; */
+  justify-content: space-between;
   flex-direction: column;
   margin: 0px;
 }
@@ -327,16 +333,16 @@ label.btn-checkbox:hover {
   cursor: pointer;
 }
 label.btn-checkbox img {
-  padding: 10px 0px;
+  /* padding: 10px 0px; */
   width: 100%;
-  height: 65px;
+  height: 75px;
   object-fit: contain;
   object-position: center;
 }
 label.btn-checkbox p {
   text-align: center;
   width: 100%;
-  font-size: 13px;
+  font-size: 20px;
 }
 label.btn-checkbox:hover p {
   color: #fff;
@@ -346,12 +352,15 @@ label.btn-checkbox:hover input {
 }
 input[type="checkbox"] {
   appearance: none;
-  width: 20px;
-  height: 20px;
+  width: 25px;
+  height: 25px;
   /* background-color: #f0f0f0; */
   border: 1px solid #57492c;
   border-radius: 4px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 input[type="checkbox"]:checked {
@@ -363,7 +372,7 @@ input[type="checkbox"]:checked::before {
   content: "✔";
   display: block;
   color: white;
-  font-size: 12px;
+  font-size: 16px;
   text-align: center;
   line-height: normal;
 }
@@ -418,9 +427,9 @@ input[type="checkbox"]:checked::before {
 .gp-txt h3,
 .ap-txt h4,
 .mr-btn-txt h2 {
-  font-size: 18px;
+  font-size: 20px;
   color: #359267;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
 }
 /* Close Button */
 .close {
@@ -469,7 +478,7 @@ input[type="checkbox"]:checked::before {
   width: 50%;
   margin: 0;
   padding-right: 15px;
-  font-size: 16px;
+  font-size: 20px;
 }
 .mrc label {
   width: 100%;
@@ -598,10 +607,10 @@ label {
 
 .mod-close {
   position: absolute;
-  top: 2%;
-  right: 1%;
-  width: 25px;
-  height: 25px;
+  top: 3%;
+  right: 1.5%;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   background: var(--bg-color, #359267);
   box-shadow: 0px 0px 5px #00000025;
@@ -615,18 +624,18 @@ label {
 }
 .btn-rest {
   position: absolute;
-  bottom: 2%;
-  right: 1%;
+  bottom: 3%;
+  right: 2%;
 }
 button#reset-defaults {
   background: var(--bg-color, #359267);
   box-shadow: 0px 0px 5px #00000025;
   color: #fff;
-  padding: 10px 15px;
+  padding: 15px 25px;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   outline: none;
-  font-size: 15px;
+  font-size: 20px;
 }
 button#reset-defaults:hover {
   background: #000;
@@ -649,6 +658,7 @@ button#reset-defaults:hover {
   align-items: center;
   justify-content: center;
   gap: 25px;
+  overflow: hidden;
 }
 .add-cocktail-form {
   position: relative;
@@ -674,7 +684,7 @@ button#reset-defaults:hover {
 /* Add grid layout for ingredients in Add Cocktail section */
 .add-cocktail-find-ing div#ingredients-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(125px, auto));
+  grid-template-columns: repeat(auto-fill, minmax(175px, auto));
   gap: 15px;
   width: 100%;
   height: auto;
@@ -691,7 +701,7 @@ button#reset-defaults:hover {
   width: 175px;
   margin: 0;
   padding: 0;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 400;
   line-height: normal;
   letter-spacing: normal;
@@ -749,37 +759,37 @@ button#add-cocktail-button {
 }
 .btns {
   border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  font-size: 15px;
+  padding: 15px 25px;
+  border-radius: 10px;
+  font-size: 20px;
 }
 button#back-button {
   background: #fff;
   border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  font-size: 15px;
+  padding: 15px 25px;
+  border-radius: 10px;
+  font-size: 20px;
 }
 button#back-button1 {
   background: #fff;
   border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  font-size: 15px;
+  padding: 15px 25px;
+  border-radius: 10px;
+  font-size: 20px;
 }
 button#back-button2 {
   background: #fff;
   border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  font-size: 15px;
+  padding: 15px 25px;
+  border-radius: 10px;
+  font-size: 20px;
 }
 button#back-button3 {
   background: #fff;
   border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  font-size: 15px;
+  padding: 15px 25px;
+  border-radius: 10px;
+  font-size: 20px;
 }
 .footer-btn button:hover {
   cursor: pointer;
@@ -835,10 +845,23 @@ button#back-button3 {
   position: relative;
 }
 .find-ing .footer-btn {
-  bottom: 18.3%;
+  bottom: 14%;
+  /* background: #ffffff25;
+  backdrop-filter: blur(5px); */
+  padding: 15px;
+  position: relative;
+  z-index: 3;
+}
+.find-ing .footer-btn::after {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 100%;
   background: #ffffff25;
   backdrop-filter: blur(5px);
-  padding: 10px 25px 22px 25px;
+  top: 0;
+  left: 0;
+  z-index: -1;
 }
 .form-group input:focus-visible,
 .form-group select:focus-visible,
@@ -849,7 +872,7 @@ button#back-button3 {
 .cocktail-list {
   display: grid;
   /* grid-template-columns: repeat(auto-fill, minmax(125px, auto)); */
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
   gap: 15px;
   width: 100%;
   height: auto;
@@ -857,13 +880,16 @@ button#back-button3 {
 .cl-item {
   display: flex;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
+  justify-content: space-between;
   flex-direction: column;
   border-radius: 10px;
   background: #ffffff50;
   overflow: hidden;
   box-shadow: 0px 0px 5px #00000010;
   padding: 15px;
+  height: auto;
+  min-height: 215px;
 }
 .cl-item:hover {
   background: var(--bg-color, #4caf5075);
@@ -876,14 +902,14 @@ button#back-button3 {
   padding: 10px 0px;
   padding-top: 0px;
   width: 100%;
-  height: 100px;
+  height: 150px;
   object-fit: contain;
   object-position: center;
 }
 .cl-item p {
   text-align: center;
   width: 100%;
-  font-size: 14px;
+  font-size: 20px;
 }
 .add-cocktail-form .form-group label {
   width: 30%;
@@ -1212,7 +1238,7 @@ select {
 .modal-content {
   background-color: #fff;
   margin: 15% auto; /* Center modal vertically */
-  padding: 20px;
+  padding: 25px;
   border-radius: 8px; /* Rounded corners */
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2); /* Shadow for depth */
   width: 80%; /* Width of the modal */
@@ -1228,6 +1254,7 @@ select {
   padding: 10px 20px; /* Padding inside the button */
   cursor: pointer; /* Pointer cursor on hover */
   transition: background-color 0.3s; /* Smooth transition */
+  margin-top: 15px;
 }
 
 #alert-ok:hover {
@@ -1238,7 +1265,7 @@ select {
   margin: 0 auto;
   max-width: unset;
   text-align: left;
-  width: 50%;
+  width: 45%;
   position: fixed;
   left: 50%;
   top: 50%;
@@ -1260,21 +1287,25 @@ select {
   flex-wrap: wrap;
 }
 .drink-type label {
-  border-radius: 5px;
+  border-radius: 10px;
   background: #ffffff50;
   box-shadow: 0px 0px 5px #00000010;
   width: max-content;
-  padding: 10px 15px;
+  padding: 15px 25px;
 }
 .add-cocktail-find-ing div#cocktail-ingredients-container1 {
   display: grid;
   /* grid-template-columns: repeat(auto-fill, minmax(115px, auto)); */
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(134px, 1fr));
   gap: 15px;
   width: 100%;
   height: auto;
   padding: 5px;
   padding-top: 5px;
+}
+.add-cocktail-find-ing div#cocktail-ingredients-container1 .ing-item {
+  height: auto;
+  min-height: 170px;
 }
 .add-cocktail-find-ing .ing-box {
   height: 88%;
@@ -1328,7 +1359,87 @@ form#cocktail-form {
 .add-cocktail-form .footer-btn {
   background: #ffffff50;
   backdrop-filter: blur(5px);
+  overflow: hidden;
+  border-radius: 0px 0px 15px 15px;
 }
 select:focus-visible {
   outline: none;
 }
+.all-cocktail .footer-btn {
+  /* background: #ffffff25;
+  backdrop-filter: blur(5px); */
+  padding: 15px;
+  z-index: 3;
+}
+.all-cocktail .footer-btn::after {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 100%;
+  background: #ffffff25;
+  backdrop-filter: blur(5px);
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+.all-cocktail {
+  overflow: hidden;
+}
+div#cocktail-ingredients-container .ing-item {
+  min-height: 157px;
+}
+div#cocktail-ingredients-container .ing-item label {
+  justify-content: space-evenly;
+}
+label {
+  font-size: 20px;
+}
+.all-cocktail button#back-button {
+  background: #3d3229 !important;
+}
+.cdr-txt input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  margin-right: 15px;
+}
+button#serial-out-button,
+button#submit-button,
+button#add-cocktail-button {
+  padding: 15px 25px;
+  font-size: 20px;
+  border-radius: 10px;
+}
+span#ingredient-id,
+input#product-id {
+  color: crimson;
+  font-weight: 500;
+}
+.add-cocktail-form .footer-btn {
+  padding: 10px;
+}
+
+.selected-ingredients-container {
+  padding: 0px;
+  border-radius: unset;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-row-gap: 15px;
+  grid-column-gap: 50px;
+  width: 100%;
+  height: auto;
+  margin-top: 25px;
+}
+.selected-ingredients-container div {
+  margin-bottom: 0px;
+  width: 100%;
+}
+.selected-ingredients-container div span {
+  width: 30%;
+}
+.selected-ingredients-container div select {
+  width: 70%;
+  margin: 0px;
+}
+/* .form-group label {
+  font-family: "Lato", sans-serif !important;
+} */
