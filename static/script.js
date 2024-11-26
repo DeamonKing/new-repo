@@ -1193,6 +1193,7 @@ async function showAllCocktails(selectedIngredients = []) {
     // Fetch cocktails
     const cocktails = await fetchCocktails();
         // Display all cocktails if no ingredients are selected
+        extraIngredients = [];
     displayCocktails(cocktails);
 }
 
