@@ -7,9 +7,9 @@ import threading
 import time
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
-import serial.tools.list_ports
 
 import serial
+import serial.tools.list_ports
 
 from image_handler import processing_complete
 
@@ -264,12 +264,11 @@ class CustomHandler(SimpleHTTPRequestHandler):
                 response.encode()
             )  # Send the error message back to JavaScript
 
-
     def send_to_serial_output(self, assigned_pipes):
         # Find the appropriate serial port
         port = None
         available_ports = serial.tools.list_ports.comports()
-        
+
         # Check for available ports and set the appropriate one
         for p in available_ports:
             if p.device == "/dev/ttyACM0" or p.device == "/dev/ttyUSB0":
@@ -286,7 +285,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
                     message = f"{ingredient}: {pipe}\n"
                     print(f"Sending to serial: {message.strip()}")
                     ser.write(message.encode("utf-8"))
-                    
+
                 return "OK"  # Indicate successful sending
         except serial.SerialException as e:
             error_message = f"Serial error: {str(e)}"
@@ -309,7 +308,9 @@ def start_electron_app():
     time.sleep(2)
     os.environ["DISPLAY"] = ":0"
     if platform.system() == "Windows":
-        electron_executable = r"C:\Users\LOQ\AppData\Roaming\npm\node_modules\electron\dist\electron.exe"
+        electron_executable = (
+            r"C:\Users\LOQ\AppData\Roaming\npm\node_modules\electron\dist\electron.exe"
+        )
     elif platform.system() == "Linux":
         electron_executable = "/usr/local/bin/electron"
     else:
