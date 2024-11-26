@@ -309,7 +309,7 @@ def start_electron_app():
     os.environ["DISPLAY"] = ":0"
     if platform.system() == "Windows":
         electron_executable = (
-            r"C:\Users\LOQ\AppData\Roaming\npm\node_modules\electron\dist\electron.exe"
+            r"C:\Users\karan\AppData\Roaming\npm\node_modules\electron\dist\electron.exe"
         )
     elif platform.system() == "Linux":
         electron_executable = "/usr/local/bin/electron"
