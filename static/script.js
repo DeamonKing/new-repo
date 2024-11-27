@@ -2,6 +2,21 @@
 const MAX_INGREDIENTS = 10;
 const DEBOUNCE_DELAY = 300;
 
+let defaultPipelineAssignments = [
+  { ingredient: "Aperol", pipe: "Pipe 1" },  // Example default assignments
+  { ingredient: "Club Soda", pipe: "Pipe 2" },
+  { ingredient: "Prosecco", pipe: "Pipe 3" },
+  { ingredient: "Lime Wedges", pipe: "Pipe 4" },
+  { ingredient: "Sugar", pipe: "Pipe 5" },
+  { ingredient: "Cachaca", pipe: "Pipe 6" },
+  { ingredient: "White Rum", pipe: "Pipe 7" },
+  { ingredient: "Coconut Milk", pipe: "Pipe 8" },
+  { ingredient: "Pineapple Juice", pipe: "Pipe 9" },
+  { ingredient: "Strawberry Liqueur", pipe: "Pipe 10" }
+];
+
+// This array can be populated dynamically based on your ingredients data.
+
 // State management
 let ingredientsData = [];
 let selectedIngredients = [];
@@ -1076,6 +1091,17 @@ function showAssignPipeline(cocktail) {
           <option value="Pipe 12">Pipe 12</option> 
       `; 
 
+      // Check if there is a default pipeline assignment for the ingredient
+      const defaultAssignment = defaultPipelineAssignments.find(
+          assignment => assignment.ingredient === ingredient.ING_Name
+      );
+
+      // If a default assignment exists, set it as the selected value in the dropdown
+      if (defaultAssignment) {
+          pipeSelect.value = defaultAssignment.pipe; // Set the default pipe
+          assignedPipelines[ingredient.ING_Name] = defaultAssignment.pipe; // Pre-populate the assigned pipelines
+      }
+
       // Append the label and dropdown to the ingredient div 
       ingredientDiv.appendChild(ingredientLabel); 
       ingredientDiv.appendChild(pipeSelect); 
@@ -1104,13 +1130,14 @@ function showAssignPipeline(cocktail) {
   findCocktailBtn.classList.remove("active"); 
   findCocktailBtn.classList.add("deactive"); 
   addIngredientsBtn.classList.remove("active"); 
-  addIngredientsBtn.classList.add("deactive"); 
+  addIngredientsBtn.classList.add("de active"); 
   addCocktailBtn.classList.remove("active"); 
   addCocktailBtn.classList.add("deactive"); 
   allCocktailsBtn.classList.remove("active"); 
   allCocktailsBtn.classList.add("deactive"); 
   updateButtonStyles(); 
-}
+} 
+
 
 // Function to update the pipeline dropdowns based on selected pipelines
 function updatePipelineDropdowns() {
