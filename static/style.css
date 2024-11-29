@@ -1541,21 +1541,22 @@ input#product-id {
 } */
 
 .num-pipes {
-  padding: 25px;
+  /* padding: 25px; */
   background: #ffffff50;
   border-radius: 15px;
-  margin-bottom: 25px;
+  /* margin-bottom: 25px; */
 }
 .aspi-div {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   width: 100%;
-  margin-top: 15px;
-  gap: 15px;
+  margin-top: 35px;
+  gap: 25px;
+  flex-direction: column;
 }
 .num-pipes-genrate {
-  width: 50%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -1578,7 +1579,7 @@ input#product-id {
   color: #fff;
 }
 .default-buttons {
-  width: 50%;
+  width: 100%;
   height: 50px;
 }
 .default-num-btn {
@@ -1651,4 +1652,64 @@ button.default-num-btn.selected {
 }
 #findCocktailBtn {
   display: none !important;
+}
+
+.popupx2 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-contentx2 {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  width: 500px;
+  text-align: left;
+  position: relative;
+}
+
+.closex2 {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 25px;
+  cursor: pointer;
+  background: #3d3229;
+  border-radius: 50%;
+  color: #fff;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.closex2:hover {
+  background: #000;
+}
+
+.aspi-txt {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  margin-bottom: 25px;
+}
+.ax-txt {
+  width: 50%;
+  text-align: left;
+}
+.ax-btn {
+  width: 50%;
+  text-align: right;
+}
+.ax-btn button:hover {
+  cursor: pointer;
 }

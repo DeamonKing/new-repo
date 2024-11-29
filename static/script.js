@@ -1911,3 +1911,56 @@ defaultButtons.forEach((button) => {
     generateButton.click(); // Trigger the generate logic
   });
 });
+
+// customize pipe popup
+
+const customizeButton = document.getElementById("customize");
+const popup = document.getElementById("customizePopup");
+const closePopup = document.getElementById("closePopup");
+
+// Open the popup when "Customize" button is clicked
+customizeButton.addEventListener("click", () => {
+  popup.style.display = "flex";
+});
+
+// Close the popup when the close button is clicked
+closePopup.addEventListener("click", () => {
+  popup.style.display = "none";
+});
+
+// Close the popup when clicking outside the content
+window.addEventListener("click", (event) => {
+  if (event.target === popup) {
+    popup.style.display = "none";
+  }
+});
+
+// Default dropdowns (10 on page load)
+window.addEventListener("load", () => {
+  numPipesInput.value = 10; // Set default value
+  generateButton.click(); // Trigger the generate logic
+});
+
+// Automatically close popup after generating custom pipes
+generateButton.addEventListener("click", () => {
+  const numPipes = parseInt(numPipesInput.value);
+
+  if (!isNaN(numPipes) && numPipes >= 1 && numPipes <= 100) {
+    popup.style.display = "none"; // Close the popup after generating
+  }
+});
+
+defaultButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    // Remove 'selected' class from all buttons
+    defaultButtons.forEach((btn) => btn.classList.remove("selected"));
+
+    // Add 'selected' class to the clicked button
+    event.target.classList.add("selected");
+    const numPipes = parseInt(event.target.getAttribute("data-value"));
+    numPipesInput.value = numPipes; // Set the input value
+    generateButton.click(); // Trigger the generate logic
+
+    popup.style.display = "none"; // Close the popup after selecting default
+  });
+});

@@ -332,31 +332,14 @@
             </div>
             <div class="assign-pipe">
               <div class="aspi-box">
-                <div class="num-pipes">
-                  <label for="numPipes" class="txc"
-                    >Select Number of Pipes To Assign :</label
-                  >
-                  <div class="aspi-div">
-                    <div class="num-pipes-genrate form-group">
-                      <input
-                        type="number"
-                        id="numPipes"
-                        min="1"
-                        max="100"
-                        placeholder="Enter Number"
-                      />
-                      <button id="generate">Generate</button>
-                    </div>
-
-                    <div class="default-buttons">
-                      <button class="default-num-btn" data-value="5">5</button>
-                      <button class="default-num-btn" data-value="10">
-                        10
-                      </button>
-                      <button class="default-num-btn" data-value="15">
-                        15
-                      </button>
-                    </div>
+                <div class="aspi-txt">
+                  <div class="ax-txt">
+                    <p class="txc">Assign Ingredients To The Pipelines</p>
+                  </div>
+                  <div class="ax-btn">
+                    <button id="customize" class="btn active btns">
+                      Customize
+                    </button>
                   </div>
                 </div>
                 <div class="pipe-assign" id="pipeAssignContainer">
@@ -472,6 +455,36 @@
         </div>
       </div>
     </div>
+    <!-- Popup for customization assign pipes-->
+    <div id="customizePopup" class="popupx2" style="display: none">
+      <div class="popup-contentx2">
+        <span id="closePopup" class="closex2">&times;</span>
+        <div class="num-pipes">
+          <label for="numPipes" class="txc"
+            >Select Number of Pipes to Assign:</label
+          >
+          <div class="aspi-div">
+            <div class="num-pipes-genrate form-group">
+              <input
+                type="number"
+                id="numPipes"
+                min="1"
+                max="100"
+                placeholder="Enter Number"
+              />
+              <button id="generate">Generate</button>
+            </div>
+
+            <div class="default-buttons">
+              <button class="default-num-btn" data-value="5">5</button>
+              <button class="default-num-btn" data-value="10">10</button>
+              <button class="default-num-btn" data-value="15">15</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- alert -->
     <div id="custom-alert" class="modal">
       <div class="modal-content">
         <p id="alert-message">This is a custom alert message.</p>
