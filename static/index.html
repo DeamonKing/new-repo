@@ -35,8 +35,8 @@
               <a href="#" class="btn deactive" id="assignPipeBtn">
                 Assign Pipeline
               </a>
-              <a href="#" class="btn deactive" id="findCocktailBtn">
-                Find Cocktail
+              <a href="#" class="btn deactive" id="selectIngBtn">
+                Select Ingredients
               </a>
               <a href="#" class="btn deactive" id="allCocktailsBtn">
                 All Cocktails
@@ -50,6 +50,8 @@
             </div>
           </div>
           <div class="app-pageview bg">
+
+            <!-- Available Cocktails -->
             <div class="available-cocktails">
               <div class="cocktail-box2">
                 <div class="cocktail-list2">
@@ -62,11 +64,13 @@
               <div class="footer-btn blurx">
                 <div class="save-button-container">
                   <button class="btn active btns" onclick="showAssignPipe()">
-                    Assign Pipeline
+                    Change Ingredients
                   </button>
                 </div>
               </div>
             </div>
+
+            <!-- Find Ingredeint / Select ingredeint -->
             <div class="find-ing">
               <div class="fi-top">
                 <div class="search-box">
@@ -80,7 +84,7 @@
                     />
                     <p>
                       Selected Ingredients :
-                      <span> 0/10 </span>
+                      <span> 0 </span>
                     </p>
                   </div>
                   <a
@@ -119,12 +123,14 @@
                       Clear All
                     </button>
                     <button id="showProducts" class="btn active btns">
-                      Find Products
+                      Assign Pipeline
                     </button>
                   </div>
                 </div>
               </div>
             </div>
+
+            <!-- Add Ingredients -->
             <div class="add-ing">
               <div class="add-ing-box">
                 <div class="add-ing-form">
@@ -172,6 +178,8 @@
                 </div>
               </div>
             </div>
+
+            <!-- Add Cocktails -->
             <div class="add-cocktail">
               <div class="add-cocktail-box">
                 <div class="add-cocktail-form">
@@ -301,35 +309,9 @@
                 </div>
               </div>
             </div>
-            <div class="select-pipeline">
-              <div class="select-pipeline-box">
-                <div class="sp-txt">
-                  <h2>Assign Pipeline For Selected Ingredients</h2>
-                </div>
-                <div class="selected-ingredients-container">
-                  <!-- This will be populated with selected ingredients and their pipe options
-                  -->
-                </div>
-                <div class="sp-form">
-                  <div class="footer-btn">
-                    <button id="back-button3" class="btn deactive">Back</button>
-                    <button id="clear-all-buttonpipe" class="btn active btns">
-                      Clear All
-                    </button>
-                    <button id="serial-out-button" class="btn active">
-                      Serial Out
-                    </button>
-                  </div>
-                  <div id="loading-page">
-                    <h1>Processing Image...</h1>
-                    <p>Please wait while we process and save your image.</p>
-                    <div class="loading-spinner"></div>
-                    <button id="cancel-button">Cancel</button>
-                    <div id="progress-status"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
+
+
+            <!-- Assign Pipeline Section -->
             <div class="assign-pipe">
               <div class="aspi-box">
                 <div class="aspi-txt">
@@ -353,6 +335,8 @@
               </div>
             </div>
           </div>
+
+          <!-- All Cocktails Section -->
           <div class="all-cocktail new-bg">
             <div class="cocktail-box">
               <div class="cocktail-list">
@@ -375,6 +359,8 @@
               <div id="extra-selected-ingredients"></div>
             </div>
           </div>
+
+          <!-- All Cocktail Details -->
           <div class="cocktail-details" style="display: none">
             <!-- Initially hidden -->
             <div class="cd-box">
@@ -444,9 +430,16 @@
                     >
                       Back
                     </button>
-                    <button id="assignPipeline" class="btn active btns">
+                    <button id="serial-out-button" class="btn active btns">
                       Start Making
                     </button>
+                  </div>
+                  <div id="loading-page">
+                    <h1>Processing Image...</h1>
+                    <p>Please wait while we process and save your image.</p>
+                    <div class="loading-spinner"></div>
+                    <button id="cancel-button">Cancel</button>
+                    <div id="progress-status"></div>
                   </div>
                 </div>
               </div>
@@ -485,6 +478,7 @@
         </div>
       </div>
     </div>
+
     <!-- alert -->
     <div id="custom-alert" class="modal">
       <div class="modal-content">
@@ -492,6 +486,8 @@
         <button id="alert-ok" class="btn">OK</button>
       </div>
     </div>
+
+
     <!-- Color Picker Modal -->
     <div id="color-picker-modal" class="modal">
       <div class="modal-content col-pop">

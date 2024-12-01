@@ -62,7 +62,7 @@ function checkActiveMenu() {
     showFindCocktail();
   } else if (activeMenu === "availableCocktails") {
     showAvailableCocktails();
-  } else if (activeMenu === "assignPip") {
+  } else if (activeMenu === "assignPipe") {
     showAssignPipe();
   } else {
     showAvailableCocktails(); // Default
@@ -105,7 +105,6 @@ function setupCocktailIngredientHandlers() {
         }
       });
       updateButtonStyles();
-
       filterCocktailIngredientsByType(selectedType);
     });
   });
@@ -115,22 +114,15 @@ async function getNextProductId() {
   try {
     const response = await fetch("products.json");
     const products = await response.json();
-
-    // Find the highest current ID
     const highestId = products.reduce((max, product) => {
       const productId = parseInt(product.PID); // Changed from product.id to product.PID
       return productId > max ? productId : max;
     }, 0);
-
-    // Return the next available ID
     const nextId = highestId + 1;
-
-    // Update the input field with the next ID
     const productIdInput = document.getElementById("product-id");
     if (productIdInput) {
       productIdInput.value = nextId; // Changed from value to textContent
     }
-
     return nextId;
   } catch (error) {
     console.error("Error getting next product ID:", error);
@@ -146,18 +138,12 @@ document.addEventListener("DOMContentLoaded", () => {
 async function fetchIngredientsForCocktail(searchTerm = "") {
   try {
     const ingredients = await fetchIngredientsData();
-
-    // Sort ingredients alphabetically by name
     ingredients.sort((a, b) => a.ING_Name.localeCompare(b.ING_Name));
-
     const container = document.getElementById(
       "cocktail-ingredients-container1"
     );
-    container.innerHTML = ""; // Clear existing ingredients
-
-    // Clear previous selections when fetching new ingredients
+    container.innerHTML = "";
     selectedingforcocktail = [];
-
     ingredients.forEach((ingredient) => {
       if (
         searchTerm === "" ||
@@ -165,17 +151,13 @@ async function fetchIngredientsForCocktail(searchTerm = "") {
       ) {
         const ingDiv = document.createElement("div");
         ingDiv.classList.add("ing-item");
-
         const label = document.createElement("label");
         label.classList.add("btn-checkbox");
-
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.classList.add("checkbox");
         checkbox.dataset.ingredientId = ingredient.ING_ID;
         checkbox.dataset.ingredientName = ingredient.ING_Name;
-
-        // Check if this ingredient is already selected
         if (
           selectedCocktailIngredients.some(
             (ing) => ing.ING_Name === ingredient.ING_Name
@@ -185,7 +167,6 @@ async function fetchIngredientsForCocktail(searchTerm = "") {
           selectedingforcocktail.push(ingredient.ING_Name); // Add to selectedingforcocktail
           console.log(`Ingredient ${ingredient.ING_Name} is already selected.`);
         }
-
         checkbox.addEventListener("change", (event) => {
           handleCocktailIngredientSelection(event, ingredient);
           // Update selectedingforcocktail array
@@ -207,11 +188,10 @@ async function fetchIngredientsForCocktail(searchTerm = "") {
             `selectedingforcocktail ${selectedingforcocktail.length}`
           );
         });
-
         const img = document.createElement("img");
+
         img.src = ingredient.ING_IMG || "img/ing2.gif";
         img.alt = `Ingredient - ${ingredient.ING_Name}`;
-
         const para = document.createElement("p");
         para.textContent = ingredient.ING_Name;
 
@@ -399,27 +379,22 @@ function setupEventListeners() {
   fetchIngredientsID();
 } // Close setupEventListeners
 
-// activeMenu is already declared at the top of the file
-
 // Toggle visibility of sections
-const findCocktailBtn = document.getElementById("findCocktailBtn");
+const selectIngBtn = document.getElementById("selectIngBtn");
 const addIngredientsBtn = document.getElementById("addIngredientsBtn");
 const addCocktailBtn = document.getElementById("addCocktailBtn");
 const allCocktailsBtn = document.getElementById("allCocktailsBtn");
 const availableCocktailsBtn = document.getElementById("availableCocktailsBtn");
 const cotailInfoBtn = document.getElementById("cotailInfo"); // New button
 const assignPipeBtn = document.getElementById("assignPipeBtn");
+const cocktailIDEle = document.getElementById("cocktail-id");
+
 const findIngSection = document.querySelector(".find-ing");
 const addIngSection = document.querySelector(".add-ing");
 const addCocktailSection = document.querySelector(".add-cocktail");
 const allCocktailSection = document.querySelector(".all-cocktail");
 const cocktailDetailsSection = document.querySelector(".cocktail-details"); // New section for cocktail details
-const assignPipelineBtn = document.getElementById("assignPipeline");
-const selectPipelineSection = document.querySelector(".select-pipeline");
-const cocktailIDEle = document.getElementById("cocktail-id");
-const availableCocktailsSection = document.querySelector(
-  ".available-cocktails"
-);
+const availableCocktailsSection = document.querySelector(".available-cocktails");
 const assignPipeSection = document.querySelector(".assign-pipe");
 
 // Function to show the "Available Cocktail" section
@@ -429,21 +404,18 @@ function showAvailableCocktails() {
   addCocktailSection.style.display = "none";
   allCocktailSection.style.display = "none";
   cocktailDetailsSection.style.display = "none"; // Hide Cocktail Details section
-  selectPipelineSection.style.display = "none";
   availableCocktailsSection.style.display = "block";
+  assignPipeSection.style.display = "none";
   availableCocktailsBtn.classList.add("active");
   availableCocktailsBtn.classList.remove("deactive");
-  assignPipeSection.style.display = "none";
   assignPipeBtn.classList.remove("active");
   assignPipeBtn.classList.add("deactive");
-  findCocktailBtn.classList.remove("active");
-  findCocktailBtn.classList.add("deactive");
+  selectIngBtn.classList.remove("active");
+  selectIngBtn.classList.add("deactive");
   addIngredientsBtn.classList.remove("active");
   addIngredientsBtn.classList.add("deactive");
   addCocktailBtn.classList.remove("active");
   addCocktailBtn.classList.add("deactive");
-  assignPipelineBtn.classList.remove("active");
-  assignPipelineBtn.classList.add("deactive");
   allCocktailsBtn.classList.remove("active");
   allCocktailsBtn.classList.add("deactive");
   cotailInfoBtn.classList.remove("active"); // Remove active from Cocktail Info
@@ -451,33 +423,50 @@ function showAvailableCocktails() {
   updateButtonStyles();
 }
 
+// Function to show the "Select Ingredients" section
+function showSelectIng() {
+  findIngSection.style.display = "block"; // Show the Find Ingredients section
+  addIngSection.style.display = "none"; // Hide the Add Ingredients section
+  addCocktailSection.style.display = "none"; // Hide the Add Cocktail section
+  allCocktailSection.style.display = "none"; // Hide the All Cocktails section
+  cocktailDetailsSection.style.display = "none"; // Hide the Cocktail Details section
+  assignPipeSection.style.display = "none";
+  // Update button states
+  selectIngBtn.classList.add("active"); // Set active class for Select Ingredients button
+  selectIngBtn.classList.remove("deactive"); // Remove deactive class
+  addIngredientsBtn.classList.remove("active"); // Remove active class from Add Ingredients button
+  addIngredientsBtn.classList.add("deactive"); // Set deactive class for Add Ingredients button
+  addCocktailBtn.classList.remove("active"); // Remove active class from Add Cocktail button
+  addCocktailBtn.classList.add("deactive"); // Set deactive class for Add Cocktail button
+  allCocktailsBtn.classList.remove("active"); // Remove active class from All Cocktails button
+  allCocktailsBtn.classList.add("deactive"); // Set deactive class for All Cocktails button
+  cotailInfoBtn.classList.remove("active"); // Remove active class from Cocktail Info button
+  cotailInfoBtn.classList.add("deactive"); // Set deactive class for Cocktail Info button
+
+  updateButtonStyles(); // Call to update button styles
+}
+
 // Function to show the "Assign Pipe" section
 function showAssignPipe() {
-  findIngSection.style.display = "none";
-  addIngSection.style.display = "none";
-  addCocktailSection.style.display = "none";
-  allCocktailSection.style.display = "none";
-  cocktailDetailsSection.style.display = "none"; // Hide Cocktail Details section
-  selectPipelineSection.style.display = "none";
-  assignPipeSection.style.display = "block";
-  assignPipeBtn.classList.add("active");
-  assignPipeBtn.classList.remove("deactive");
+  findIngSection.style.display = "none"; // Hide the Find Ingredients section
+  addIngSection.style.display = "none"; // Hide the Add Ingredients section
+  addCocktailSection.style.display = "none"; // Hide the Add Cocktail section
+  allCocktailSection.style.display = "none"; // Hide the All Cocktails section
+  cocktailDetailsSection.style.display = "none"; // Hide the Cocktail Details section
   availableCocktailsSection.style.display = "none";
-  availableCocktailsBtn.classList.remove("active");
-  availableCocktailsBtn.classList.add("deactive");
-  findCocktailBtn.classList.remove("active");
-  findCocktailBtn.classList.add("deactive");
-  addIngredientsBtn.classList.remove("active");
-  addIngredientsBtn.classList.add("deactive");
-  addCocktailBtn.classList.remove("active");
-  addCocktailBtn.classList.add("deactive");
-  assignPipelineBtn.classList.remove("active");
-  assignPipelineBtn.classList.add("deactive");
-  allCocktailsBtn.classList.remove("active");
-  allCocktailsBtn.classList.add("deactive");
-  cotailInfoBtn.classList.remove("active"); // Remove active from Cocktail Info
-  cotailInfoBtn.classList.add("deactive");
-  updateButtonStyles();
+  assignPipeSection.style.display = "block";
+  // Update button states
+  selectIngBtn.classList.remove("active"); // Remove active class from Select Ingredients button
+  selectIngBtn.classList.add("deactive"); // Set deactive class for Select Ingredients button
+  addIngredientsBtn.classList.remove("active"); // Remove active class from Add Ingredients button
+  addIngredientsBtn.classList.add("deactive"); // Set deactive class for Add Ingredients button
+  addCocktailBtn.classList.remove("active"); // Remove active class from Add Cocktail button
+  addCocktailBtn.classList.add("deactive"); // Set deactive class for Add Cocktail button
+  allCocktailsBtn.classList.remove("active"); // Remove active class from All Cocktails button
+  allCocktailsBtn.classList.add("deactive"); // Set deactive class for All Cocktails button
+  cotailInfoBtn.classList.remove("active"); // Remove active class from Cocktail Info button
+  cotailInfoBtn.classList.add("deactive"); // Set deactive class for Cocktail Info button
+  updateButtonStyles(); // Call to update button styles
 }
 
 // Function to show the "Find Cocktail" section
@@ -487,21 +476,18 @@ function showFindCocktail() {
   addCocktailSection.style.display = "none";
   allCocktailSection.style.display = "none";
   cocktailDetailsSection.style.display = "none"; // Hide Cocktail Details section
-  selectPipelineSection.style.display = "none";
   availableCocktailsSection.style.display = "none";
   availableCocktailsBtn.classList.remove("active");
   availableCocktailsBtn.classList.add("deactive");
   assignPipeSection.style.display = "none";
   assignPipeBtn.classList.remove("active");
   assignPipeBtn.classList.add("deactive");
-  findCocktailBtn.classList.add("active");
-  findCocktailBtn.classList.remove("deactive");
+  selectIngBtn.classList.add("active");
+  selectIngBtn.classList.remove("deactive");
   addIngredientsBtn.classList.remove("active");
   addIngredientsBtn.classList.add("deactive");
   addCocktailBtn.classList.remove("active");
   addCocktailBtn.classList.add("deactive");
-  assignPipelineBtn.classList.remove("active");
-  assignPipelineBtn.classList.add("deactive");
   allCocktailsBtn.classList.remove("active");
   allCocktailsBtn.classList.add("deactive");
   cotailInfoBtn.classList.remove("active"); // Remove active from Cocktail Info
@@ -516,7 +502,6 @@ function showAddIngredients() {
   addCocktailSection.style.display = "none";
   allCocktailSection.style.display = "none";
   cocktailDetailsSection.style.display = "none";
-  selectPipelineSection.style.display = "none";
   availableCocktailsSection.style.display = "none";
   availableCocktailsBtn.classList.remove("active");
   availableCocktailsBtn.classList.add("deactive");
@@ -525,12 +510,10 @@ function showAddIngredients() {
   assignPipeBtn.classList.add("deactive");
   addIngredientsBtn.classList.add("active");
   addIngredientsBtn.classList.remove("deactive");
-  findCocktailBtn.classList.remove("active");
-  findCocktailBtn.classList.add("deactive");
+  selectIngBtn.classList.remove("active");
+  selectIngBtn.classList.add("deactive");
   addCocktailBtn.classList.remove("active");
   addCocktailBtn.classList.add("deactive");
-  assignPipelineBtn.classList.remove("active");
-  assignPipelineBtn.classList.add("deactive");
   allCocktailsBtn.classList.remove("active");
   allCocktailsBtn.classList.add("deactive");
   cotailInfoBtn.classList.remove("active");
@@ -546,7 +529,6 @@ function showCocktailDetails() {
   addCocktailSection.style.display = "none";
   allCocktailSection.style.display = "none";
   cocktailDetailsSection.style.display = "block"; // Show Cocktail Details section
-  selectPipelineSection.style.display = "none";
   availableCocktailsSection.style.display = "none";
   availableCocktailsBtn.classList.remove("active");
   availableCocktailsBtn.classList.add("deactive");
@@ -555,14 +537,12 @@ function showCocktailDetails() {
   assignPipeBtn.classList.add("deactive");
   cotailInfoBtn.classList.add("active");
   cotailInfoBtn.classList.remove("deactive");
-  findCocktailBtn.classList.remove("active");
-  findCocktailBtn.classList.add("deactive");
+  selectIngBtn.classList.remove("active");
+  selectIngBtn.classList.add("deactive");
   addIngredientsBtn.classList.remove("active");
   addIngredientsBtn.classList.add("deactive");
   addCocktailBtn.classList.remove("active");
   addCocktailBtn.classList.add("deactive");
-  assignPipelineBtn.classList.remove("active");
-  assignPipelineBtn.classList.add("deactive");
   allCocktailsBtn.classList.remove("active");
   allCocktailsBtn.classList.add("deactive");
   updateButtonStyles();
@@ -575,7 +555,6 @@ function showAddCocktail() {
   addCocktailSection.style.display = "block";
   allCocktailSection.style.display = "none";
   cocktailDetailsSection.style.display = "none";
-  selectPipelineSection.style.display = "none";
   availableCocktailsSection.style.display = "none";
   availableCocktailsBtn.classList.remove("active");
   availableCocktailsBtn.classList.add("deactive");
@@ -586,12 +565,10 @@ function showAddCocktail() {
   fetchIngredientsForCocktail();
   addCocktailBtn.classList.add("active");
   addCocktailBtn.classList.remove("deactive");
-  findCocktailBtn.classList.remove("active");
-  findCocktailBtn.classList.add("deactive");
+  selectIngBtn.classList.remove("active");
+  selectIngBtn.classList.add("deactive");
   addIngredientsBtn.classList.remove("active");
   addIngredientsBtn.classList.add("deactive");
-  assignPipelineBtn.classList.remove("active");
-  assignPipelineBtn.classList.add("deactive");
   allCocktailsBtn.classList.remove("active");
   allCocktailsBtn.classList.add("deactive");
   cotailInfoBtn.classList.remove("active");
@@ -672,7 +649,7 @@ function displayErrorMessage(message) {
 }
 
 // Add click event listeners to the buttons
-findCocktailBtn.addEventListener("click", function (event) {
+selectIngBtn.addEventListener("click", function (event) {
   event.preventDefault();
   showFindCocktail();
 });
@@ -1065,7 +1042,7 @@ function updateSelectedCount() {
   const selectedCountElement = document.querySelector(".fi-top p span");
 
   // Update displayed count
-  selectedCountElement.textContent = `${Math.min(selectedCount, 10)}/10`; // Display count, max 10
+  selectedCountElement.textContent = `${Math.min(selectedCount, 10)}`; // Display count, max 10
 }
 
 // Add event delegation to the ingredients container
@@ -1220,7 +1197,6 @@ function showAssignPipeline(cocktail) {
   addCocktailSection.style.display = "none";
   allCocktailSection.style.display = "none";
   cocktailDetailsSection.style.display = "none";
-  selectPipelineSection.style.display = "block"; // Show Assign Pipeline section
 
   const selectedIngredientsContainer = document.querySelector(
     ".selected-ingredients-container"
@@ -1295,10 +1271,8 @@ function showAssignPipeline(cocktail) {
   });
 
   // Update button states
-  assignPipelineBtn.classList.add("active");
-  assignPipelineBtn.classList.remove("deactive");
-  findCocktailBtn.classList.remove("active");
-  findCocktailBtn.classList.add("deactive");
+  selectIngBtn.classList.remove("active");
+  selectIngBtn.classList.add("deactive");
   addIngredientsBtn.classList.remove("active");
   addIngredientsBtn.classList.add("de active");
   addCocktailBtn.classList.remove("active");
@@ -1382,7 +1356,7 @@ async function showAllCocktails(selectedIngredients = []) {
   addCocktailSection.style.display = "none";
   allCocktailSection.style.display = "block"; // Show All Cocktails section
   cocktailDetailsSection.style.display = "none";
-  selectPipelineSection.style.display = "none";
+  assignPipeSection.style.display = "none";
   availableCocktailsSection.style.display = "none";
   availableCocktailsBtn.classList.remove("active");
   availableCocktailsBtn.classList.add("deactive");
@@ -1391,14 +1365,12 @@ async function showAllCocktails(selectedIngredients = []) {
   assignPipeBtn.classList.add("deactive");
   allCocktailsBtn.classList.add("active");
   allCocktailsBtn.classList.remove("deactive");
-  findCocktailBtn.classList.remove("active");
-  findCocktailBtn.classList.add("deactive");
+  selectIngBtn.classList.remove("active");
+  selectIngBtn.classList.add("deactive");
   addIngredientsBtn.classList.remove("active");
   addIngredientsBtn.classList.add("deactive");
   addCocktailBtn.classList.remove("active");
   addCocktailBtn.classList.add("deactive");
-  assignPipelineBtn.classList.remove("active");
-  assignPipelineBtn.classList.add("deactive");
   cotailInfoBtn.classList.remove("active");
   cotailInfoBtn.classList.add("deactive");
   updateButtonStyles();
@@ -1429,17 +1401,15 @@ function displayCocktails(cocktails) {
   addCocktailSection.style.display = "none";
   allCocktailSection.style.display = "block"; // Show All Cocktails section
   cocktailDetailsSection.style.display = "none";
-  selectPipelineSection.style.display = "none";
+  assignPipeSection.style.display = "none";
   allCocktailsBtn.classList.add("active");
   allCocktailsBtn.classList.remove("deactive");
-  findCocktailBtn.classList.remove("active");
-  findCocktailBtn.classList.add("deactive");
+  selectIngBtn.classList.remove("active");
+  selectIngBtn.classList.add("deactive");
   addIngredientsBtn.classList.remove("active");
   addIngredientsBtn.classList.add("deactive");
   addCocktailBtn.classList.remove("active");
   addCocktailBtn.classList.add("deactive");
-  assignPipelineBtn.classList.remove("active");
-  assignPipelineBtn.classList.add("deactive");
   cotailInfoBtn.classList.remove("active");
   cotailInfoBtn.classList.add("deactive");
   updateButtonStyles();
@@ -1472,7 +1442,7 @@ async function wshowCocktailDetails(cocktail) {
   addCocktailSection.style.display = "none";
   allCocktailSection.style.display = "none";
   cocktailDetailsSection.style.display = "block"; // Show Cocktail Details section
-
+  assignPipeSection.style.display = "none";
   // Update the cocktail image and name
   const cocktailID = document.getElementById("cocktail-id");
   const cocktailImage = document.getElementById("cocktail-image");
@@ -1734,16 +1704,15 @@ document.getElementById("alert-ok").onclick = function () {
   document.getElementById("custom-alert").style.display = "none"; // Hide the alert
 };
 
+
 /////////////////////////////////////////////////////////////
 ///Select Number Of Pipes To Assign & Searchable dropdown///
 ///////////////////////////////////////////////////////////
-
 const numPipesInput = document.getElementById("numPipes");
 const generateButton = document.getElementById("generate");
 const saveButton = document.getElementById("save");
 const pipeAssignContainer = document.getElementById("pipeAssignContainer");
 const errorMessage = document.getElementById("errorMessage");
-
 generateButton.addEventListener("click", () => {
   const numPipes = parseInt(numPipesInput.value);
 
@@ -1758,6 +1727,7 @@ generateButton.addEventListener("click", () => {
   // Create a single parent div to hold all dropdowns
   const parentDiv = document.createElement("div");
   parentDiv.className = "dropdowns-parent-container"; // Add a class for styling if needed
+
 
   // Generate dropdowns and append them to the parent div
   for (let i = 1; i <= numPipes; i++) {
@@ -1794,14 +1764,12 @@ generateButton.addEventListener("click", () => {
   // Append the parent div to the container
   pipeAssignContainer.appendChild(parentDiv);
 });
-
 saveButton.addEventListener("click", () => {
   const dropdownInputs = document.querySelectorAll(".pipe-dropdown");
   let allAssigned = true;
 
   dropdownInputs.forEach((input, index) => {
-    const errorMessage =
-      input.parentElement.parentElement.querySelector(".error-message");
+    const errorMessage = input.parentElement.parentElement.querySelector(".error-message");
 
     if (input.value.trim() === "") {
       allAssigned = false;
@@ -1834,7 +1802,6 @@ saveButton.addEventListener("click", () => {
   console.log("Assigned Values:", assignedValues);
   alert("All pipes assigned successfully!");
 });
-
 // Function to handle dropdown functionality
 function setupDropdown(input, optionsContainer) {
   const originalOptions = Array.from(optionsContainer.children);
@@ -1879,26 +1846,21 @@ function setupDropdown(input, optionsContainer) {
   });
 
   optionsContainer.addEventListener("click", (event) => {
-    if (
-      event.target.tagName === "DIV" &&
-      !event.target.classList.contains("no-result")
-    ) {
+    if (event.target.tagName === "DIV" &&
+      !event.target.classList.contains("no-result")) {
       input.value = event.target.textContent;
       optionsContainer.style.display = "none";
       input.nextElementSibling.style.transform = "rotate(0deg)"; // Reset arrow
     }
   });
 }
-
 function resetDropdownOptions(container, originalOptions) {
   container.innerHTML = ""; // Clear the current content
   originalOptions.forEach((option) => {
     container.appendChild(option); // Add original options back
   });
 }
-
 const defaultButtons = document.querySelectorAll(".default-num-btn");
-
 defaultButtons.forEach((button) => {
   button.addEventListener("click", (event) => {
     // Remove 'selected' class from all buttons
@@ -1911,36 +1873,29 @@ defaultButtons.forEach((button) => {
     generateButton.click(); // Trigger the generate logic
   });
 });
-
 // customize pipe popup
-
 const customizeButton = document.getElementById("customize");
 const popup = document.getElementById("customizePopup");
 const closePopup = document.getElementById("closePopup");
-
 // Open the popup when "Customize" button is clicked
 customizeButton.addEventListener("click", () => {
   popup.style.display = "flex";
 });
-
 // Close the popup when the close button is clicked
 closePopup.addEventListener("click", () => {
   popup.style.display = "none";
 });
-
 // Close the popup when clicking outside the content
 window.addEventListener("click", (event) => {
   if (event.target === popup) {
     popup.style.display = "none";
   }
 });
-
 // Default dropdowns (10 on page load)
 window.addEventListener("load", () => {
   numPipesInput.value = 10; // Set default value
   generateButton.click(); // Trigger the generate logic
 });
-
 // Automatically close popup after generating custom pipes
 generateButton.addEventListener("click", () => {
   const numPipes = parseInt(numPipesInput.value);
@@ -1949,7 +1904,6 @@ generateButton.addEventListener("click", () => {
     popup.style.display = "none"; // Close the popup after generating
   }
 });
-
 defaultButtons.forEach((button) => {
   button.addEventListener("click", (event) => {
     // Remove 'selected' class from all buttons

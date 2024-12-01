@@ -307,8 +307,29 @@ def start_http_server():
 def start_electron_app():
     time.sleep(2)
     os.environ["DISPLAY"] = ":0"
+
+    # Define the base path to check for "karan" or "LOQ"
+    users_base_path = r"C:/Users/"
+
+    # Initialize user_identifier and path for Electron executable
+    user_identifier = None
+    electron_executable = None
+
+    # Check for "karan" or "LOQ" in the C:\Users\ directory
+    if os.path.exists(os.path.join(users_base_path, "karan")):
+        user_identifier = "karan"
+    elif os.path.exists(os.path.join(users_base_path, "LOQ")):
+        user_identifier = "LOQ"
+
+    if user_identifier is None:
+        print("Neither 'karan' nor 'LOQ' directories found in C:\\Users\\")
+        return  # Exit if neither directory is found
+
+    print(f"User  Identifier: {user_identifier}")
+
+    # Set the path for the Electron executable based on the platform
     if platform.system() == "Windows":
-        electron_executable = r"C:\Users\karan\AppData\Roaming\npm\node_modules\electron\dist\electron.exe"
+        electron_executable = os.path.join(users_base_path, user_identifier, r"AppData/Roaming/npm/node_modules/electron/dist/electron.exe")
     elif platform.system() == "Linux":
         electron_executable = "/usr/local/bin/electron"
     else:
@@ -322,7 +343,6 @@ def start_electron_app():
         ]
     )
     electron_process.communicate()
-
 
 def start_image_handler():
     """Start the image handler script in a separate thread."""

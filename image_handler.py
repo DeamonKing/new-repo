@@ -9,7 +9,8 @@ import threading
 # Define the base directory as the directory where this script is located
 base_dir = os.path.dirname(__file__)
 web_dir = os.path.join(base_dir, "static")  # Define `static` folder path
-img_dir = os.path.join(web_dir, "upload")  # Path to the img directory
+img_dir = os.path.join(web_dir, "img")  # Path to the img directory
+uplaod_dir = os.path.join(img_dir, "upload") # Path to the upload directory
 db_file_path = os.path.join(web_dir, "db.json")  # Path to db.json
 products_file_path = os.path.join(web_dir, "products.json")  # Path to products.json
 
@@ -92,14 +93,14 @@ def save_image(item, type_):
 
             # Create a filename based on the name and extension
             filename = f"{name.replace(' ', '_').lower()}.{extension}"
-            file_path = os.path.join(img_dir, filename)
+            file_path = os.path.join(uplaod_dir, filename)
 
             # Write the image to a file
             with open(file_path, "wb") as img_file:
                 img_file.write(base64.b64decode(encoded))
             
             # Update the item's image path
-            item[img_key] = f"/upload/{filename}"
+            item[img_key] = f"/img/upload/{filename}"
 
             print(f"Image saved at: {file_path}")
             
@@ -111,7 +112,7 @@ def save_image(item, type_):
             print(f"Error saving image for {name}: {e}")
 
     # Check if the image data is a file path
-    elif img_data and img_data.startswith("/upload/"):
+    elif img_data and img_data.startswith("/img/upload/"):
         print(f"Image already formatted for {name}: {img_data}")
 
 # Start watching for changes in db.json
