@@ -134,6 +134,9 @@ class CustomHandler(SimpleHTTPRequestHandler):
         elif self.path == "/send-pipes":
             self.handle_send_pipes(post_data)
             return
+        
+        elif self.path == "/save-config":
+            self.save_config(post_data)
 
         else:
             self.send_response(404)
@@ -148,7 +151,24 @@ class CustomHandler(SimpleHTTPRequestHandler):
             subprocess.Popen(["sh", script_path])
         else:
             print(f"Unsupported operating system for script execution.")
+    def save_config(self, post_data):
+        try:
+            config_data = json.loads(post_data)
+            config_path = os.path.join(web_dir, "config.json")
 
+            # Write the configuration data to config.json
+            with open(config_path, "w") as file:
+                json.dump(config_data, file, indent=2)
+
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"Config saved successfully")
+        except Exception as e:
+            print(f"Error saving config: {e}")
+            self.send_response(500)
+            self.end_headers()
+            self.wfile.write(b"Error saving config")
+            
     def add_cocktail(self, post_data):
         try:
             products_path = os.path.join(web_dir, "products.json")

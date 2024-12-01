@@ -1,0 +1,8 @@
+{
+  "numberOfPipes": 3,
+  "pipeConfig": {
+    "Pipe 1": "Absinthe",
+    "Pipe 2": "Agave Nectar",
+    "Pipe 3": "Absinthe"
+  }
+}

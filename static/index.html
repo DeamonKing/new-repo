@@ -63,7 +63,7 @@
               </div>
               <div class="footer-btn blurx">
                 <div class="save-button-container">
-                  <button class="btn active btns" onclick="showAssignPipe()">
+                  <button class="btn active btns" onclick="showSelectIng()">
                     Change Ingredients
                   </button>
                 </div>
@@ -251,7 +251,7 @@
                     <button
                       id="back-button2"
                       class="btn deactive"
-                      onclick="showFindCocktail()"
+                      onclick="showSelectIng()"
                     >
                       Back
                     </button>
@@ -310,30 +310,31 @@
               </div>
             </div>
 
-
             <!-- Assign Pipeline Section -->
             <div class="assign-pipe">
               <div class="aspi-box">
-                <div class="aspi-txt">
-                  <div class="ax-txt">
-                    <p class="txc">Assign Ingredients To The Pipelines</p>
+                  <div class="aspi-txt">
+                      <div class="ax-txt">
+                          <p class="txc">Assign Ingredients To The Pipelines</p>
+                      </div>
+                      <div class="ax-btn">
+                          <button id="customize" class="btn active btns">
+                              Customize
+                          </button>
+                      </div>
                   </div>
-                  <div class="ax-btn">
-                    <button id="customize" class="btn active btns">
-                      Customize
-                    </button>
+                  <div class="pipe-assign" id="pipeAssignContainer" style="display: none;">
+                      <!-- Dropdowns will be dynamically added here -->
                   </div>
-                </div>
-                <div class="pipe-assign" id="pipeAssignContainer">
-                  <!-- Dropdowns will be dynamically added here -->
-                </div>
               </div>
               <div class="footer-btn blurx">
-                <div class="save-button-container">
-                  <button id="save" class="btn active btns">Save</button>
-                </div>
+                  <div class="save-button-container">
+                    <button id="changeIngredients" class="btn deactive btns" onclick=showSelectIng()>Change Ingredients</button>
+                      <button id="save" class="btn active btns">Save</button>
+                  </div>
               </div>
-            </div>
+          </div>
+
           </div>
 
           <!-- All Cocktails Section -->
@@ -350,7 +351,7 @@
                 <button
                   id="back-button"
                   class="btn deactive"
-                  onclick="showFindCocktail()"
+                  onclick="showSelectIng()"
                 >
                   Back
                 </button>
@@ -426,7 +427,7 @@
                     <button
                       id="back-button1"
                       class="btn deactive"
-                      onclick="showFindCocktail()"
+                      onclick="showSelectIng()"
                     >
                       Back
                     </button>
