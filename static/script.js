@@ -2,20 +2,7 @@
 const MAX_INGREDIENTS = 10;
 const DEBOUNCE_DELAY = 300;
 
-let defaultPipelineAssignments = [
-  { ingredient: "Aperol", pipe: "Pipe 1" }, // Example default assignments
-  { ingredient: "Club Soda", pipe: "Pipe 2" },
-  { ingredient: "Prosecco", pipe: "Pipe 3" },
-  { ingredient: "Lime Wedges", pipe: "Pipe 4" },
-  { ingredient: "Sugar", pipe: "Pipe 5" },
-  { ingredient: "Cachaca", pipe: "Pipe 6" },
-  { ingredient: "White Rum", pipe: "Pipe 7" },
-  { ingredient: "Coconut Milk", pipe: "Pipe 8" },
-  { ingredient: "Pineapple Juice", pipe: "Pipe 9" },
-  { ingredient: "Strawberry Liqueur", pipe: "Pipe 10" },
-];
-
-// This array can be populated dynamically based on your ingredients data.
+let numberOfPipes = 0;
 
 // State management
 let ingredientsData = [];
@@ -295,7 +282,7 @@ function setupEventListeners() {
     }
 
     // Populate the dropdowns in the Assign Pipeline section with selected ingredients
-    populateAssignPipeDropdowns(selectedIngredients, numPipes);
+    populateAssignPipeDropdowns();
   }
 
   document
@@ -371,21 +358,18 @@ const cocktailDetailsSection = document.querySelector(".cocktail-details"); // N
 const availableCocktailsSection = document.querySelector(".available-cocktails");
 const assignPipeSection = document.querySelector(".assign-pipe");
 
-// Function to show the "Available Cocktail" section
-function showAvailableCocktails() {
+async function showAvailableCocktails() {
   findIngSection.style.display = "none";
   addIngSection.style.display = "none";
   addCocktailSection.style.display = "none";
-  allCocktailSection.style.display = "none";
-  cocktailDetailsSection.style.display = "none"; // Hide Cocktail Details section
-  availableCocktailsSection.style.display = "block";
+  allCocktailSection.style.display = "block";
+  cocktailDetailsSection.style.display = "none";
   assignPipeSection.style.display = "none";
+  availableCocktailsSection.style.display = "none"; 
   availableCocktailsBtn.classList.add("active");
   availableCocktailsBtn.classList.remove("deactive");
-  assignPipeBtn.classList.remove("active");
   assignPipeBtn.classList.add("deactive");
-  selectIngBtn.classList.remove("active");
-  selectIngBtn.classList.add("deactive");
+  assignPipeBtn.classList.remove("active");
   addIngredientsBtn.classList.remove("active");
   addIngredientsBtn.classList.add("deactive");
   addCocktailBtn.classList.remove("active");
@@ -394,7 +378,32 @@ function showAvailableCocktails() {
   allCocktailsBtn.classList.add("deactive");
   cotailInfoBtn.classList.remove("active"); // Remove active from Cocktail Info
   cotailInfoBtn.classList.add("deactive");
+  document.getElementById("back-button-all-cocktail").style.display = "none"; 
   updateButtonStyles();
+
+  const cocktails = await fetchCocktails(); 
+
+   // Filter cocktails based on selected ingredients 
+    const filteredCocktails = cocktails.filter(cocktail => { 
+       // Check if all ingredients required by the cocktail are in selectedIngredients
+        return cocktail.PIng.every(ingredient => 
+            selectedIngredients.includes(ingredient.ING_Name) 
+          ); 
+      }); 
+
+    const cocktailListContainer = document.querySelector(".cocktail-list"); 
+    cocktailListContainer.innerHTML = ""; // Clear existing content 
+
+   // Check if there are any filtered cocktails 
+    if (filteredCocktails.length === 0) { 
+      const noCocktailMessage = document.createElement("p"); 
+      noCocktailMessage.className = "no-cocktail-message"; // Apply the CSS class 
+      noCocktailMessage.textContent = "No Cocktails Found, Please Assign Proper Ingredients"; // Set the message 
+      cocktailListContainer.appendChild(noCocktailMessage); // Append the message to the container 
+    } else { 
+      // Display filtered cocktails 
+      displayCocktails(filteredCocktails); 
+    } 
 }
 
 
@@ -428,6 +437,8 @@ function showAssignPipe() {
 
 // Function to show the "Find Cocktail" section
 function showSelectIng() {
+  fetchIngredients();
+  updateSelectedCount();
   findIngSection.style.display = "block";
   addIngSection.style.display = "none";
   addCocktailSection.style.display = "none";
@@ -449,6 +460,7 @@ function showSelectIng() {
   allCocktailsBtn.classList.add("deactive");
   cotailInfoBtn.classList.remove("active"); // Remove active from Cocktail Info
   cotailInfoBtn.classList.add("deactive");
+  
   updateButtonStyles();
 }
 
@@ -927,6 +939,8 @@ async function fetchIngredients(searchTerm = "") {
           checkbox.checked = true; // Keep it checked
         }
 
+        updateSelectedCount();
+
         // Add event listener to handle checkbox changes
         checkbox.addEventListener("change", (event) => {
           const ingredientName = ingredient.ING_Name;
@@ -967,30 +981,23 @@ async function fetchIngredients(searchTerm = "") {
 }
 
 // Function to handle checkbox changes
-function handleCheckboxChange(event) {
-  const ingredientName = event.target
-    .closest(".ing-item")
-    .querySelector("p").textContent;
+function handleCheckboxChange(event) { 
+  const ingredientName = event.target.closest(".ing-item").querySelector("p").textContent; 
 
-  if (event.target.checked) {
-    // If the checkbox is checked, check if we can add it
-    if (selectedIngredients.length < 10) {
-      selectedIngredients.push(ingredientName);
-      console.log(selectedIngredients);
-    } else {
-      event.target.checked = false; // Uncheck the checkbox
-      console.log(selectedIngredients);
-      showCustomAlert("You can only select up to 10 ingredients."); // showCustomAlert the user
-    }
-  } else {
-    // If the checkbox is unchecked, remove it from the selectedIngredients array
-    selectedIngredients = selectedIngredients.filter(
-      (name) => name !== ingredientName
-    );
-  }
+  if (event.target.checked) { 
+      if (selectedIngredients.length < 10) { 
+          selectedIngredients.push(ingredientName); 
+          console.log(selectedIngredients); 
+      } else { 
+          event.target.checked = false; 
+          console.log(selectedIngredients); 
+          showCustomAlert("You can only select up to 10 ingredients."); 
+      } 
+  } else { 
+      selectedIngredients = selectedIngredients.filter(name => name !== ingredientName); 
+  } 
 
-  // Update the count display based on selectedIngredients
-  updateSelectedCount();
+  updateSelectedCount(); // Update the selected count 
 }
 
 // Function to update the selected count
@@ -1012,17 +1019,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+function handleSearchInput() {
+  const searchInput = document.getElementById("ingredient-search").value; // Get the input value
+  fetchIngredients(searchInput); // Fetch ingredients based on the search input
 
+  // Log the search term to the Python server
+  console.log(`Search term: ${searchInput}`);
+}
 document.addEventListener("DOMContentLoaded", () => {
-  // Function to handle input changes in the search box
-  function handleSearchInput() {
-    const searchInput = document.getElementById("ingredient-search").value; // Get the input value
-    fetchIngredients(searchInput); // Fetch ingredients based on the search input
-
-    // Log the search term to the Python server
-    console.log(`Search term: ${searchInput}`);
-  }
-
+  
   // Add event listener to the search input
   document
     .getElementById("ingredient-search")
@@ -1125,7 +1130,7 @@ document.querySelectorAll(".ing-filter a").forEach((button) => {
 document.getElementById("back-button").addEventListener("click", (event) => {
   event.preventDefault(); // Prevent default button behavior
   console.log("Back button clicked");
-  showSelectIng(); // Call the function to show the Find Cocktail section
+  showAvailableCocktails(); // Call the function to show the Find Cocktail section
   console.log("Find Cocktail section displayed");
 });
 
@@ -1133,7 +1138,7 @@ document.getElementById("back-button").addEventListener("click", (event) => {
 document.getElementById("back-button1").addEventListener("click", (event) => {
   event.preventDefault(); // Prevent default button behavior
   console.log("Back button 1 clicked");
-  showAllCocktails(); // Call the function to show the Find Cocktail section
+  showAvailableCocktails(); // Call the function to show the Find Cocktail section
   console.log("Find Cocktail section displayed");
 });
 
@@ -1181,6 +1186,9 @@ async function showAllCocktails(selectedIngredients = []) {
   cotailInfoBtn.classList.add("deactive");
   updateButtonStyles();
 
+  document.getElementById("back-button-all-cocktail").style.display = "block"; 
+
+
   // Fetch cocktails
   const cocktails = await fetchCocktails();
   // Display all cocktails if no ingredients are selected
@@ -1208,16 +1216,7 @@ function displayCocktails(cocktails) {
   allCocktailSection.style.display = "block"; // Show All Cocktails section
   cocktailDetailsSection.style.display = "none";
   assignPipeSection.style.display = "none";
-  allCocktailsBtn.classList.add("active");
-  allCocktailsBtn.classList.remove("deactive");
-  selectIngBtn.classList.remove("active");
-  selectIngBtn.classList.add("deactive");
-  addIngredientsBtn.classList.remove("active");
-  addIngredientsBtn.classList.add("deactive");
-  addCocktailBtn.classList.remove("active");
-  addCocktailBtn.classList.add("deactive");
-  cotailInfoBtn.classList.remove("active");
-  cotailInfoBtn.classList.add("deactive");
+
   updateButtonStyles();
   const cocktailListContainer = document.querySelector(".cocktail-list");
   cocktailListContainer.innerHTML = ""; // Clear existing content
@@ -1517,10 +1516,10 @@ const errorMessage = document.getElementById("errorMessage");
 
 generateButton.addEventListener("click", () => {
   const numPipes = parseInt(numPipesInput.value);
-
+  numberOfPipes = numPipes;
   // Validate the number of pipes
   if (isNaN(numPipes) || numPipes < 1 || numPipes > 100) {
-    alert("Please enter a valid number between 1 and 100.");
+    showCustomAlert("Please enter a valid number between 1 and 100.");
     return;
   }
 
@@ -1528,15 +1527,14 @@ generateButton.addEventListener("click", () => {
   pipeAssignContainer.innerHTML = "";
 
   // Call the function to populate the dropdowns with the selected ingredients
-  populateAssignPipeDropdowns(selectedIngredients, numPipes);
+  populateAssignPipeDropdowns();
 });
 
-function populateAssignPipeDropdowns(selectedIngredients, numPipes) {
+function populateAssignPipeDropdowns() {
   const pipeAssignContainer = document.getElementById("pipeAssignContainer");
   pipeAssignContainer.innerHTML = ""; // Clear existing dropdowns
 
-  // Generate dropdowns for the specified number of pipes
-  for (let i = 1; i <= numPipes; i++) {
+  for (let i = 1; i <= numberOfPipes; i++) {
       const dropdownContainer = document.createElement("div");
       dropdownContainer.className = "pipe-dropdown-container";
       dropdownContainer.innerHTML = `
@@ -1554,43 +1552,9 @@ function populateAssignPipeDropdowns(selectedIngredients, numPipes) {
 }
 
 saveButton.addEventListener("click", () => {
-  const dropdownInputs = document.querySelectorAll(".pipe-dropdown");
-  let allAssigned = true;
-
-  dropdownInputs.forEach((input, index) => {
-    const errorMessage =
-      input.parentElement.parentElement.querySelector(".error-message");
-
-    if (input.value.trim() === "") {
-      allAssigned = false;
-
-      // Highlight the unassigned dropdown
-      input.style.border = "1px solid red";
-
-      // Show specific error message
-      errorMessage.textContent = `Please assign a value to Pipe ${index + 1}`;
-      errorMessage.style.display = "block";
-    } else {
-      // Remove error highlights and messages if valid
-      input.style.border = "";
-      errorMessage.textContent = "";
-      errorMessage.style.display = "none";
-    }
-  });
-
-  if (!allAssigned) {
-    console.log("Validation failed. Some pipes are unassigned.");
-    return;
-  }
-
-  // If all dropdowns are valid, proceed to save
-  const assignedValues = Array.from(dropdownInputs).map((input, index) => ({
-    pipe: `Pipe ${index + 1}`,
-    value: input.value,
-  }));
-
-  console.log("Assigned Values:", assignedValues);
-  alert("All pipes assigned successfully!");
+    // Call the saveConfig function with the current global variables
+    saveConfig(numberOfPipes, selectedIngredients);
+    showCustomAlert("New configuration saved!", "success");
 });
 
 // Function to handle dropdown functionality
@@ -1655,7 +1619,6 @@ function resetDropdownOptions(container, originalOptions) {
   });
 }
 
-
 document.addEventListener("DOMContentLoaded", () => {
   const customizeButton = document.getElementById("customize");
   const popup = document.getElementById("customizePopup");
@@ -1684,11 +1647,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   });
 
-  // Default dropdowns (10 on page load)
-  window.addEventListener("load", () => {
-      numPipesInput.value = 10; // Set default value
-      generateButton.click(); // Trigger the generate logic
-  });
 
   // Automatically close popup after generating custom pipes
   generateButton.addEventListener("click", () => {
@@ -1716,3 +1674,141 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+async function saveConfig(numberOfPipes, selectedIngredients) {
+  const pipeConfig = {}; // Create an object to hold pipe to ingredient mappings
+
+  // Loop through the number of pipes and get their selected ingredient values
+  for (let i = 1; i <= numberOfPipes; i++) {
+      const dropdown = document.getElementById(`pipeDropdown${i}`);
+      if (dropdown) {
+          const ingredientName = dropdown.value; // Get the selected ingredient for the pipe
+          pipeConfig[`Pipe ${i}`] = ingredientName; // Map pipe to ingredient
+      }
+  }
+
+  const configData = {
+      numberOfPipes: numberOfPipes,
+      pipeConfig: pipeConfig, // Include the pipeConfig in the data to save
+      selectedIngredients: selectedIngredients // Optionally save selected ingredients
+  };
+
+  try {
+      const response = await fetch("/save-config", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify(configData),
+      });
+
+      if (response.ok) {
+          console.log("Configuration saved successfully.");
+      } else {
+          console.error("Failed to save configuration.");
+      }
+  } catch (error) {
+      console.error("Error saving configuration:", error);
+  }
+}
+
+async function loadConfig() {
+  try {
+      const response = await fetch("config.json");
+      const configData = await response.json();
+      selectedIngredients = configData.selectedIngredients;
+
+      // Set global variables from config data
+      numberOfPipes = configData.numberOfPipes || 0; // Update numberOfPipes
+      populateAssignPipeDropdowns();
+
+      // Populate dropdowns based on pipeConfig
+      if (configData.pipeConfig) {
+          for (let i = 1; i <= numberOfPipes; i++) {
+              const dropdown = document.getElementById(`pipeDropdown${i}`);
+              if (dropdown) {
+                  const ingredientName = configData.pipeConfig[`Pipe ${i}`];
+                  dropdown.value = ingredientName || "Unknown"; // Preselect the saved ingredient
+              }
+          }
+      }
+
+      console.log(`Loaded ${numberOfPipes} pipes and selected ingredients:`, selectedIngredients);
+  } catch (error) {
+      console.error("Error loading configuration:", error);
+  }
+}
+
+
+// Call loadConfig when the DOM is fully loaded
+document.addEventListener("DOMContentLoaded", () => {
+  loadConfig();
+  updateSelectedCount();
+  console.log(selectedIngredients);
+  // You can also call other initialization functions here
+});
+
+
+document.getElementById("clear-all-button").addEventListener("click", () => {
+  // Call the function to clear all selected ingredients
+  clearAllSelectedIngredients();
+});
+
+function clearAllSelectedIngredients() {
+  // Deselect all checkboxes
+  const checkboxes = document.querySelectorAll(".checkbox");
+  checkboxes.forEach((checkbox) => {
+      checkbox.checked = false; // Uncheck each checkbox
+  });
+
+  // Clear the selectedIngredients array
+  selectedIngredients = []; // Reset selected ingredients
+
+  // Update the count display
+  updateSelectedCount(); // This function should update the UI to reflect the count
+}
+
+function updatePipesAndIngredients() {
+  const numPipeInput = document.getElementById("numPipeInput").value; // Get the updated number of pipes
+  numberOfPipes = parseInt(numPipeInput, 10); // Update the global variable
+
+  selectedIngredients = []; // Reset selectedIngredients array
+
+  // Loop through each pipe dropdown and capture the selected ingredients
+  for (let i = 1; i <= numberOfPipes; i++) {
+      const dropdown = document.getElementById(`pipeDropdown${i}`);
+      if (dropdown) {
+          const ingredientName = dropdown.value;
+          if (ingredientName) {
+              selectedIngredients.push(ingredientName); // Update selectedIngredients
+          }
+      }
+  }
+}
+
+numPipesInput.addEventListener("input", () => {
+    numberOfPipes = parseInt(numPipesInput.value);
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.getElementById("ingredient-search");
+  const clearButton = document.getElementById("clear-search");
+
+  // Show clear button when there is input
+  searchInput.addEventListener("input", () => {
+      if (searchInput.value.trim() !== "") {
+          clearButton.style.display = "inline"; // Show the clear button
+      } else {
+          clearButton.style.display = "none"; // Hide the clear button
+      }
+  });
+
+  // Clear the input field when the clear button is clicked
+  clearButton.addEventListener("click", () => {
+      searchInput.value = ""; // Clear the input field
+      clearButton.style.display = "none"; // Hide the clear button
+      fetchIngredients(); // Optionally, refresh the ingredient list
+  });
+
+  // Existing search input event listener
+  searchInput.addEventListener("input", debounce(handleSearchInput, 300)); // Assuming you have a debounce function
+});

@@ -155,6 +155,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
         try:
             config_data = json.loads(post_data)
             config_path = os.path.join(web_dir, "config.json")
+            print(post_data)
 
             # Write the configuration data to config.json
             with open(config_path, "w") as file:

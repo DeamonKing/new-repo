@@ -793,6 +793,13 @@ button#back-button3 {
   border-radius: 10px;
   font-size: 20px;
 }
+button#back-button-all-cocktail {
+  background: #fff;
+  border: none;
+  padding: 15px 25px;
+  border-radius: 10px;
+  font-size: 20px;
+}
 .footer-btn button:hover {
   cursor: pointer;
 }
@@ -1712,4 +1719,42 @@ button.default-num-btn.selected {
 }
 .ax-btn button:hover {
   cursor: pointer;
+}
+
+.search-box {
+  display: flex; /* Use flexbox for alignment */
+  align-items: center; /* Center items vertically */
+}
+
+#clear-search {
+  background-color: #71b093; /* Background color for the button */
+  color: white; /* Text color for the X */
+  border: none; /* No border */
+  border-radius: 50%; /* Make it circular */
+  width: 30px; /* Width of the button */
+  height: 30px; /* Height of the button */
+  font-size: 16px; /* Font size */
+  font-weight: bold; /* Make the X bold */
+  cursor: pointer; /* Pointer cursor on hover */
+  display: none; /* Initially hidden */
+  align-items: center; /* Center the text vertically */
+  justify-content: center; /* Center the text horizontally */
+  position: relative; /* For positioning */
+  outline: none; /* Remove outline */
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+#clear-search:hover {
+  background-color: #2a6b5d; /* Darker background on hover */
+}
+
+.no-cocktail-message {
+  font-size: 18px; /* Font size */
+  color: crimson; /* Text color */
+  text-align: center; /* Center the text */
+  padding: 20px; /* Padding around the message */
+  background-color: rgba(255, 228, 228, 0.8); /* Light red background with transparency */
+  border: 1px solid crimson; /* Border color */
+  border-radius: 5px; /* Rounded corners */
+  margin: 20px; /* Margin around the message */
 }
