@@ -1758,3 +1758,10 @@ button.default-num-btn.selected {
   border-radius: 5px; /* Rounded corners */
   margin: 20px; /* Margin around the message */
 }
+
+
+label.btn-checkbox p.not-selected {
+  color: red !important; /* Use !important to ensure it overrides other styles */
+  font-weight: bold; /* Make it bold */
+  text-decoration: underline; /* Optional: underline the text */
+}

@@ -6,8 +6,6 @@ import subprocess
 import threading
 import time
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-from pathlib import Path
-
 import serial
 import serial.tools.list_ports
 

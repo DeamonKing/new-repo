@@ -3,25 +3,25 @@
   "pipeConfig": {
     "Pipe 1": "Aperol",
     "Pipe 2": "Club Soda",
-    "Pipe 3": "Anejo Rum",
-    "Pipe 4": "Prosecco",
-    "Pipe 5": "Brandy",
-    "Pipe 6": "Crushed Ice",
-    "Pipe 7": "Sugar",
-    "Pipe 8": "Coconut Milk",
-    "Pipe 9": "Pineapple Juice",
-    "Pipe 10": "White Rum"
+    "Pipe 3": "Prosecco",
+    "Pipe 4": "Crushed Ice",
+    "Pipe 5": "Sugar",
+    "Pipe 6": "Pineapple Juice",
+    "Pipe 7": "White Rum",
+    "Pipe 8": "Anejo Rum",
+    "Pipe 9": "Cachaca",
+    "Pipe 10": "Lime Wedges"
   },
   "selectedIngredients": [
     "Aperol",
     "Club Soda",
     "Prosecco",
-    "Brandy",
     "Crushed Ice",
     "Sugar",
-    "Coconut Milk",
     "Pineapple Juice",
     "White Rum",
-    "Anejo Rum"
+    "Anejo Rum",
+    "Cachaca",
+    "Lime Wedges"
   ]
 }

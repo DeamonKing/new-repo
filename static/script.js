@@ -1248,15 +1248,15 @@ async function wshowCocktailDetails(cocktail) {
   allCocktailSection.style.display = "none";
   cocktailDetailsSection.style.display = "block"; // Show Cocktail Details section
   assignPipeSection.style.display = "none";
+
   // Update the cocktail image and name
   const cocktailID = document.getElementById("cocktail-id");
   const cocktailImage = document.getElementById("cocktail-image");
   const cocktailName = document.getElementById("cocktail-name");
   const cocktailDescription = document.getElementById("cocktail-description");
-  const cocktailIngredientsContainer = document.getElementById(
-    "cocktail-ingredients-container"
-  );
+  const cocktailIngredientsContainer = document.getElementById("cocktail-ingredients-container");
   const cocktailHtm = document.getElementById("htm");
+
   cocktailImage.src = cocktail.PImage; // Set the image source
   cocktailID.textContent = cocktail.PID;
   cocktailName.textContent = cocktail.PName; // Set the cocktail name
@@ -1267,16 +1267,23 @@ async function wshowCocktailDetails(cocktail) {
   // Clear previous ingredients
   cocktailIngredientsContainer.innerHTML = "";
 
-  // Populate the ingredients
+  // Populate the ingredients with red mark for unselected ones
   cocktail.PIng.forEach((ingredient) => {
     const ingredientItem = document.createElement("div");
     ingredientItem.classList.add("ing-item");
+
+    // Check if the ingredient is selected
+    const isSelected = selectedIngredients.includes(ingredient.ING_Name);
+    console.log(`checking ${ingredient.ING_Name} is ${isSelected}`)
+    const className = isSelected ? '' : 'not-selected'; // Add class if not selected
+
     ingredientItem.innerHTML = `
-          <label class="btn-checkbox">
-              <img src="img/ing2.gif" alt="Ingredient - ${ingredient.ING_Name}" />
-              <p>${ingredient.ING_Name}</p>
-          </label>
-      `;
+      <label class="btn-checkbox">
+        <img src="img/ing2.gif" alt="Ingredient - ${ingredient.ING_Name}" />
+        <p class="${className}">${ingredient.ING_Name}</p> <!-- Add class here -->
+      </label>
+    `;
+
     cocktailIngredientsContainer.appendChild(ingredientItem);
   });
 
@@ -1744,6 +1751,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadConfig();
   updateSelectedCount();
   console.log(selectedIngredients);
+  showAvailableCocktails();
   // You can also call other initialization functions here
 });
 
