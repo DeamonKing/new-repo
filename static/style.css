@@ -332,6 +332,7 @@ label.btn-checkbox:hover {
   background: var(--bg-color, #4caf5075);
   cursor: pointer;
 }
+
 label.btn-checkbox img {
   /* padding: 10px 0px; */
   width: 100%;
@@ -1763,5 +1764,4 @@ button.default-num-btn.selected {
 label.btn-checkbox p.not-selected {
   color: red !important; /* Use !important to ensure it overrides other styles */
   font-weight: bold; /* Make it bold */
-  text-decoration: underline; /* Optional: underline the text */
 }
