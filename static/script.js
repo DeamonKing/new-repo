@@ -1355,7 +1355,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Read the image file and convert it to Base64
+      // Read the image file and convert it to a Base64 string
       const reader = new FileReader();
       reader.readAsDataURL(cocktailImage);
       reader.onload = async () => {
@@ -1543,6 +1543,7 @@ function populateAssignPipeDropdowns() {
   for (let i = 1; i <= numberOfPipes; i++) {
       const dropdownContainer = document.createElement("div");
       dropdownContainer.className = "pipe-dropdown-container";
+      dropdownContainer.id = `pipeContainer${i}`; // Add ID for targeting
       
       // Create dropdown with search input
       dropdownContainer.innerHTML = `
@@ -1558,17 +1559,25 @@ function populateAssignPipeDropdowns() {
               </div>
               <div class="pipe-dropdown-options" id="pipeOptions${i}">
                   <div class="option" data-value="">Select Ingredient</div>
-                  ${selectedIngredients.map(ingredient => 
-                      `<div class="option" data-value="${ingredient}">${ingredient}</div>`
-                  ).join('')}
+                  ${selectedIngredients.map(ingredient => {
+                      const isAssigned = isIngredientAssigned(ingredient);
+                      return `<div class="option ${isAssigned ? 'disabled' : ''}" 
+                          data-value="${ingredient}"
+                          title="${isAssigned ? 'Already assigned to another pipe' : ''}"
+                          >${ingredient}</div>`;
+                  }).join('')}
               </div>
           </div>
       `;
       
       pipeAssignContainer.appendChild(dropdownContainer);
-
       setupPipeDropdown(i);
   }
+}
+
+// Check if ingredient is already assigned to any pipe
+function isIngredientAssigned(ingredient) {
+    return Object.values(currentPipeAssignments).includes(ingredient);
 }
 
 function setupPipeDropdown(pipeNumber) {
@@ -1586,7 +1595,6 @@ function setupPipeDropdown(pipeNumber) {
         const searchTerm = searchInput.value.toLowerCase();
         const options = optionsContainer.querySelectorAll('.option');
         
-        // Show/hide clear button
         clearButton.style.display = searchTerm ? 'block' : 'none';
         
         options.forEach(option => {
@@ -1601,23 +1609,37 @@ function setupPipeDropdown(pipeNumber) {
 
     // Handle clear button click
     clearButton.addEventListener('click', () => {
+        // Get the current assignment before clearing
+        const currentAssignment = currentPipeAssignments[`Pipe ${pipeNumber}`];
+        
+        // Clear the input and assignment
         searchInput.value = '';
         clearButton.style.display = 'none';
         currentPipeAssignments[`Pipe ${pipeNumber}`] = '';
-        // Show all options
-        optionsContainer.querySelectorAll('.option').forEach(option => {
-            option.style.display = 'block';
-        });
+
+        // Immediately update all dropdowns to reflect the unassigned ingredient
+        populateAssignPipeDropdowns();
+
+        // Stop event propagation to prevent dropdown from showing
+        event.stopPropagation();
     });
 
     // Handle option selection
     optionsContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('option')) {
+        if (e.target.classList.contains('option') && !e.target.classList.contains('disabled')) {
             const value = e.target.dataset.value;
             searchInput.value = e.target.textContent;
             currentPipeAssignments[`Pipe ${pipeNumber}`] = value;
             optionsContainer.style.display = 'none';
             clearButton.style.display = value ? 'block' : 'none';
+            
+            // Remove error class when assigning an ingredient
+            const pipeContainer = document.getElementById(`pipeContainer${pipeNumber}`);
+            if (pipeContainer) {
+                pipeContainer.classList.remove('pipe-error');
+            }
+            
+            populateAssignPipeDropdowns();
         }
     });
 
@@ -1641,7 +1663,6 @@ function setupPipeDropdown(pipeNumber) {
 saveButton.addEventListener("click", () => {
     // Call the saveConfig function with the current global variables
     saveConfig(numberOfPipes, selectedIngredients);
-    showCustomAlert("New configuration saved!", "success");
 });
 
 // Function to handle dropdown functionality
@@ -1762,39 +1783,58 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function saveConfig(numberOfPipes, selectedIngredients) {
-  // Update savedIngredients when saving
-  savedIngredients = selectedIngredients;
-  
-  // Update currentPipeAssignments from dropdowns
-  for (let i = 1; i <= numberOfPipes; i++) {
-      const dropdown = document.getElementById(`pipeDropdown${i}`);
-      if (dropdown) {
-          currentPipeAssignments[`Pipe ${i}`] = dropdown.value;
-      }
-  }
+    // Check if all pipes are assigned
+    let unassignedPipes = [];
+    for (let i = 1; i <= numberOfPipes; i++) {
+        const searchInput = document.getElementById(`pipeSearch${i}`);
+        const pipeContainer = document.getElementById(`pipeContainer${i}`);
+        
+        if (!searchInput || !searchInput.value.trim()) {
+            unassignedPipes.push(i);
+            // Add error class to highlight unassigned pipe
+            if (pipeContainer) {
+                pipeContainer.classList.add('pipe-error');
+            }
+        } else {
+            // Remove error class if pipe is assigned
+            if (pipeContainer) {
+                pipeContainer.classList.remove('pipe-error');
+            }
+        }
+    }
 
-  const configData = {
-      numberOfPipes: numberOfPipes,
-      pipeConfig: currentPipeAssignments,
-      selectedIngredients: savedIngredients // Save the savedIngredients
-  };
+    if (unassignedPipes.length > 0) {
+        showCustomAlert(`Please assign ingredients to all pipes.\nUnassigned pipes:\n ${unassignedPipes.map(num => `<span style="color:red;font-weight:bold">Pipe ${num}</span>`).join(', ')}`);
+        return;
+    }
 
-  try {
-      const response = await fetch("/save-config", {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json",
-          },
-          body: JSON.stringify(configData),
-      });
+    // Update savedIngredients when saving
+    savedIngredients = selectedIngredients;
+    
+    const configData = {
+        numberOfPipes: numberOfPipes,
+        pipeConfig: currentPipeAssignments,
+        selectedIngredients: savedIngredients
+    };
 
-      if (response.ok) {
-          showCustomAlert("Configuration saved successfully!");
-      }
-  } catch (error) {
-      console.error("Error saving configuration:", error);
-      showCustomAlert("Failed to save configuration");
-  }
+    try {
+        const response = await fetch("/save-config", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(configData),
+        });
+
+        if (response.ok) {
+            showCustomAlert("Configuration saved successfully!");
+            // Update available cocktails after successful save
+            showAvailableCocktails();
+        }
+    } catch (error) {
+        console.error("Error saving configuration:", error);
+        showCustomAlert("Failed to save configuration");
+    }
 }
 async function loadConfig() {
   try {
@@ -1898,4 +1938,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Existing search input event listener
   searchInput.addEventListener("input", debounce(handleSearchInput, 300)); // Assuming you have a debounce function
 });
+
+// Add this function to handle dropdown updates
+function updateAllDropdowns() {
+    // Just call populateAssignPipeDropdowns to refresh all dropdowns
+    populateAssignPipeDropdowns();
+}
 

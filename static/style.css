@@ -1776,3 +1776,24 @@ label.btn-checkbox p.not-selected {
   color: red !important; /* Use !important to ensure it overrides other styles */
   font-weight: bold; /* Make it bold */
 }
+
+.pipe-dropdown-options .option.disabled {
+  color: #999;
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.pipe-dropdown-options .option.disabled:hover {
+  background: #f5f5f5;
+}
+
+.pipe-error {
+  box-shadow: 0 0 5px 2px #ff0000;
+  animation: errorShake 0.4s ease-in-out;
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
