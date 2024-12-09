@@ -1,5 +1,5 @@
 {
-  "numberOfPipes": 8,
+  "numberOfPipes": 10,
   "pipeConfig": {
     "Pipe 1": "Aperol",
     "Pipe 2": "Basil",
@@ -8,7 +8,9 @@
     "Pipe 5": "Cachaca",
     "Pipe 6": "Club Soda",
     "Pipe 7": "Amaretto",
-    "Pipe 8": "Anejo Rum"
+    "Pipe 8": "Anejo Rum",
+    "Pipe 9": "Bitters",
+    "Pipe 10": "Agave Nectar"
   },
   "selectedIngredients": [
     "Aperol",
@@ -18,6 +20,8 @@
     "Cachaca",
     "Club Soda",
     "Anejo Rum",
-    "Amaretto"
+    "Amaretto",
+    "Bitters",
+    "Agave Nectar"
   ]
 }

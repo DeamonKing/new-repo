@@ -547,11 +547,68 @@ function showAddCocktail() {
 }
 
 document.getElementById("serial-out-button").addEventListener("click", () => {
-  // Show loading page
-  showLoadingPage();
+    // Get the selected cocktail details
+    const cocktailId = document.getElementById("cocktail-id").textContent;
+    const drinkType = document.querySelector('input[name="drink-type"]:checked').value;
+    
+    // Get the cocktail's ingredients and their assigned pipes
+    const cocktailIngredients = [];
+    const cocktail = document.querySelector(".cocktail-details");
+    const ingredients = cocktail.querySelectorAll("#cocktail-ingredients-container .ing-item p");
+    
+    ingredients.forEach(ingredientElem => {
+        const ingredientName = ingredientElem.textContent;
+        // Find the pipe number for this ingredient from currentPipeAssignments
+        let pipeNumber = null;
+        for (const [pipe, ingredient] of Object.entries(currentPipeAssignments)) {
+            if (ingredient === ingredientName) {
+                pipeNumber = pipe.split(' ')[1]; // Get the number from "Pipe X"
+                break;
+            }
+        }
+        if (pipeNumber) {
+            cocktailIngredients.push({
+                name: ingredientName,
+                pipe: pipeNumber
+            });
+        }
+    });
 
-  // Send the assigned pipelines to the Python server
-  sendPipesToPython(assignedPipelines);
+    // Prepare data for serial output
+    const serialData = {
+        productId: parseInt(cocktailId),
+        ingredients: cocktailIngredients,
+        drinkType: drinkType
+    };
+
+    // Show loading page
+    showLoadingPage();
+
+    // Send the data to Python
+    fetch("/send-pipes", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(serialData)
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.text();
+        } else {
+            throw new Error('Failed to send data to serial port');
+        }
+    })
+    .then(data => {
+        if (data === "OK") {
+            hideLoadingPage();
+            showCustomAlert("Drink making started successfully!");
+        }
+    })
+    .catch(error => {
+        hideLoadingPage();
+        showCustomAlert("Error: " + error.message);
+    });
 });
 
 // Function to send assigned pipelines to the Python script
@@ -1523,11 +1580,20 @@ const errorMessage = document.getElementById("errorMessage");
 generateButton.addEventListener("click", () => {
   const numPipes = parseInt(numPipesInput.value);
   numberOfPipes = numPipes;
+  
   // Validate the number of pipes
   if (isNaN(numPipes) || numPipes < 1 || numPipes > 100) {
     showCustomAlert("Please enter a valid number between 1 and 100.");
     return;
   }
+
+  // Remove assignments for pipes that no longer exist
+  Object.keys(currentPipeAssignments).forEach(pipe => {
+    const pipeNumber = parseInt(pipe.split(' ')[1]);
+    if (pipeNumber > numPipes) {
+      delete currentPipeAssignments[pipe];
+    }
+  });
 
   // Clear existing dropdowns in the container
   pipeAssignContainer.innerHTML = "";
@@ -1593,18 +1659,34 @@ function setupPipeDropdown(pipeNumber) {
     // Handle search
     searchInput.addEventListener('input', () => {
         const searchTerm = searchInput.value.toLowerCase();
-        const options = optionsContainer.querySelectorAll('.option');
+        const options = optionsContainer.querySelectorAll('.option:not(.no-results)');
         
         clearButton.style.display = searchTerm ? 'block' : 'none';
         
+        let hasResults = false;
         options.forEach(option => {
             const text = option.textContent.toLowerCase();
             if (text.includes(searchTerm)) {
                 option.style.display = 'block';
+                hasResults = true;
             } else {
                 option.style.display = 'none';
             }
         });
+
+        // Remove existing no-results message if it exists
+        const existingNoResults = optionsContainer.querySelector('.no-results');
+        if (existingNoResults) {
+            existingNoResults.remove();
+        }
+
+        // Add no-results message if no matches found and search term isn't empty
+        if (!hasResults && searchTerm) {
+            const noResults = document.createElement('div');
+            noResults.className = 'option no-results';
+            noResults.textContent = 'No matching ingredients found';
+            optionsContainer.appendChild(noResults);
+        }
     });
 
     // Handle clear button click

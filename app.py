@@ -264,56 +264,61 @@ class CustomHandler(SimpleHTTPRequestHandler):
             self.wfile.write(f"Error saving ingredient: {str(e)}".encode())
 
     def handle_send_pipes(self, post_data):
-        # Parse the incoming data
-        assigned_pipes = json.loads(post_data)
-
-        # Send data to serial output and get the response
-        response = self.send_to_serial_output(assigned_pipes)
-
-        if response == "OK":
-            # Respond back to the client with 'OK'
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write(b"OK")  # Send 'OK' response back to JavaScript
-        else:
-            # If there was an error, respond with the error message
-            self.send_response(500)  # Internal Server Error
-            self.end_headers()
-            self.wfile.write(
-                response.encode()
-            )  # Send the error message back to JavaScript
-
-    def send_to_serial_output(self, assigned_pipes):
-        # Find the appropriate serial port
-        port = None
-        available_ports = serial.tools.list_ports.comports()
-
-        # Check for available ports and set the appropriate one
-        for p in available_ports:
-            if p.device == "/dev/ttyACM0" or p.device == "/dev/ttyUSB0":
-                port = p.device
-                break  # Exit the loop once we find a suitable port
-
-        if port is None:
-            print("No suitable serial port found.")
-            return "Error: No suitable serial port found"
-
         try:
-            with serial.Serial(port, 9600, timeout=5) as ser:
-                for ingredient, pipe in assigned_pipes.items():
-                    message = f"{ingredient}: {pipe}\n"
-                    print(f"Sending to serial: {message.strip()}")
-                    ser.write(message.encode("utf-8"))
+            data = json.loads(post_data)
+            
+            # Get the data
+            product_id = data['productId']
+            ingredients = data['ingredients']
+            drink_type = data['drinkType']
+            
+            # Find the appropriate serial port
+            port = None
+            available_ports = serial.tools.list_ports.comports()
+            
+            for p in available_ports:
+                if p.device == "/dev/ttyACM0" or p.device == "/dev/ttyUSB0":
+                    port = p.device
+                    break
 
-                return "OK"  # Indicate successful sending
-        except serial.SerialException as e:
-            error_message = f"Serial error: {str(e)}"
-            print(error_message)
-            return error_message  # Return the error message for the frontend
+            if port is None:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(b"Error: No suitable serial port found")
+                return
+
+            try:
+                with serial.Serial(port, 9600, timeout=5) as ser:
+                    # Send product ID
+                    ser.write(f"ID:{product_id}\n".encode())
+                    time.sleep(0.1)  # Small delay between writes
+                    
+                    # Send drink type
+                    ser.write(f"TYPE:{drink_type}\n".encode())
+                    time.sleep(0.1)
+                    
+                    # Send each ingredient with its pipe number
+                    for ing in ingredients:
+                        message = f"PIPE{ing['pipe']}:{ing['name']}\n"
+                        ser.write(message.encode())
+                        time.sleep(0.1)
+                    
+                    # Send end marker
+                    ser.write(b"END\n")
+                    
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(b"OK")
+                
+            except serial.SerialException as e:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(f"Serial error: {str(e)}".encode())
+                
         except Exception as e:
-            error_message = f"Error sending to serial output: {str(e)}"
-            print(error_message)
-            return error_message  # Return the error message for the frontend
+            self.send_response(500)
+            self.end_headers()
+            self.wfile.write(f"Error: {str(e)}".encode())
 
 
 def start_http_server():
