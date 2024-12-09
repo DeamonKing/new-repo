@@ -1,32 +1,23 @@
 {
-  "numberOfPipes": 15,
+  "numberOfPipes": 8,
   "pipeConfig": {
-    "Pipe 1": "",
-    "Pipe 2": "",
-    "Pipe 3": "",
-    "Pipe 4": "",
-    "Pipe 5": "",
-    "Pipe 6": "",
-    "Pipe 7": "",
-    "Pipe 8": "",
-    "Pipe 9": "",
-    "Pipe 10": "",
-    "Pipe 11": "",
-    "Pipe 12": "",
-    "Pipe 13": "",
-    "Pipe 14": "",
-    "Pipe 15": ""
+    "Pipe 1": "Aperol",
+    "Pipe 2": "Basil",
+    "Pipe 3": "Crushed Ice",
+    "Pipe 4": "Prosecco",
+    "Pipe 5": "Cachaca",
+    "Pipe 6": "Club Soda",
+    "Pipe 7": "Amaretto",
+    "Pipe 8": "Anejo Rum"
   },
   "selectedIngredients": [
-    "Club Soda",
-    "Prosecco",
+    "Aperol",
+    "Basil",
     "Crushed Ice",
-    "Sugar",
-    "Pineapple Juice",
-    "White Rum",
+    "Prosecco",
     "Cachaca",
-    "Lime Wedges",
-    "Absinthe",
-    "Agave Nectar"
+    "Club Soda",
+    "Anejo Rum",
+    "Amaretto"
   ]
 }

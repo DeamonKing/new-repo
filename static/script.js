@@ -7,6 +7,7 @@ let numberOfPipes = 0;
 // State management
 let ingredientsData = [];
 let selectedIngredients = [];
+let savedIngredients = []; // New global array for saved ingredients
 let activeMenu = "availableCocktails";
 
 let selectedCocktailID = 1;
@@ -16,6 +17,7 @@ let selectedCocktailIngredients = [];
 let selectedingforcocktail = [];
 let assignedPipelines = {}; // Global object to keep track of assigned pipelines
 let extraIngredients = []; // Global array to hold extra ingredients
+let currentPipeAssignments = {}; // Store current pipe assignments
 
 document.addEventListener("DOMContentLoaded", () => {
   initializeApp();
@@ -383,13 +385,12 @@ async function showAvailableCocktails() {
 
   const cocktails = await fetchCocktails(); 
 
-   // Filter cocktails based on selected ingredients 
+   // Filter cocktails based on saved ingredients instead of selected ingredients
     const filteredCocktails = cocktails.filter(cocktail => { 
-       // Check if all ingredients required by the cocktail are in selectedIngredients
         return cocktail.PIng.every(ingredient => 
-            selectedIngredients.includes(ingredient.ING_Name) 
-          ); 
-      }); 
+            savedIngredients.includes(ingredient.ING_Name) 
+        ); 
+    }); 
 
     const cocktailListContainer = document.querySelector(".cocktail-list"); 
     cocktailListContainer.innerHTML = ""; // Clear existing content 
@@ -946,6 +947,9 @@ async function fetchIngredients(searchTerm = "") {
           const ingredientName = ingredient.ING_Name;
           if (event.target.checked) {
             // If checked, add to selectedIngredients
+            if (!selectedIngredients.includes(ingredientName)) {
+              selectedIngredients.push(ingredientName);
+            }
           } else {
             // If unchecked, remove from selectedIngredients
             selectedIngredients = selectedIngredients.filter(
@@ -985,17 +989,12 @@ function handleCheckboxChange(event) {
   const ingredientName = event.target.closest(".ing-item").querySelector("p").textContent; 
 
   if (event.target.checked) { 
-      if (selectedIngredients.length < 10) { 
-          selectedIngredients.push(ingredientName); 
-          console.log(selectedIngredients); 
-      } else { 
-          event.target.checked = false; 
-          console.log(selectedIngredients); 
-          showCustomAlert("You can only select up to 10 ingredients."); 
-      } 
-  } else { 
-      selectedIngredients = selectedIngredients.filter(name => name !== ingredientName); 
-  } 
+    if (!selectedIngredients.includes(ingredientName)) {
+      selectedIngredients.push(ingredientName);
+    }
+  } else {
+    selectedIngredients = selectedIngredients.filter(name => name !== ingredientName);
+  }
 
   updateSelectedCount(); // Update the selected count 
 }
@@ -1006,7 +1005,7 @@ function updateSelectedCount() {
   const selectedCountElement = document.querySelector(".fi-top p span");
 
   // Update displayed count
-  selectedCountElement.textContent = `${Math.min(selectedCount, 10)}`; // Display count, max 10
+  selectedCountElement.textContent = `${selectedCount}`; 
 }
 
 // Add event delegation to the ingredients container
@@ -1539,23 +1538,104 @@ generateButton.addEventListener("click", () => {
 
 function populateAssignPipeDropdowns() {
   const pipeAssignContainer = document.getElementById("pipeAssignContainer");
-  pipeAssignContainer.innerHTML = ""; // Clear existing dropdowns
+  pipeAssignContainer.innerHTML = "";
 
   for (let i = 1; i <= numberOfPipes; i++) {
       const dropdownContainer = document.createElement("div");
       dropdownContainer.className = "pipe-dropdown-container";
+      
+      // Create dropdown with search input
       dropdownContainer.innerHTML = `
           <label for="pipeDropdown${i}">Pipe ${i}</label>
           <div class="pipe-dropdown-wrapper">
-              <select id="pipeDropdown${i}" class="pipe-dropdown">
-                  <option value="">Select Ingredient</option>
-                  ${selectedIngredients.map(ingredient => `<option value="${ingredient}">${ingredient}</option>`).join('')}
-              </select>
+              <div class="search-input-container">
+                  <input type="text" 
+                      class="pipe-dropdown-search" 
+                      id="pipeSearch${i}" 
+                      placeholder="Search ingredient..."
+                  />
+                  <button class="clear-pipe-search" id="clearSearch${i}">x</button>
+              </div>
+              <div class="pipe-dropdown-options" id="pipeOptions${i}">
+                  <div class="option" data-value="">Select Ingredient</div>
+                  ${selectedIngredients.map(ingredient => 
+                      `<div class="option" data-value="${ingredient}">${ingredient}</div>`
+                  ).join('')}
+              </div>
           </div>
-          <p class="error-message" style="color: red; display: none;"></p>
       `;
+      
       pipeAssignContainer.appendChild(dropdownContainer);
+
+      setupPipeDropdown(i);
   }
+}
+
+function setupPipeDropdown(pipeNumber) {
+    const searchInput = document.getElementById(`pipeSearch${pipeNumber}`);
+    const optionsContainer = document.getElementById(`pipeOptions${pipeNumber}`);
+    const clearButton = document.getElementById(`clearSearch${pipeNumber}`);
+
+    // Show options on focus
+    searchInput.addEventListener('focus', () => {
+        optionsContainer.style.display = 'block';
+    });
+
+    // Handle search
+    searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const options = optionsContainer.querySelectorAll('.option');
+        
+        // Show/hide clear button
+        clearButton.style.display = searchTerm ? 'block' : 'none';
+        
+        options.forEach(option => {
+            const text = option.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                option.style.display = 'block';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+    });
+
+    // Handle clear button click
+    clearButton.addEventListener('click', () => {
+        searchInput.value = '';
+        clearButton.style.display = 'none';
+        currentPipeAssignments[`Pipe ${pipeNumber}`] = '';
+        // Show all options
+        optionsContainer.querySelectorAll('.option').forEach(option => {
+            option.style.display = 'block';
+        });
+    });
+
+    // Handle option selection
+    optionsContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('option')) {
+            const value = e.target.dataset.value;
+            searchInput.value = e.target.textContent;
+            currentPipeAssignments[`Pipe ${pipeNumber}`] = value;
+            optionsContainer.style.display = 'none';
+            clearButton.style.display = value ? 'block' : 'none';
+        }
+    });
+
+    // Close options when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && 
+            !optionsContainer.contains(e.target) &&
+            !clearButton.contains(e.target)) {
+            optionsContainer.style.display = 'none';
+        }
+    });
+
+    // Set previous value if exists
+    const previousAssignment = currentPipeAssignments[`Pipe ${pipeNumber}`];
+    if (previousAssignment && selectedIngredients.includes(previousAssignment)) {
+        searchInput.value = previousAssignment;
+        clearButton.style.display = 'block';
+    }
 }
 
 saveButton.addEventListener("click", () => {
@@ -1682,21 +1762,21 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function saveConfig(numberOfPipes, selectedIngredients) {
-  const pipeConfig = {}; // Create an object to hold pipe to ingredient mappings
-
-  // Loop through the number of pipes and get their selected ingredient values
+  // Update savedIngredients when saving
+  savedIngredients = selectedIngredients;
+  
+  // Update currentPipeAssignments from dropdowns
   for (let i = 1; i <= numberOfPipes; i++) {
       const dropdown = document.getElementById(`pipeDropdown${i}`);
       if (dropdown) {
-          const ingredientName = dropdown.value; // Get the selected ingredient for the pipe
-          pipeConfig[`Pipe ${i}`] = ingredientName; // Map pipe to ingredient
+          currentPipeAssignments[`Pipe ${i}`] = dropdown.value;
       }
   }
 
   const configData = {
       numberOfPipes: numberOfPipes,
-      pipeConfig: pipeConfig, // Include the pipeConfig in the data to save
-      selectedIngredients: selectedIngredients // Optionally save selected ingredients
+      pipeConfig: currentPipeAssignments,
+      selectedIngredients: savedIngredients // Save the savedIngredients
   };
 
   try {
@@ -1709,37 +1789,35 @@ async function saveConfig(numberOfPipes, selectedIngredients) {
       });
 
       if (response.ok) {
-          console.log("Configuration saved successfully.");
-      } else {
-          console.error("Failed to save configuration.");
+          showCustomAlert("Configuration saved successfully!");
       }
   } catch (error) {
       console.error("Error saving configuration:", error);
+      showCustomAlert("Failed to save configuration");
   }
 }
-
 async function loadConfig() {
   try {
       const response = await fetch("config.json");
       const configData = await response.json();
-      selectedIngredients = configData.selectedIngredients;
+      
+      // Initialize both arrays from config
+      savedIngredients = configData.selectedIngredients || [];
+      selectedIngredients = [...savedIngredients]; // Copy saved ingredients to selected
+      numberOfPipes = configData.numberOfPipes || 0;
 
-      // Set global variables from config data
-      numberOfPipes = configData.numberOfPipes || 0; // Update numberOfPipes
-      populateAssignPipeDropdowns();
+      // Load pipe assignments
+      currentPipeAssignments = configData.pipeConfig || {};
 
-      // Populate dropdowns based on pipeConfig
+      await fetchIngredients();
+      updateSelectedCount();
+
+      // Populate dropdowns with current assignments
       if (configData.pipeConfig) {
-          for (let i = 1; i <= numberOfPipes; i++) {
-              const dropdown = document.getElementById(`pipeDropdown${i}`);
-              if (dropdown) {
-                  const ingredientName = configData.pipeConfig[`Pipe ${i}`];
-                  dropdown.value = ingredientName || "Unknown"; // Preselect the saved ingredient
-              }
-          }
+          populateAssignPipeDropdowns();
       }
 
-      console.log(`Loaded ${numberOfPipes} pipes and selected ingredients:`, selectedIngredients);
+      console.log(`Loaded ${numberOfPipes} pipes and saved ingredients:`, savedIngredients);
   } catch (error) {
       console.error("Error loading configuration:", error);
   }
@@ -1820,3 +1898,4 @@ document.addEventListener("DOMContentLoaded", () => {
   // Existing search input event listener
   searchInput.addEventListener("input", debounce(handleSearchInput, 300)); // Assuming you have a debounce function
 });
+
