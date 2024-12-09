@@ -267,13 +267,14 @@ function setupEventListeners() {
 
   async function ShowProductsFunc() {
     // First, show the Assign Pipeline section
-    showAssignPipe(); // This will display the Assign Pipeline section
 
     // Check if there are selected ingredients
     if (selectedIngredients.length === 0) {
         showCustomAlert("No ingredients selected. Please select at least one ingredient.");
         return; // Exit if no ingredients are selected
     }
+
+    showAssignPipe(); // This will display the Assign Pipeline section
 
     // Get the number of pipes from the input field
     const numPipes = parseInt(numPipesInput.value);
