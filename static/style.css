@@ -1478,6 +1478,7 @@ input#product-id {
   border: 1px solid #ccc;
   border-radius: 5px;
   box-sizing: border-box;
+  margin: 0;
 }
 
 .dropdown-arrow {
@@ -1610,7 +1611,7 @@ input#product-id {
   cursor: pointer;
 }
 .dropdowns-parent-container {
-  display: grid;
+  display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(302px, 1fr));
   gap: 25px;
   width: 100%;
@@ -1754,12 +1755,16 @@ button.default-num-btn.selected {
   color: crimson; /* Text color */
   text-align: center; /* Center the text */
   padding: 20px; /* Padding around the message */
-  background-color: rgba(255, 228, 228, 0.8); /* Light red background with transparency */
+  background-color: rgba(
+    255,
+    228,
+    228,
+    0.8
+  ); /* Light red background with transparency */
   border: 1px solid crimson; /* Border color */
   border-radius: 5px; /* Rounded corners */
   margin: 20px; /* Margin around the message */
 }
-
 
 label.btn-checkbox p.not-selected {
   color: red !important; /* Use !important to ensure it overrides other styles */

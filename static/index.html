@@ -50,18 +50,15 @@
             </div>
           </div>
           <div class="app-pageview bg">
-
             <!-- Available Cocktails -->
             <div class="available-cocktails">
               <div class="cocktail-box2">
                 <div class="cocktail-list2">
-                  <div class="cl-item" id="cotailInfo">
-                  </div>
+                  <div class="cl-item" id="cotailInfo"></div>
                 </div>
               </div>
               <div class="footer-btn blurx">
-                <div class="save-button-container">
-                </div>
+                <div class="save-button-container"></div>
               </div>
             </div>
 
@@ -77,10 +74,11 @@
                       name="search"
                       id="ingredient-search"
                     />
-                    <button id="clear-search" style="display: none;">X</button> <!-- Clear button -->
+                    <button id="clear-search" style="display: none">X</button>
+                    <!-- Clear button -->
                     <p>
                       Selected Ingredients :
-                      <span> 0 </span>
+                      <span> 0 </span><span>/10</span>
                     </p>
                   </div>
                   <a
@@ -115,7 +113,13 @@
                     <div id="ingredients-container"></div>
                   </div>
                   <div class="footer-btn">
-                    <button id="back-button" class="btn active btns" onclick="showAvailableCocktails()">Back</button>
+                    <button
+                      id="back-button"
+                      class="btn active btns"
+                      onclick="showAvailableCocktails()"
+                    >
+                      Back
+                    </button>
                     <button id="clear-all-button" class="btn active btns">
                       Clear All
                     </button>
@@ -167,7 +171,13 @@
                     </div>
                   </form>
                   <div class="footer-btn">
-                    <button id="back-button" class="btn deactive" onclick="showAvailableCocktails()">Back</button>
+                    <button
+                      id="back-button"
+                      class="btn deactive"
+                      onclick="showAvailableCocktails()"
+                    >
+                      Back
+                    </button>
                     <button id="submit-button" class="btn active">
                       Add Ingredient
                     </button>
@@ -310,29 +320,44 @@
             <!-- Assign Pipeline Section -->
             <div class="assign-pipe">
               <div class="aspi-box">
-                  <div class="aspi-txt">
-                      <div class="ax-txt">
-                          <p class="txc">Assign Ingredients To The Pipelines</p>
-                      </div>
-                      <div class="ax-btn">
-                        <button id="Reload" class="btn deactive btns" onclick="loadConfig()">Reload</button>
-                          <button id="customize" class="btn active btns">
-                              Customize
-                          </button>
-                      </div>
+                <div class="aspi-txt">
+                  <div class="ax-txt">
+                    <p class="txc">Assign Ingredients To The Pipelines</p>
                   </div>
-                  <div class="pipe-assign" id="pipeAssignContainer" style="display: none;">
-                      <!-- Dropdowns will be dynamically added here -->
+                  <div class="ax-btn">
+                    <button
+                      id="Reload"
+                      class="btn deactive btns"
+                      onclick="loadConfig()"
+                    >
+                      Reload
+                    </button>
+                    <button id="customize" class="btn active btns">
+                      Customize
+                    </button>
                   </div>
+                </div>
+                <div
+                  class="pipe-assign dropdowns-parent-container"
+                  id="pipeAssignContainer"
+                  style="display: none"
+                >
+                  <!-- Dropdowns will be dynamically added here -->
+                </div>
               </div>
               <div class="footer-btn blurx">
-                  <div class="save-button-container">
-                    <button id="changeIngredients" class="btn deactive btns" onclick=showSelectIng()>Change Ingredients</button>
-                      <button id="save" class="btn active btns">Save</button>
-                  </div>
+                <div class="save-button-container">
+                  <button
+                    id="changeIngredients"
+                    class="btn deactive btns"
+                    onclick="showSelectIng()"
+                  >
+                    Change Ingredients
+                  </button>
+                  <button id="save" class="btn active btns">Save</button>
+                </div>
               </div>
-          </div>
-
+            </div>
           </div>
 
           <!-- All Cocktails Section -->
@@ -488,7 +513,6 @@
         <button id="alert-ok" class="btn">OK</button>
       </div>
     </div>
-
 
     <!-- Color Picker Modal -->
     <div id="color-picker-modal" class="modal">
