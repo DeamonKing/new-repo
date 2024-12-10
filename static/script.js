@@ -1,5 +1,4 @@
 // Constants
-const MAX_INGREDIENTS = 10;
 const DEBOUNCE_DELAY = 300;
 
 let numberOfPipes = 0;
@@ -169,7 +168,7 @@ async function fetchIngredientsForCocktail(searchTerm = "") {
             );
           }
           const counterElement = document.getElementById("cicount");
-          counterElement.textContent = `${selectedCocktailIngredients.length}/10`;
+          counterElement.textContent = `${selectedCocktailIngredients.length}`;
           console.log(
             `SelectedCocktailIngredients ${selectedCocktailIngredients.length}`
           );
@@ -198,28 +197,16 @@ async function fetchIngredientsForCocktail(searchTerm = "") {
 
 function handleCocktailIngredientSelection(event, ingredient) {
   if (event.target.checked) {
-    if (selectedCocktailIngredients.length < MAX_INGREDIENTS) {
-      selectedCocktailIngredients.push({
-        ING_ID: ingredient.ING_ID,
-        ING_Name: ingredient.ING_Name,
-      });
-      console.log(
-        "Added ingredient to selectedCocktailIngredients:",
-        ingredient.ING_Name
-      );
-    } else {
-      event.target.checked = false; // Uncheck if max ingredients reached
-      alert(`You can only select up to ${MAX_INGREDIENTS} ingredients.`);
-      console.log("Max ingredients limit reached.");
-    }
+    selectedCocktailIngredients.push({
+      ING_ID: ingredient.ING_ID,
+      ING_Name: ingredient.ING_Name,
+    });
+    console.log("Added ingredient to selectedCocktailIngredients:", ingredient.ING_Name);
   } else {
     selectedCocktailIngredients = selectedCocktailIngredients.filter(
       (ing) => ing.ING_ID !== ingredient.ING_ID
     );
-    console.log(
-      "Removed ingredient from selectedCocktailIngredients:",
-      ingredient.ING_Name
-    );
+    console.log("Removed ingredient from selectedCocktailIngredients:", ingredient.ING_Name);
   }
 }
 
@@ -1488,7 +1475,7 @@ function clearaddcocktailform() {
   // Clear selected ingredients
   selectedCocktailIngredients = [];
   const counterElement = document.getElementById("cicount");
-  counterElement.textContent = "0/10";
+  counterElement.textContent = "0";
   document
     .querySelectorAll('#cocktail-ingredients-container1 input[type="checkbox"]')
     .forEach((checkbox) => {
