@@ -174,13 +174,41 @@ const updateAngle = (event) => {
   setKnobPosition(angle);
 };
 
-// Mouse events for angle selection
-angleKnob.addEventListener("mousedown", () => {
-  document.addEventListener("mousemove", updateAngle);
+
+
+function handleTouchInput(event) {
+    event.preventDefault();
+    const touch = event.touches[0];
+    const rect = angleSlider.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const x = touch.clientX - centerX;
+    const y = touch.clientY - centerY;
+    angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
+    angle = (angle + 360) % 360;
+    setKnobPosition(angle);
+    updateGradient();
+}
+
+// Add touch event listeners
+angleKnob.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    angleSlider.addEventListener('touchmove', handleTouchInput);
 });
 
-document.addEventListener("mouseup", () => {
-  document.removeEventListener("mousemove", updateAngle);
+document.addEventListener('touchend', () => {
+    angleSlider.removeEventListener('touchmove', handleTouchInput);
+});
+
+// Replace existing mouse events with touch-friendly events
+angleKnob.addEventListener('mousedown', () => {
+    document.addEventListener('mousemove', updateAngle);
+    document.addEventListener('touchmove', handleTouchInput);
+});
+
+document.addEventListener('mouseup', () => {
+    document.removeEventListener('mousemove', updateAngle);
+    document.removeEventListener('touchmove', handleTouchInput);
 });
 
 // Select all buttons with the class 'predefined-color'

@@ -1797,3 +1797,207 @@ label.btn-checkbox p.not-selected {
   25% { transform: translateX(-5px); }
   75% { transform: translateX(5px); }
 }
+
+/* Add subtle animations */
+.btn, .modal-content {
+    transition: all 0.3s ease;
+}
+
+/* Enhance button styles */
+.btn {
+    background: linear-gradient(135deg, #3d3229, #57492c);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, #57492c, #3d3229);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Improve typography */
+.cdr-txt h2, .sp-txt h2, .txc {
+    font-size: 22px;
+    font-weight: bold;
+    color: #359267;
+}
+
+/* Use consistent spacing */
+.modal-content {
+    padding: 30px;
+    margin: 10% auto;
+}
+
+/* Add hover effects */
+.navbar a:hover {
+    color: #fff;
+    background: #57492c;
+    border-radius: 5px;
+}
+
+/* Add these touch-optimized styles */
+
+/* Increase touch targets */
+.btn, 
+.navbar a,
+.ingredient-item,
+.color-picker input,
+.predefined-color {
+    min-height: 44px; /* Minimum touch target size */
+    min-width: 44px;
+    padding: 12px 20px;
+}
+
+/* Add touch feedback */
+.btn:active,
+.navbar a:active,
+.ingredient-item:active {
+    transform: scale(0.98);
+    transition: transform 0.1s;
+}
+
+/* Improve touch scrolling */
+.ing-grid,
+.cocktail-list,
+.app-pageview {
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scroll-behavior: smooth;
+}
+
+/* Enhanced touch slider styles */
+.angle-slider {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    position: relative;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    touch-action: none; /* Prevent default touch behaviors */
+    margin: 20px auto;
+}
+
+.angle-knob {
+    width: 30px;
+    height: 30px;
+    background: #00ff9d;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border: 2px solid #fff;
+}
+
+/* Improve color picker inputs for touch */
+input[type="color"] {
+    -webkit-appearance: none;
+    appearance: none;  /* Add standard property */
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border-radius: 50%;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
+
+/* Improve dropdown menus for touch */
+select,
+.pipe-dropdown {
+    height: 44px;
+    padding: 10px 15px;
+    font-size: 16px; /* Prevent iOS zoom on focus */
+    border-radius: 8px;
+}
+
+/* Add visual feedback for touch interactions */
+.ingredient-item:active,
+.cocktail-item:active {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Improve modal interactions */
+.modal-content {
+    padding: 20px;
+    border-radius: 15px;
+    max-height: 80vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Enhance buttons for touch */
+.predefined-color {
+    width: 60px;
+    height: 60px;
+    margin: 8px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Add ripple effect for touch feedback */
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.btn:active::after {
+    animation: ripple 0.4s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(40, 40);
+        opacity: 0;
+    }
+}
+
+/* Improve scrollbar for touch devices */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+/* Add momentum scrolling for touch devices */
+.scrollable {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+}
