@@ -81,6 +81,22 @@ class CustomHandler(SimpleHTTPRequestHandler):
                 self.wfile.write(str(e).encode())
             return
 
+        elif self.path == "/shutdown":
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"Server shutting down...")
+            print("Shutting down the server...")
+            
+            # Kill the watchdog process if it exists
+            if platform.system() == "Windows":
+                subprocess.run(["taskkill", "/F", "/IM", "watchdog.exe"], capture_output=True)
+            else:
+                subprocess.run(["pkill", "-f", "watchdog"], capture_output=True)
+                
+            httpd.shutdown()  # Graceful shutdown of the server
+            os._exit(0)  # Force exit all processes
+            return
+
         content_length = int(self.headers["Content-Length"])
         post_data = self.rfile.read(content_length)
 
@@ -114,14 +130,6 @@ class CustomHandler(SimpleHTTPRequestHandler):
                 self.wfile.write(
                     b"Focus-out event received, but keyboard functionality is disabled on Windows."
                 )
-
-        elif self.path == "/shutdown":
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write(b"Server shutting down...")
-            print("Shutting down the server...")
-            httpd.shutdown()  # Graceful shutdown of the server
-            os._exit(0)
 
         elif self.path == "/addIngredient":
             self.add_ingredient(post_data)
@@ -335,20 +343,20 @@ def start_electron_app():
     electron_executable = None
 
     if platform.system() == "Windows":
-        # Define the base path to check for "karan" or "LOQ"
+        # Define the base path to check for "karan" or "Parag Patil"
         users_base_path = r"C:/Users/"
 
         # Initialize user_identifier
         user_identifier = None
 
-        # Check for "karan" or "LOQ" in the C:\Users\ directory
+        # Check for "karan" or "Parag Patil" in the C:\Users\ directory
         if os.path.exists(os.path.join(users_base_path, "karan")):
             user_identifier = "karan"
-        elif os.path.exists(os.path.join(users_base_path, "LOQ")):
-            user_identifier = "LOQ"
+        elif os.path.exists(os.path.join(users_base_path, "Parag Patil")):
+            user_identifier = "Parag Patil"
 
         if user_identifier is None:
-            print("Neither 'karan' nor 'LOQ' directories found in C:\\Users\\")
+            print("Neither 'karan' nor 'Parag Patil' directories found in C:\\Users\\")
             return  # Exit if neither directory is found
 
         print(f"User Identifier: {user_identifier}")

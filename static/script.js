@@ -861,7 +861,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Read the image file and convert it to a Base64 string
     const reader = new FileReader();
-    reader.readAsDataURL(ingredientImage); // Convert image to Base64
+    reader.readAsDataURL(ingredientImage);
     reader.onload = async () => {
       const newIngredient = {
         ING_ID: ingredientId,
@@ -2014,4 +2014,30 @@ function updateAllDropdowns() {
     // Just call populateAssignPipeDropdowns to refresh all dropdowns
     populateAssignPipeDropdowns();
 }
+
+// Exit button handler
+document.getElementById('exit-button').addEventListener('click', async function() {
+  // Show confirmation dialog
+  if (confirm('Are you sure you want to exit?')) {
+    try {
+      const response = await fetch('/shutdown', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        // Close the window after a short delay to ensure the server has time to shut down
+        setTimeout(() => {
+          window.close();
+        }, 500);
+      } else {
+        console.error('Failed to shutdown server');
+      }
+    } catch (error) {
+      console.error('Error during shutdown:', error);
+    }
+  }
+});
 
