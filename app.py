@@ -90,11 +90,15 @@ class CustomHandler(SimpleHTTPRequestHandler):
             # Kill the watchdog process if it exists
             if platform.system() == "Windows":
                 subprocess.run(["taskkill", "/F", "/IM", "watchdog.exe"], capture_output=True)
+                # Kill the Python process itself
+                subprocess.run(["taskkill", "/F", "/IM", "python.exe"], capture_output=True)
             else:
                 subprocess.run(["pkill", "-f", "watchdog"], capture_output=True)
-                
-            httpd.shutdown()  # Graceful shutdown of the server
-            os._exit(0)  # Force exit all processes
+                # Kill the Python process itself
+                subprocess.run(["pkill", "-f", "python"], capture_output=True)
+            
+            # Force exit all processes
+            os._exit(0)
             return
 
         content_length = int(self.headers["Content-Length"])
