@@ -961,8 +961,8 @@ button#back-button-all-cocktail {
   width: 65%;
   height: 100%;
   position: relative;
-  overflow-y: scroll;
-  padding-right: 15px;
+  /* overflow-y: scroll; */
+  /* padding-right: 15px; */
 }
 .cd-right .footer-btn {
   padding: 0px 15px;
@@ -1274,7 +1274,7 @@ select {
 }
 
 .col-pop {
-  margin: 0 auto;
+  margin: 0 auto !important;
   max-width: unset;
   text-align: left;
   width: 45%;
@@ -1793,213 +1793,227 @@ label.btn-checkbox p.not-selected {
 }
 
 @keyframes errorShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
 }
 
 /* Add subtle animations */
-.btn, .modal-content {
-    transition: all 0.3s ease;
+.btn,
+.modal-content {
+  transition: all 0.3s ease;
 }
 
 /* Enhance button styles */
 .btn {
-    background: linear-gradient(135deg, #3d3229, #57492c);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #3d3229, #57492c);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .btn:hover {
-    background: linear-gradient(135deg, #57492c, #3d3229);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #57492c, #3d3229);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Improve typography */
-.cdr-txt h2, .sp-txt h2, .txc {
-    font-size: 22px;
-    font-weight: bold;
-    color: #359267;
+.cdr-txt h2,
+.sp-txt h2,
+.txc {
+  font-size: 22px;
+  font-weight: bold;
+  color: #359267;
 }
 
 /* Use consistent spacing */
 .modal-content {
-    padding: 30px;
-    margin: 10% auto;
+  padding: 30px;
+  margin: 10% auto;
 }
 
 /* Add hover effects */
 .navbar a:hover {
-    color: #fff;
-    background: #57492c;
-    border-radius: 5px;
+  color: #fff;
+  background: #57492c;
+  border-radius: 10px;
 }
 
 /* Add these touch-optimized styles */
 
 /* Increase touch targets */
-.btn, 
+.btn,
 .navbar a,
 .ingredient-item,
 .color-picker input,
 .predefined-color {
-    min-height: 44px; /* Minimum touch target size */
-    min-width: 44px;
-    padding: 12px 20px;
+  min-height: 44px; /* Minimum touch target size */
+  min-width: 44px;
+  padding: 12px 20px;
 }
 
 /* Add touch feedback */
 .btn:active,
 .navbar a:active,
 .ingredient-item:active {
-    transform: scale(0.98);
-    transition: transform 0.1s;
+  transform: scale(0.98);
+  transition: transform 0.1s;
 }
 
 /* Improve touch scrolling */
 .ing-grid,
 .cocktail-list,
 .app-pageview {
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  scroll-behavior: smooth;
 }
 
 /* Enhanced touch slider styles */
 .angle-slider {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    position: relative;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    touch-action: none; /* Prevent default touch behaviors */
-    margin: 20px auto;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  position: relative;
+  background: rgba(0, 0, 0, 0.1);
+  border: 0px solid rgba(0, 0, 0, 0.2);
+  /* background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2); */
+  touch-action: none; /* Prevent default touch behaviors */
+  /* margin: 20px auto; */
+  margin: 0px;
 }
 
 .angle-knob {
-    width: 30px;
-    height: 30px;
-    background: #00ff9d;
-    border-radius: 50%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    border: 2px solid #fff;
+  width: 30px;
+  height: 30px;
+  background: #00ff9d;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 2px solid #fff;
 }
 
 /* Improve color picker inputs for touch */
 input[type="color"] {
-    -webkit-appearance: none;
-    appearance: none;  /* Add standard property */
-    width: 60px;
-    height: 60px;
-    border: none;
-    border-radius: 50%;
-    padding: 0;
-    cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none; /* Add standard property */
+  width: 60px;
+  height: 60px;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  border: 1px solid lightgrey;
 }
 
 input[type="color"]::-webkit-color-swatch-wrapper {
-    padding: 0;
-    border-radius: 50%;
+  padding: 0;
+  border-radius: 50%;
 }
 
 input[type="color"]::-webkit-color-swatch {
-    border: none;
-    border-radius: 50%;
+  border: none;
+  border-radius: 50%;
 }
 
 /* Improve dropdown menus for touch */
 select,
 .pipe-dropdown {
-    height: 44px;
-    padding: 10px 15px;
-    font-size: 16px; /* Prevent iOS zoom on focus */
-    border-radius: 8px;
+  height: 44px;
+  padding: 10px 15px;
+  font-size: 16px; /* Prevent iOS zoom on focus */
+  border-radius: 8px;
 }
 
 /* Add visual feedback for touch interactions */
 .ingredient-item:active,
 .cocktail-item:active {
-    background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 /* Improve modal interactions */
 .modal-content {
-    padding: 20px;
-    border-radius: 15px;
-    max-height: 80vh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+  padding: 20px;
+  border-radius: 15px;
+  max-height: 80vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Enhance buttons for touch */
 .predefined-color {
-    width: 60px;
-    height: 60px;
-    margin: 8px;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+  width: 60px;
+  height: 60px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 /* Add ripple effect for touch feedback */
 .btn {
-    position: relative;
-    overflow: hidden;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5px;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.5);
-    opacity: 0;
-    border-radius: 100%;
-    transform: scale(1, 1) translate(-50%);
-    transform-origin: 50% 50%;
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%);
+  transform-origin: 50% 50%;
 }
 
 .btn:active::after {
-    animation: ripple 0.4s ease-out;
+  animation: ripple 0.4s ease-out;
 }
 
 @keyframes ripple {
-    0% {
-        transform: scale(0, 0);
-        opacity: 0.5;
-    }
-    100% {
-        transform: scale(40, 40);
-        opacity: 0;
-    }
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(40, 40);
+    opacity: 0;
+  }
 }
 
 /* Improve scrollbar for touch devices */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
 }
 
 /* Add momentum scrolling for touch devices */
 .scrollable {
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
 }
 
 /* Exit Button Styles */
@@ -2028,4 +2042,152 @@ select,
 .exit-btn i {
   color: white;
   font-size: 20px;
+}
+
+/* New Changes */
+
+.additional-option {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.alc-pre label {
+  gap: 15px;
+  border-radius: 10px;
+  background: #ffffff50;
+  box-shadow: 0px 0px 5px #00000010;
+  width: max-content;
+  padding: 15px 15px;
+}
+.alc-pre label input[type="checkbox"] {
+  width: 25px;
+  height: 25px;
+}
+.assign-pipe .footer-btn {
+  justify-content: space-between;
+}
+/* Styles for the remark popup and related elements */
+.selected-ingredients-list {
+  max-height: 400px;
+  overflow-y: auto;
+  margin: 20px 0;
+}
+
+.ingredient-remark-item {
+  background: #ffffff50;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0px 0px 5px #00000010;
+}
+
+.ingredient-remark-item h3 {
+  color: #359267;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.ingredient-remark-textarea {
+  width: 100%;
+  min-height: 60px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-family: "Nunito", sans-serif;
+  font-size: 16px;
+  resize: vertical;
+}
+
+.ingredient-remark-textarea:focus {
+  outline: none;
+  border-color: #359267;
+  box-shadow: 0 0 5px rgba(53, 146, 103, 0.3);
+}
+
+.remark-badge {
+  display: inline-block;
+  background: #359267;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 14px;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+.remark-text {
+  display: block;
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+  font-style: italic;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 5px 10px;
+  border-radius: 5px;
+  border-left: 3px solid #359267;
+}
+
+.popup-contentx2 {
+  max-width: 600px;
+  width: 90%;
+}
+
+.remark-container {
+  width: 100%;
+}
+
+.remark-container h2 {
+  margin-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .popup-contentx2 {
+    width: 95%;
+    padding: 15px;
+  }
+
+  .ingredient-remark-item {
+    padding: 10px;
+  }
+}
+
+.remark-popup .popup-contentx2 {
+  max-width: 75%;
+  width: 75%;
+}
+.remark-popup .selected-ingredients-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 25px;
+  align-items: center;
+  margin: 0px;
+  min-height: 550px;
+}
+.remark-popup .ingredient-remark-item {
+  margin: 0px;
+  background: #f6f6f6;
+}
+.show-remark {
+  background: rgb(42 107 93 / 54%);
+  padding: 15px;
+  border-radius: 10px;
+}
+.show-remark p,
+.show-remark span {
+  /* color: #ff4600; */
+  color: #fff;
+}
+.cd-right .footer-btn {
+  width: max-content;
+}
+/* .cd-right {
+  overflow: none !important;
+} */
+.cdr-box {
+  overflow-y: scroll;
+  height: 100%;
+  padding-right: 15px;
 }

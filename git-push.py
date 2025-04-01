@@ -2,7 +2,7 @@ import os
 import subprocess
 
 # Path to your local repository
-repo_dir = "C:/Users/karan/Downloads/RASP_APP"
+repo_dir = "C:/Users/karan/Desktop/NEW_APP"
 
 
 # Change directory to the repository
@@ -98,7 +98,7 @@ def update_git_repo(commit_message):
 
 
 # Example commit message
-commit_message = "New Fix"
+commit_message = "New Updates 1/4/2025"
 
 # Call the update function with a commit message
 update_git_repo(commit_message)

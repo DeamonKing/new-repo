@@ -18,6 +18,276 @@ let assignedPipelines = {}; // Global object to keep track of assigned pipelines
 let extraIngredients = []; // Global array to hold extra ingredients
 let currentPipeAssignments = {}; // Store current pipe assignments
 
+// Global variable to store ingredient remarks
+let ingredientRemarks = {};
+
+// Add event listener for the "Add Remark" button
+document.addEventListener("DOMContentLoaded", () => {
+  const addRemarkButton = document.getElementById("add-remark-button");
+  const closeRemarkPopup = document.getElementById("closeRemarkPopup");
+  const saveRemarksButton = document.getElementById("save-remarks");
+
+  if (addRemarkButton) {
+    addRemarkButton.addEventListener("click", showRemarkPopup);
+  }
+
+  if (closeRemarkPopup) {
+    closeRemarkPopup.addEventListener("click", hideRemarkPopup);
+  }
+
+  if (saveRemarksButton) {
+    saveRemarksButton.addEventListener("click", saveIngredientRemarks);
+  }
+
+  // Load remarks from db.json when the page loads
+  loadRemarksFromDB();
+});
+
+// Function to load remarks from db.json
+async function loadRemarksFromDB() {
+  try {
+    const response = await fetch("db.json");
+    const ingredients = await response.json();
+
+    // Clear the ingredientRemarks object
+    ingredientRemarks = {};
+
+    // Populate the ingredientRemarks object with remarks from db.json
+    ingredients.forEach((ingredient) => {
+      if (ingredient.ING_Remark && ingredient.ING_Remark.trim() !== "") {
+        ingredientRemarks[ingredient.ING_Name] = ingredient.ING_Remark;
+      }
+    });
+
+    console.log("Loaded remarks from db.json:", ingredientRemarks);
+  } catch (error) {
+    console.error("Error loading remarks from db.json:", error);
+  }
+}
+
+// Function to show the remark popup
+function showRemarkPopup() {
+  // Check if there are any pipeline-assigned ingredients
+  const assignedIngredients = Object.values(currentPipeAssignments).filter(
+    Boolean
+  );
+
+  if (assignedIngredients.length === 0) {
+    showCustomAlert(
+      "No ingredients assigned to pipes. Please assign ingredients to pipes first."
+    );
+    return;
+  }
+
+  const remarkPopup = document.getElementById("remarkPopup");
+  const selectedIngredientsList = document.getElementById(
+    "selected-ingredients-list"
+  );
+
+  // Clear previous content
+  selectedIngredientsList.innerHTML = "";
+
+  // Add each pipeline-assigned ingredient to the list with a remark field
+  assignedIngredients.forEach((ingredientName) => {
+    const ingredientItem = document.createElement("div");
+    ingredientItem.className = "ingredient-remark-item";
+
+    const existingRemark = ingredientRemarks[ingredientName] || "";
+
+    // Find which pipe this ingredient is assigned to
+    const pipeNumber = Object.entries(currentPipeAssignments).find(
+      ([pipe, ing]) => ing === ingredientName
+    )[0];
+
+    ingredientItem.innerHTML = `
+      <h3>${pipeNumber} : ${ingredientName}</h3>
+      <textarea 
+        class="ingredient-remark-textarea" 
+        placeholder="Add remark for this ingredient" 
+        data-ingredient="${ingredientName}"
+      >${existingRemark}</textarea>
+    `;
+
+    selectedIngredientsList.appendChild(ingredientItem);
+  });
+
+  // Show the popup
+  remarkPopup.style.display = "flex";
+}
+
+// Function to hide the remark popup
+function hideRemarkPopup() {
+  const remarkPopup = document.getElementById("remarkPopup");
+  remarkPopup.style.display = "none";
+}
+
+// Function to save the ingredient remarks to db.json
+async function saveIngredientRemarks() {
+  const textareas = document.querySelectorAll(".ingredient-remark-textarea");
+  const updatedIngredients = [];
+
+  // Update the ingredientRemarks object with values from textareas
+  textareas.forEach((textarea) => {
+    const ingredientName = textarea.getAttribute("data-ingredient");
+    const remarkText = textarea.value.trim();
+
+    if (remarkText) {
+      ingredientRemarks[ingredientName] = remarkText;
+    } else {
+      // If remark is empty, remove it from the object
+      delete ingredientRemarks[ingredientName];
+    }
+  });
+
+  try {
+    // Fetch all ingredients from db.json
+    const response = await fetch("db.json");
+    const ingredients = await response.json();
+
+    // Update the ingredients with remarks
+    ingredients.forEach((ingredient) => {
+      // If this ingredient has a remark in our object, add it to the ingredient
+      if (ingredientRemarks[ingredient.ING_Name]) {
+        ingredient.ING_Remark = ingredientRemarks[ingredient.ING_Name];
+      } else {
+        // If no remark, ensure the field exists but is empty
+        ingredient.ING_Remark = "";
+      }
+
+      updatedIngredients.push(ingredient);
+    });
+
+    // Save the updated ingredients back to db.json
+    const saveResponse = await fetch("/updateIngredients", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedIngredients),
+    });
+
+    if (saveResponse.ok) {
+      // Hide the popup
+      hideRemarkPopup();
+
+      // Show confirmation message
+      showCustomAlert("Remarks saved successfully!");
+
+      // Refresh the ingredients display to show the updated remarks
+      await fetchIngredients();
+
+      // Update the pipeline remarks display
+      updatePipelineRemarksDisplay();
+    } else {
+      showCustomAlert("Failed to save remarks. Please try again.");
+    }
+  } catch (error) {
+    console.error("Error saving remarks to db.json:", error);
+    showCustomAlert("An error occurred while saving remarks: " + error.message);
+  }
+}
+
+// Function to update the pipeline remarks display
+function updatePipelineRemarksDisplay() {
+  // Create or update the remarks container
+  let remarksContainer = document.getElementById("pipeline-remarks-container");
+  if (!remarksContainer) {
+    remarksContainer = document.createElement("div");
+    remarksContainer.id = "pipeline-remarks-container";
+    remarksContainer.className = "pipeline-remarks-container";
+
+    // Find the parent container to append to (in the Assign Pipe section)
+    const parentContainer = document.querySelector(".assign-pipe .content");
+    if (parentContainer) {
+      parentContainer.appendChild(remarksContainer);
+    } else {
+      return; // Exit if we can't find the container
+    }
+  }
+
+  // Clear the container
+  remarksContainer.innerHTML = "";
+
+  // Add a heading
+  const heading = document.createElement("h3");
+  heading.textContent = "Pipeline Ingredient Remarks";
+  remarksContainer.appendChild(heading);
+
+  // Check if there are any pipeline ingredients with remarks
+  let hasRemarks = false;
+
+  // Get all assigned ingredients from currentPipeAssignments
+  const assignedIngredients = Object.values(currentPipeAssignments).filter(
+    Boolean
+  );
+
+  // Add remarks for pipeline ingredients
+  assignedIngredients.forEach((ingredientName) => {
+    if (ingredientRemarks[ingredientName]) {
+      hasRemarks = true;
+
+      const remarkItem = document.createElement("div");
+      remarkItem.className = "pipeline-remark-item";
+
+      // Find which pipe this ingredient is assigned to
+      const pipeNumber = Object.entries(currentPipeAssignments).find(
+        ([pipe, ing]) => ing === ingredientName
+      )[0];
+
+      remarkItem.innerHTML = `
+        <h4>${pipeNumber}: ${ingredientName}</h4>
+        <p>${ingredientRemarks[ingredientName]}</p>
+      `;
+
+      remarksContainer.appendChild(remarkItem);
+    }
+  });
+
+  // If no remarks, show a message
+  if (!hasRemarks) {
+    const noRemarks = document.createElement("p");
+    noRemarks.className = "no-remarks";
+    noRemarks.textContent = "No remarks for pipeline ingredients";
+    remarksContainer.appendChild(noRemarks);
+  }
+
+  // Show or hide the container based on whether there are pipeline ingredients
+  remarksContainer.style.display =
+    assignedIngredients.length > 0 ? "block" : "none";
+}
+
+// Call this function whenever pipe assignments change
+function setupPipeDropdown(pipeNumber) {
+  // ... existing setup code ...
+
+  // Modify the option selection handler to update remarks display
+  optionsContainer.addEventListener("click", (e) => {
+    if (
+      e.target.classList.contains("option") &&
+      !e.target.classList.contains("disabled")
+    ) {
+      const value = e.target.dataset.value;
+      searchInput.value = e.target.textContent;
+      currentPipeAssignments[`Pipe ${pipeNumber}`] = value;
+      optionsContainer.style.display = "none";
+      clearButton.style.display = value ? "block" : "none";
+
+      // Remove error class when assigning an ingredient
+      const pipeContainer = document.getElementById(
+        `pipeContainer${pipeNumber}`
+      );
+      if (pipeContainer) {
+        pipeContainer.classList.remove("pipe-error");
+      }
+
+      populateAssignPipeDropdowns();
+      updatePipelineRemarksDisplay(); // Update the remarks display
+    }
+  });
+
+  // ... rest of the existing code ...
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initializeApp();
   setupCocktailIngredientHandlers();
@@ -123,6 +393,7 @@ document.addEventListener("DOMContentLoaded", () => {
   getNextProductId();
 });
 
+// Modify the fetchIngredientsForCocktail function to display remarks
 async function fetchIngredientsForCocktail(searchTerm = "") {
   try {
     const ingredients = await fetchIngredientsData();
@@ -175,6 +446,8 @@ async function fetchIngredientsForCocktail(searchTerm = "") {
           console.log(
             `selectedingforcocktail ${selectedingforcocktail.length}`
           );
+          // Update remarks display in the container
+          updateRemarksDisplay();
         });
         const img = document.createElement("img");
 
@@ -187,12 +460,83 @@ async function fetchIngredientsForCocktail(searchTerm = "") {
         label.appendChild(img);
         label.appendChild(para);
         ingDiv.appendChild(label);
+
+        // Add remark if available
+        if (ingredient.ING_Remark && ingredient.ING_Remark.trim() !== "") {
+          const remarkDiv = document.createElement("div");
+          remarkDiv.className = "remark-text";
+          remarkDiv.textContent = ingredient.ING_Remark;
+          ingDiv.appendChild(remarkDiv);
+        }
+
         container.appendChild(ingDiv);
       }
     });
+
+    // Update remarks display after loading all ingredients
+    updateRemarksDisplay();
   } catch (error) {
     console.error("Error fetching ingredients for cocktail:", error);
   }
+}
+
+// Function to update the remarks display in the cocktail-ingredients-container1
+function updateRemarksDisplay() {
+  // Create or update the remarks container
+  let remarksContainer = document.getElementById(
+    "ingredient-remarks-container"
+  );
+  if (!remarksContainer) {
+    remarksContainer = document.createElement("div");
+    remarksContainer.id = "ingredient-remarks-container";
+    remarksContainer.className = "ingredient-remarks-container";
+
+    // Find the parent container to append to
+    const parentContainer = document.getElementById(
+      "cocktail-ingredients-container1"
+    ).parentNode;
+    parentContainer.appendChild(remarksContainer);
+  }
+
+  // Clear the container
+  remarksContainer.innerHTML = "";
+
+  // Add a heading
+  const heading = document.createElement("h3");
+  heading.textContent = "Selected Ingredient Remarks";
+  remarksContainer.appendChild(heading);
+
+  // Check if there are any selected ingredients with remarks
+  let hasRemarks = false;
+
+  // Add remarks for selected ingredients
+  selectedingforcocktail.forEach((ingredientName) => {
+    if (ingredientRemarks[ingredientName]) {
+      hasRemarks = true;
+
+      const remarkItem = document.createElement("div");
+      remarkItem.className = "selected-remark-item";
+
+      remarkItem.innerHTML = `
+        <h4>${ingredientName}</h4>
+        <p>${ingredientRemarks[ingredientName]}</p>
+      `;
+
+      remarksContainer.appendChild(remarkItem);
+    }
+  });
+
+  // If no remarks, show a message
+  if (!hasRemarks) {
+    const noRemarks = document.createElement("p");
+    noRemarks.className = "no-remarks";
+    noRemarks.textContent = "No remarks for selected ingredients";
+    remarksContainer.appendChild(noRemarks);
+  }
+
+  // Show or hide the container based on whether there are selected ingredients
+  remarksContainer.style.display =
+    selectedingforcocktail.length > 0 ? "block" : "none";
 }
 
 function handleCocktailIngredientSelection(event, ingredient) {
@@ -201,12 +545,18 @@ function handleCocktailIngredientSelection(event, ingredient) {
       ING_ID: ingredient.ING_ID,
       ING_Name: ingredient.ING_Name,
     });
-    console.log("Added ingredient to selectedCocktailIngredients:", ingredient.ING_Name);
+    console.log(
+      "Added ingredient to selectedCocktailIngredients:",
+      ingredient.ING_Name
+    );
   } else {
     selectedCocktailIngredients = selectedCocktailIngredients.filter(
       (ing) => ing.ING_ID !== ingredient.ING_ID
     );
-    console.log("Removed ingredient from selectedCocktailIngredients:", ingredient.ING_Name);
+    console.log(
+      "Removed ingredient from selectedCocktailIngredients:",
+      ingredient.ING_Name
+    );
   }
 }
 
@@ -257,8 +607,10 @@ function setupEventListeners() {
 
     // Check if there are selected ingredients
     if (selectedIngredients.length === 0) {
-        showCustomAlert("No ingredients selected. Please select at least one ingredient.");
-        return; // Exit if no ingredients are selected
+      showCustomAlert(
+        "No ingredients selected. Please select at least one ingredient."
+      );
+      return; // Exit if no ingredients are selected
     }
 
     showAssignPipe(); // This will display the Assign Pipeline section
@@ -268,7 +620,7 @@ function setupEventListeners() {
 
     // If numPipes is not set or invalid, default to 1
     if (isNaN(numPipes) || numPipes < 1 || numPipes > 100) {
-        numPipesInput.value = 1; // Reset to 1 if invalid
+      numPipesInput.value = 1; // Reset to 1 if invalid
     }
 
     // Populate the dropdowns in the Assign Pipeline section with selected ingredients
@@ -345,7 +697,9 @@ const addIngSection = document.querySelector(".add-ing");
 const addCocktailSection = document.querySelector(".add-cocktail");
 const allCocktailSection = document.querySelector(".all-cocktail");
 const cocktailDetailsSection = document.querySelector(".cocktail-details"); // New section for cocktail details
-const availableCocktailsSection = document.querySelector(".available-cocktails");
+const availableCocktailsSection = document.querySelector(
+  ".available-cocktails"
+);
 const assignPipeSection = document.querySelector(".assign-pipe");
 
 async function showAvailableCocktails() {
@@ -355,7 +709,7 @@ async function showAvailableCocktails() {
   allCocktailSection.style.display = "block";
   cocktailDetailsSection.style.display = "none";
   assignPipeSection.style.display = "none";
-  availableCocktailsSection.style.display = "none"; 
+  availableCocktailsSection.style.display = "none";
   availableCocktailsBtn.classList.add("active");
   availableCocktailsBtn.classList.remove("deactive");
   assignPipeBtn.classList.add("deactive");
@@ -368,33 +722,33 @@ async function showAvailableCocktails() {
   allCocktailsBtn.classList.add("deactive");
   cotailInfoBtn.classList.remove("active"); // Remove active from Cocktail Info
   cotailInfoBtn.classList.add("deactive");
-  document.getElementById("back-button-all-cocktail").style.display = "none"; 
+  document.getElementById("back-button-all-cocktail").style.display = "none";
   updateButtonStyles();
 
-  const cocktails = await fetchCocktails(); 
+  const cocktails = await fetchCocktails();
 
-   // Filter cocktails based on saved ingredients instead of selected ingredients
-    const filteredCocktails = cocktails.filter(cocktail => { 
-        return cocktail.PIng.every(ingredient => 
-            savedIngredients.includes(ingredient.ING_Name) 
-        ); 
-    }); 
+  // Filter cocktails based on saved ingredients instead of selected ingredients
+  const filteredCocktails = cocktails.filter((cocktail) => {
+    return cocktail.PIng.every((ingredient) =>
+      savedIngredients.includes(ingredient.ING_Name)
+    );
+  });
 
-    const cocktailListContainer = document.querySelector(".cocktail-list"); 
-    cocktailListContainer.innerHTML = ""; // Clear existing content 
+  const cocktailListContainer = document.querySelector(".cocktail-list");
+  cocktailListContainer.innerHTML = ""; // Clear existing content
 
-   // Check if there are any filtered cocktails 
-    if (filteredCocktails.length === 0) { 
-      const noCocktailMessage = document.createElement("p"); 
-      noCocktailMessage.className = "no-cocktail-message"; // Apply the CSS class 
-      noCocktailMessage.textContent = "No Cocktails Found, Please Assign Proper Ingredients"; // Set the message 
-      cocktailListContainer.appendChild(noCocktailMessage); // Append the message to the container 
-    } else { 
-      // Display filtered cocktails 
-      displayCocktails(filteredCocktails); 
-    } 
+  // Check if there are any filtered cocktails
+  if (filteredCocktails.length === 0) {
+    const noCocktailMessage = document.createElement("p");
+    noCocktailMessage.className = "no-cocktail-message"; // Apply the CSS class
+    noCocktailMessage.textContent =
+      "No Cocktails Found, Please Assign Proper Ingredients"; // Set the message
+    cocktailListContainer.appendChild(noCocktailMessage); // Append the message to the container
+  } else {
+    // Display filtered cocktails
+    displayCocktails(filteredCocktails);
+  }
 }
-
 
 // Function to show the "Assign Pipe" section
 function showAssignPipe() {
@@ -423,7 +777,6 @@ function showAssignPipe() {
   updateButtonStyles();
 }
 
-
 // Function to show the "Find Cocktail" section
 function showSelectIng() {
   fetchIngredients();
@@ -449,7 +802,7 @@ function showSelectIng() {
   allCocktailsBtn.classList.add("deactive");
   cotailInfoBtn.classList.remove("active"); // Remove active from Cocktail Info
   cotailInfoBtn.classList.add("deactive");
-  
+
   updateButtonStyles();
 }
 
@@ -535,67 +888,71 @@ function showAddCocktail() {
 }
 
 document.getElementById("serial-out-button").addEventListener("click", () => {
-    // Get the selected cocktail details
-    const cocktailId = document.getElementById("cocktail-id").textContent;
-    const drinkType = document.querySelector('input[name="drink-type"]:checked').value;
-    
-    // Get the cocktail's ingredients and their assigned pipes
-    const cocktailIngredients = [];
-    const cocktail = document.querySelector(".cocktail-details");
-    const ingredients = cocktail.querySelectorAll("#cocktail-ingredients-container .ing-item p");
-    
-    ingredients.forEach(ingredientElem => {
-        const ingredientName = ingredientElem.textContent;
-        // Find the pipe number for this ingredient from currentPipeAssignments
-        let pipeNumber = null;
-        for (const [pipe, ingredient] of Object.entries(currentPipeAssignments)) {
-            if (ingredient === ingredientName) {
-                pipeNumber = pipe.split(' ')[1]; // Get the number from "Pipe X"
-                break;
-            }
-        }
-        if (pipeNumber) {
-            cocktailIngredients.push({
-                name: ingredientName,
-                pipe: pipeNumber
-            });
-        }
-    });
+  // Get the selected cocktail details
+  const cocktailId = document.getElementById("cocktail-id").textContent;
+  const drinkType = document.querySelector(
+    'input[name="drink-type"]:checked'
+  ).value;
 
-    // Prepare data for serial output
-    const serialData = {
-        productId: parseInt(cocktailId),
-        ingredients: cocktailIngredients,
-        drinkType: drinkType
-    };
+  // Get the cocktail's ingredients and their assigned pipes
+  const cocktailIngredients = [];
+  const cocktail = document.querySelector(".cocktail-details");
+  const ingredients = cocktail.querySelectorAll(
+    "#cocktail-ingredients-container .ing-item p"
+  );
 
-    // Show loading page
-    showLoadingPage();
+  ingredients.forEach((ingredientElem) => {
+    const ingredientName = ingredientElem.textContent;
+    // Find the pipe number for this ingredient from currentPipeAssignments
+    let pipeNumber = null;
+    for (const [pipe, ingredient] of Object.entries(currentPipeAssignments)) {
+      if (ingredient === ingredientName) {
+        pipeNumber = pipe.split(" ")[1]; // Get the number from "Pipe X"
+        break;
+      }
+    }
+    if (pipeNumber) {
+      cocktailIngredients.push({
+        name: ingredientName,
+        pipe: pipeNumber,
+      });
+    }
+  });
 
-    // Send the data to Python
-    fetch("/send-pipes", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(serialData)
+  // Prepare data for serial output
+  const serialData = {
+    productId: parseInt(cocktailId),
+    ingredients: cocktailIngredients,
+    drinkType: drinkType,
+  };
+
+  // Show loading page
+  showLoadingPage();
+
+  // Send the data to Python
+  fetch("/send-pipes", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(serialData),
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.text();
+      } else {
+        throw new Error("Failed to send data to serial port");
+      }
     })
-    .then(response => {
-        if (response.ok) {
-            return response.text();
-        } else {
-            throw new Error('Failed to send data to serial port');
-        }
-    })
-    .then(data => {
-        if (data === "OK") {
-            hideLoadingPage();
-            showCustomAlert("Drink making started successfully!");
-        }
-    })
-    .catch(error => {
+    .then((data) => {
+      if (data === "OK") {
         hideLoadingPage();
-        showCustomAlert("Error: " + error.message);
+        showCustomAlert("Drink making started successfully!");
+      }
+    })
+    .catch((error) => {
+      hideLoadingPage();
+      showCustomAlert("Error: " + error.message);
     });
 });
 
@@ -1030,18 +1387,22 @@ async function fetchIngredients(searchTerm = "") {
 }
 
 // Function to handle checkbox changes
-function handleCheckboxChange(event) { 
-  const ingredientName = event.target.closest(".ing-item").querySelector("p").textContent; 
+function handleCheckboxChange(event) {
+  const ingredientName = event.target
+    .closest(".ing-item")
+    .querySelector("p").textContent;
 
-  if (event.target.checked) { 
+  if (event.target.checked) {
     if (!selectedIngredients.includes(ingredientName)) {
       selectedIngredients.push(ingredientName);
     }
   } else {
-    selectedIngredients = selectedIngredients.filter(name => name !== ingredientName);
+    selectedIngredients = selectedIngredients.filter(
+      (name) => name !== ingredientName
+    );
   }
 
-  updateSelectedCount(); // Update the selected count 
+  updateSelectedCount(); // Update the selected count
 }
 
 // Function to update the selected count
@@ -1050,7 +1411,7 @@ function updateSelectedCount() {
   const selectedCountElement = document.querySelector(".fi-top p span");
 
   // Update displayed count
-  selectedCountElement.textContent = `${selectedCount}`; 
+  selectedCountElement.textContent = `${selectedCount}`;
 }
 
 // Add event delegation to the ingredients container
@@ -1071,7 +1432,6 @@ function handleSearchInput() {
   console.log(`Search term: ${searchInput}`);
 }
 document.addEventListener("DOMContentLoaded", () => {
-  
   // Add event listener to the search input
   document
     .getElementById("ingredient-search")
@@ -1178,7 +1538,6 @@ document.getElementById("back-button").addEventListener("click", (event) => {
   console.log("Find Cocktail section displayed");
 });
 
-
 document.getElementById("back-button1").addEventListener("click", (event) => {
   event.preventDefault(); // Prevent default button behavior
   console.log("Back button 1 clicked");
@@ -1187,8 +1546,6 @@ document.getElementById("back-button1").addEventListener("click", (event) => {
 });
 
 let selectedPipelines = {}; // Global object to keep track of selected pipelines
-
-
 
 // Function to display the selected image name
 function displayImageName() {
@@ -1230,8 +1587,7 @@ async function showAllCocktails(selectedIngredients = []) {
   cotailInfoBtn.classList.add("deactive");
   updateButtonStyles();
 
-  document.getElementById("back-button-all-cocktail").style.display = "block"; 
-
+  document.getElementById("back-button-all-cocktail").style.display = "block";
 
   // Fetch cocktails
   const cocktails = await fetchCocktails();
@@ -1298,7 +1654,9 @@ async function wshowCocktailDetails(cocktail) {
   const cocktailImage = document.getElementById("cocktail-image");
   const cocktailName = document.getElementById("cocktail-name");
   const cocktailDescription = document.getElementById("cocktail-description");
-  const cocktailIngredientsContainer = document.getElementById("cocktail-ingredients-container");
+  const cocktailIngredientsContainer = document.getElementById(
+    "cocktail-ingredients-container"
+  );
   const cocktailHtm = document.getElementById("htm");
 
   cocktailImage.src = cocktail.PImage; // Set the image source
@@ -1318,8 +1676,8 @@ async function wshowCocktailDetails(cocktail) {
 
     // Check if the ingredient is selected
     const isSelected = selectedIngredients.includes(ingredient.ING_Name);
-    console.log(`checking ${ingredient.ING_Name} is ${isSelected}`)
-    const className = isSelected ? '' : 'not-selected'; // Add class if not selected
+    console.log(`checking ${ingredient.ING_Name} is ${isSelected}`);
+    const className = isSelected ? "" : "not-selected"; // Add class if not selected
 
     ingredientItem.innerHTML = `
       <label class="btn-checkbox">
@@ -1554,7 +1912,6 @@ document.getElementById("alert-ok").onclick = function () {
   document.getElementById("custom-alert").style.display = "none"; // Hide the alert
 };
 
-
 /////////////////////////////////////////////////////////////
 ///Select Number Of Pipes To Assign & Searchable dropdown///
 ///////////////////////////////////////////////////////////
@@ -1568,7 +1925,7 @@ const errorMessage = document.getElementById("errorMessage");
 generateButton.addEventListener("click", () => {
   const numPipes = parseInt(numPipesInput.value);
   numberOfPipes = numPipes;
-  
+
   // Validate the number of pipes
   if (isNaN(numPipes) || numPipes < 1 || numPipes > 100) {
     showCustomAlert("Please enter a valid number between 1 and 100.");
@@ -1576,8 +1933,8 @@ generateButton.addEventListener("click", () => {
   }
 
   // Remove assignments for pipes that no longer exist
-  Object.keys(currentPipeAssignments).forEach(pipe => {
-    const pipeNumber = parseInt(pipe.split(' ')[1]);
+  Object.keys(currentPipeAssignments).forEach((pipe) => {
+    const pipeNumber = parseInt(pipe.split(" ")[1]);
     if (pipeNumber > numPipes) {
       delete currentPipeAssignments[pipe];
     }
@@ -1595,12 +1952,12 @@ function populateAssignPipeDropdowns() {
   pipeAssignContainer.innerHTML = "";
 
   for (let i = 1; i <= numberOfPipes; i++) {
-      const dropdownContainer = document.createElement("div");
-      dropdownContainer.className = "pipe-dropdown-container";
-      dropdownContainer.id = `pipeContainer${i}`; // Add ID for targeting
-      
-      // Create dropdown with search input
-      dropdownContainer.innerHTML = `
+    const dropdownContainer = document.createElement("div");
+    dropdownContainer.className = "pipe-dropdown-container";
+    dropdownContainer.id = `pipeContainer${i}`; // Add ID for targeting
+
+    // Create dropdown with search input
+    dropdownContainer.innerHTML = `
           <label for="pipeDropdown${i}">Pipe ${i}</label>
           <div class="pipe-dropdown-wrapper">
               <div class="search-input-container">
@@ -1613,126 +1970,141 @@ function populateAssignPipeDropdowns() {
               </div>
               <div class="pipe-dropdown-options" id="pipeOptions${i}">
                   <div class="option" data-value="">Select Ingredient</div>
-                  ${selectedIngredients.map(ingredient => {
+                  ${selectedIngredients
+                    .map((ingredient) => {
                       const isAssigned = isIngredientAssigned(ingredient);
-                      return `<div class="option ${isAssigned ? 'disabled' : ''}" 
+                      return `<div class="option ${
+                        isAssigned ? "disabled" : ""
+                      }" 
                           data-value="${ingredient}"
-                          title="${isAssigned ? 'Already assigned to another pipe' : ''}"
+                          title="${
+                            isAssigned ? "Already assigned to another pipe" : ""
+                          }"
                           >${ingredient}</div>`;
-                  }).join('')}
+                    })
+                    .join("")}
               </div>
           </div>
       `;
-      
-      pipeAssignContainer.appendChild(dropdownContainer);
-      setupPipeDropdown(i);
+
+    pipeAssignContainer.appendChild(dropdownContainer);
+    setupPipeDropdown(i);
   }
 }
 
 // Check if ingredient is already assigned to any pipe
 function isIngredientAssigned(ingredient) {
-    return Object.values(currentPipeAssignments).includes(ingredient);
+  return Object.values(currentPipeAssignments).includes(ingredient);
 }
 
 function setupPipeDropdown(pipeNumber) {
-    const searchInput = document.getElementById(`pipeSearch${pipeNumber}`);
-    const optionsContainer = document.getElementById(`pipeOptions${pipeNumber}`);
-    const clearButton = document.getElementById(`clearSearch${pipeNumber}`);
+  const searchInput = document.getElementById(`pipeSearch${pipeNumber}`);
+  const optionsContainer = document.getElementById(`pipeOptions${pipeNumber}`);
+  const clearButton = document.getElementById(`clearSearch${pipeNumber}`);
 
-    // Show options on focus
-    searchInput.addEventListener('focus', () => {
-        optionsContainer.style.display = 'block';
+  // Show options on focus
+  searchInput.addEventListener("focus", () => {
+    optionsContainer.style.display = "block";
+  });
+
+  // Handle search
+  searchInput.addEventListener("input", () => {
+    const searchTerm = searchInput.value.toLowerCase();
+    const options = optionsContainer.querySelectorAll(
+      ".option:not(.no-results)"
+    );
+
+    clearButton.style.display = searchTerm ? "block" : "none";
+
+    let hasResults = false;
+    options.forEach((option) => {
+      const text = option.textContent.toLowerCase();
+      if (text.includes(searchTerm)) {
+        option.style.display = "block";
+        hasResults = true;
+      } else {
+        option.style.display = "none";
+      }
     });
 
-    // Handle search
-    searchInput.addEventListener('input', () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        const options = optionsContainer.querySelectorAll('.option:not(.no-results)');
-        
-        clearButton.style.display = searchTerm ? 'block' : 'none';
-        
-        let hasResults = false;
-        options.forEach(option => {
-            const text = option.textContent.toLowerCase();
-            if (text.includes(searchTerm)) {
-                option.style.display = 'block';
-                hasResults = true;
-            } else {
-                option.style.display = 'none';
-            }
-        });
-
-        // Remove existing no-results message if it exists
-        const existingNoResults = optionsContainer.querySelector('.no-results');
-        if (existingNoResults) {
-            existingNoResults.remove();
-        }
-
-        // Add no-results message if no matches found and search term isn't empty
-        if (!hasResults && searchTerm) {
-            const noResults = document.createElement('div');
-            noResults.className = 'option no-results';
-            noResults.textContent = 'No matching ingredients found';
-            optionsContainer.appendChild(noResults);
-        }
-    });
-
-    // Handle clear button click
-    clearButton.addEventListener('click', () => {
-        // Get the current assignment before clearing
-        const currentAssignment = currentPipeAssignments[`Pipe ${pipeNumber}`];
-        
-        // Clear the input and assignment
-        searchInput.value = '';
-        clearButton.style.display = 'none';
-        currentPipeAssignments[`Pipe ${pipeNumber}`] = '';
-
-        // Immediately update all dropdowns to reflect the unassigned ingredient
-        populateAssignPipeDropdowns();
-
-        // Stop event propagation to prevent dropdown from showing
-        event.stopPropagation();
-    });
-
-    // Handle option selection
-    optionsContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('option') && !e.target.classList.contains('disabled')) {
-            const value = e.target.dataset.value;
-            searchInput.value = e.target.textContent;
-            currentPipeAssignments[`Pipe ${pipeNumber}`] = value;
-            optionsContainer.style.display = 'none';
-            clearButton.style.display = value ? 'block' : 'none';
-            
-            // Remove error class when assigning an ingredient
-            const pipeContainer = document.getElementById(`pipeContainer${pipeNumber}`);
-            if (pipeContainer) {
-                pipeContainer.classList.remove('pipe-error');
-            }
-            
-            populateAssignPipeDropdowns();
-        }
-    });
-
-    // Close options when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target) && 
-            !optionsContainer.contains(e.target) &&
-            !clearButton.contains(e.target)) {
-            optionsContainer.style.display = 'none';
-        }
-    });
-
-    // Set previous value if exists
-    const previousAssignment = currentPipeAssignments[`Pipe ${pipeNumber}`];
-    if (previousAssignment && selectedIngredients.includes(previousAssignment)) {
-        searchInput.value = previousAssignment;
-        clearButton.style.display = 'block';
+    // Remove existing no-results message if it exists
+    const existingNoResults = optionsContainer.querySelector(".no-results");
+    if (existingNoResults) {
+      existingNoResults.remove();
     }
+
+    // Add no-results message if no matches found and search term isn't empty
+    if (!hasResults && searchTerm) {
+      const noResults = document.createElement("div");
+      noResults.className = "option no-results";
+      noResults.textContent = "No matching ingredients found";
+      optionsContainer.appendChild(noResults);
+    }
+  });
+
+  // Handle clear button click
+  clearButton.addEventListener("click", () => {
+    // Get the current assignment before clearing
+    const currentAssignment = currentPipeAssignments[`Pipe ${pipeNumber}`];
+
+    // Clear the input and assignment
+    searchInput.value = "";
+    clearButton.style.display = "none";
+    currentPipeAssignments[`Pipe ${pipeNumber}`] = "";
+
+    // Immediately update all dropdowns to reflect the unassigned ingredient
+    populateAssignPipeDropdowns();
+
+    // Stop event propagation to prevent dropdown from showing
+    event.stopPropagation();
+  });
+
+  // Handle option selection
+  optionsContainer.addEventListener("click", (e) => {
+    if (
+      e.target.classList.contains("option") &&
+      !e.target.classList.contains("disabled")
+    ) {
+      const value = e.target.dataset.value;
+      searchInput.value = e.target.textContent;
+      currentPipeAssignments[`Pipe ${pipeNumber}`] = value;
+      optionsContainer.style.display = "none";
+      clearButton.style.display = value ? "block" : "none";
+
+      // Remove error class when assigning an ingredient
+      const pipeContainer = document.getElementById(
+        `pipeContainer${pipeNumber}`
+      );
+      if (pipeContainer) {
+        pipeContainer.classList.remove("pipe-error");
+      }
+
+      populateAssignPipeDropdowns();
+    }
+  });
+
+  // Close options when clicking outside
+  document.addEventListener("click", (e) => {
+    if (
+      !searchInput.contains(e.target) &&
+      !optionsContainer.contains(e.target) &&
+      !clearButton.contains(e.target)
+    ) {
+      optionsContainer.style.display = "none";
+    }
+  });
+
+  // Set previous value if exists
+  const previousAssignment = currentPipeAssignments[`Pipe ${pipeNumber}`];
+  if (previousAssignment && selectedIngredients.includes(previousAssignment)) {
+    searchInput.value = previousAssignment;
+    clearButton.style.display = "block";
+  }
 }
 
 saveButton.addEventListener("click", () => {
-    // Call the saveConfig function with the current global variables
-    saveConfig(numberOfPipes, selectedIngredients);
+  // Call the saveConfig function with the current global variables
+  saveConfig(numberOfPipes, selectedIngredients);
 });
 
 // Function to handle dropdown functionality
@@ -1807,132 +2179,139 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Open the popup when "Customize" button is clicked
   customizeButton.addEventListener("click", () => {
-      console.log("Customize button clicked");
-      popup.style.display = "flex";
+    console.log("Customize button clicked");
+    popup.style.display = "flex";
   });
 
   // Close the popup when the close button is clicked
   closePopup.addEventListener("click", () => {
-      console.log("Close button clicked");
-      popup.style.display = "none";
+    console.log("Close button clicked");
+    popup.style.display = "none";
   });
 
   // Close the popup when clicking outside the content
   window.addEventListener("click", (event) => {
-      if (event.target === popup) {
-          console.log("Clicked outside the popup");
-          popup.style.display = "none";
-      }
+    if (event.target === popup) {
+      console.log("Clicked outside the popup");
+      popup.style.display = "none";
+    }
   });
-
 
   // Automatically close popup after generating custom pipes
   generateButton.addEventListener("click", () => {
-      const numPipes = parseInt(numPipesInput.value);
-      console.log(`Generating ${numPipes} pipes`);
+    const numPipes = parseInt(numPipesInput.value);
+    console.log(`Generating ${numPipes} pipes`);
 
-      if (!isNaN(numPipes) && numPipes >= 1 && numPipes <= 100) {
-          popup.style.display = "none"; // Close the popup after generating
-      }
+    if (!isNaN(numPipes) && numPipes >= 1 && numPipes <= 100) {
+      popup.style.display = "none"; // Close the popup after generating
+    }
   });
 
   defaultButtons.forEach((button) => {
-      button.addEventListener("click", (event) => {
-          // Remove 'selected' class from all buttons
-          defaultButtons.forEach((btn) => btn.classList.remove("selected"));
+    button.addEventListener("click", (event) => {
+      // Remove 'selected' class from all buttons
+      defaultButtons.forEach((btn) => btn.classList.remove("selected"));
 
-          // Add 'selected' class to the clicked button
-          event.target.classList.add("selected");
-          const numPipes = parseInt(event.target.getAttribute("data-value"));
-          numPipesInput.value = numPipes; // Set the input value
-          generateButton.click(); // Trigger the generate logic
+      // Add 'selected' class to the clicked button
+      event.target.classList.add("selected");
+      const numPipes = parseInt(event.target.getAttribute("data-value"));
+      numPipesInput.value = numPipes; // Set the input value
+      generateButton.click(); // Trigger the generate logic
 
-          popup.style.display = "none"; // Close the popup after selecting default
-      });
+      popup.style.display = "none"; // Close the popup after selecting default
+    });
   });
 });
 
 async function saveConfig(numberOfPipes, selectedIngredients) {
-    // Check if all pipes are assigned
-    let unassignedPipes = [];
-    for (let i = 1; i <= numberOfPipes; i++) {
-        const searchInput = document.getElementById(`pipeSearch${i}`);
-        const pipeContainer = document.getElementById(`pipeContainer${i}`);
-        
-        if (!searchInput || !searchInput.value.trim()) {
-            unassignedPipes.push(i);
-            // Add error class to highlight unassigned pipe
-            if (pipeContainer) {
-                pipeContainer.classList.add('pipe-error');
-            }
-        } else {
-            // Remove error class if pipe is assigned
-            if (pipeContainer) {
-                pipeContainer.classList.remove('pipe-error');
-            }
-        }
+  // Check if all pipes are assigned
+  let unassignedPipes = [];
+  for (let i = 1; i <= numberOfPipes; i++) {
+    const searchInput = document.getElementById(`pipeSearch${i}`);
+    const pipeContainer = document.getElementById(`pipeContainer${i}`);
+
+    if (!searchInput || !searchInput.value.trim()) {
+      unassignedPipes.push(i);
+      // Add error class to highlight unassigned pipe
+      if (pipeContainer) {
+        pipeContainer.classList.add("pipe-error");
+      }
+    } else {
+      // Remove error class if pipe is assigned
+      if (pipeContainer) {
+        pipeContainer.classList.remove("pipe-error");
+      }
     }
+  }
 
-    if (unassignedPipes.length > 0) {
-        showCustomAlert(`Please assign ingredients to all pipes.\nUnassigned pipes:\n ${unassignedPipes.map(num => `<span style="color:red;font-weight:bold">Pipe ${num}</span>`).join(', ')}`);
-        return;
+  if (unassignedPipes.length > 0) {
+    showCustomAlert(
+      `Please assign ingredients to all pipes.\nUnassigned pipes:\n ${unassignedPipes
+        .map(
+          (num) => `<span style="color:red;font-weight:bold">Pipe ${num}</span>`
+        )
+        .join(", ")}`
+    );
+    return;
+  }
+
+  // Update savedIngredients when saving
+  savedIngredients = selectedIngredients;
+
+  const configData = {
+    numberOfPipes: numberOfPipes,
+    pipeConfig: currentPipeAssignments,
+    selectedIngredients: savedIngredients,
+  };
+
+  try {
+    const response = await fetch("/save-config", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(configData),
+    });
+
+    if (response.ok) {
+      showCustomAlert("Configuration saved successfully!");
+      // Update available cocktails after successful save
+      showAvailableCocktails();
     }
-
-    // Update savedIngredients when saving
-    savedIngredients = selectedIngredients;
-    
-    const configData = {
-        numberOfPipes: numberOfPipes,
-        pipeConfig: currentPipeAssignments,
-        selectedIngredients: savedIngredients
-    };
-
-    try {
-        const response = await fetch("/save-config", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(configData),
-        });
-
-        if (response.ok) {
-            showCustomAlert("Configuration saved successfully!");
-            // Update available cocktails after successful save
-            showAvailableCocktails();
-        }
-    } catch (error) {
-        console.error("Error saving configuration:", error);
-        showCustomAlert("Failed to save configuration");
-    }
+  } catch (error) {
+    console.error("Error saving configuration:", error);
+    showCustomAlert("Failed to save configuration");
+  }
 }
 async function loadConfig() {
   try {
-      const response = await fetch("config.json");
-      const configData = await response.json();
-      
-      // Initialize both arrays from config
-      savedIngredients = configData.selectedIngredients || [];
-      selectedIngredients = [...savedIngredients]; // Copy saved ingredients to selected
-      numberOfPipes = configData.numberOfPipes || 0;
+    const response = await fetch("config.json");
+    const configData = await response.json();
 
-      // Load pipe assignments
-      currentPipeAssignments = configData.pipeConfig || {};
+    // Initialize both arrays from config
+    savedIngredients = configData.selectedIngredients || [];
+    selectedIngredients = [...savedIngredients]; // Copy saved ingredients to selected
+    numberOfPipes = configData.numberOfPipes || 0;
 
-      await fetchIngredients();
-      updateSelectedCount();
+    // Load pipe assignments
+    currentPipeAssignments = configData.pipeConfig || {};
 
-      // Populate dropdowns with current assignments
-      if (configData.pipeConfig) {
-          populateAssignPipeDropdowns();
-      }
+    await fetchIngredients();
+    updateSelectedCount();
 
-      console.log(`Loaded ${numberOfPipes} pipes and saved ingredients:`, savedIngredients);
+    // Populate dropdowns with current assignments
+    if (configData.pipeConfig) {
+      populateAssignPipeDropdowns();
+    }
+
+    console.log(
+      `Loaded ${numberOfPipes} pipes and saved ingredients:`,
+      savedIngredients
+    );
   } catch (error) {
-      console.error("Error loading configuration:", error);
+    console.error("Error loading configuration:", error);
   }
 }
-
 
 // Call loadConfig when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
@@ -1943,7 +2322,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // You can also call other initialization functions here
 });
 
-
 document.getElementById("clear-all-button").addEventListener("click", () => {
   // Call the function to clear all selected ingredients
   clearAllSelectedIngredients();
@@ -1953,7 +2331,7 @@ function clearAllSelectedIngredients() {
   // Deselect all checkboxes
   const checkboxes = document.querySelectorAll(".checkbox");
   checkboxes.forEach((checkbox) => {
-      checkbox.checked = false; // Uncheck each checkbox
+    checkbox.checked = false; // Uncheck each checkbox
   });
 
   // Clear the selectedIngredients array
@@ -1971,18 +2349,18 @@ function updatePipesAndIngredients() {
 
   // Loop through each pipe dropdown and capture the selected ingredients
   for (let i = 1; i <= numberOfPipes; i++) {
-      const dropdown = document.getElementById(`pipeDropdown${i}`);
-      if (dropdown) {
-          const ingredientName = dropdown.value;
-          if (ingredientName) {
-              selectedIngredients.push(ingredientName); // Update selectedIngredients
-          }
+    const dropdown = document.getElementById(`pipeDropdown${i}`);
+    if (dropdown) {
+      const ingredientName = dropdown.value;
+      if (ingredientName) {
+        selectedIngredients.push(ingredientName); // Update selectedIngredients
       }
+    }
   }
 }
 
 numPipesInput.addEventListener("input", () => {
-    numberOfPipes = parseInt(numPipesInput.value);
+  numberOfPipes = parseInt(numPipesInput.value);
 });
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1991,18 +2369,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Show clear button when there is input
   searchInput.addEventListener("input", () => {
-      if (searchInput.value.trim() !== "") {
-          clearButton.style.display = "inline"; // Show the clear button
-      } else {
-          clearButton.style.display = "none"; // Hide the clear button
-      }
+    if (searchInput.value.trim() !== "") {
+      clearButton.style.display = "inline"; // Show the clear button
+    } else {
+      clearButton.style.display = "none"; // Hide the clear button
+    }
   });
 
   // Clear the input field when the clear button is clicked
   clearButton.addEventListener("click", () => {
-      searchInput.value = ""; // Clear the input field
-      clearButton.style.display = "none"; // Hide the clear button
-      fetchIngredients(); // Optionally, refresh the ingredient list
+    searchInput.value = ""; // Clear the input field
+    clearButton.style.display = "none"; // Hide the clear button
+    fetchIngredients(); // Optionally, refresh the ingredient list
   });
 
   // Existing search input event listener
@@ -2011,33 +2389,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Add this function to handle dropdown updates
 function updateAllDropdowns() {
-    // Just call populateAssignPipeDropdowns to refresh all dropdowns
-    populateAssignPipeDropdowns();
+  // Just call populateAssignPipeDropdowns to refresh all dropdowns
+  populateAssignPipeDropdowns();
 }
 
 // Exit button handler
-document.getElementById('exit-button').addEventListener('click', async function() {
-  // Show confirmation dialog
-  if (confirm('Are you sure you want to exit?')) {
-    try {
-      const response = await fetch('/shutdown', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (response.ok) {
-        // Close the window after a short delay to ensure the server has time to shut down
-        setTimeout(() => {
-          window.close();
-        }, 500);
-      } else {
-        console.error('Failed to shutdown server');
-      }
-    } catch (error) {
-      console.error('Error during shutdown:', error);
-    }
-  }
-});
+document
+  .getElementById("exit-button")
+  .addEventListener("click", async function () {
+    // Show confirmation dialog
+    if (confirm("Are you sure you want to exit?")) {
+      try {
+        const response = await fetch("/shutdown", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
+        if (response.ok) {
+          // Close the window after a short delay to ensure the server has time to shut down
+          setTimeout(() => {
+            window.close();
+          }, 500);
+        } else {
+          console.error("Failed to shutdown server");
+        }
+      } catch (error) {
+        console.error("Error during shutdown:", error);
+      }
+    }
+  });
+
+// New Changes
+
+// Alcohol Preference Checkbox Single Value Selection
+function toggleCheckbox(clickedCheckbox) {
+  document
+    .querySelectorAll('.alc-pre input[type="checkbox"]')
+    .forEach((checkbox) => {
+      if (checkbox !== clickedCheckbox) {
+        checkbox.checked = false;
+      }
+    });
+}

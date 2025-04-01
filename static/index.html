@@ -235,7 +235,9 @@
                       </select>
                     </div>
                     <div class="form-group">
-                      <label for="product-description">Product Description:</label>
+                      <label for="product-description"
+                        >Product Description:</label
+                      >
                       <textarea
                         id="product-description"
                         name="product-description"
@@ -345,15 +347,22 @@
                 </div>
               </div>
               <div class="footer-btn blurx">
-                <div class="save-button-container">
-                  <button
-                    id="changeIngredients"
-                    class="btn deactive btns"
-                    onclick="showSelectIng()"
-                  >
-                    Change Ingredients
+                <div class="fi-fl-btn">
+                  <button id="add-remark-button" class="btn active btns">
+                    Add Remark
                   </button>
-                  <button id="save" class="btn active btns">Save</button>
+                </div>
+                <div class="fi-fr-btn">
+                  <div class="save-button-container">
+                    <button
+                      id="changeIngredients"
+                      class="btn deactive btns"
+                      onclick="showSelectIng()"
+                    >
+                      Change Ingredients
+                    </button>
+                    <button id="save" class="btn active btns">Save</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -416,6 +425,14 @@
                       </div>
                     </div>
                   </div>
+                  <div class="cdr-txt">
+                    <div class="show-remark">
+                      <p>
+                        <span>Remark : </span>Show Upper Selected Ingredient
+                        Remark Here
+                      </p>
+                    </div>
+                  </div>
                   <div style="display: none">
                     <p id="cocktail-id">1</p>
                   </div>
@@ -425,26 +442,61 @@
                     <!-- Instructions will be dynamically populated -->
                   </div>
                   <div class="cdr-txt">
-                    <h2>Select Drink Type</h2>
+                    <h2>Select Drink Intensity</h2>
                     <div class="drink-type">
                       <label>
                         <input
                           type="radio"
-                          id="drink-type-soft"
+                          id="drink-type-light"
                           name="drink-type"
-                          value="soft"
+                          value="light"
                           checked
                         />
-                        Soft Drink
+                        Light
                       </label>
                       <label>
                         <input
                           type="radio"
-                          id="drink-type-hard"
+                          id="drink-type-medium"
                           name="drink-type"
-                          value="hard"
+                          value="medium"
                         />
-                        Hard Drink
+                        Medium
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          id="drink-type-strong"
+                          name="drink-type"
+                          value="strong"
+                        />
+                        Strong
+                      </label>
+                    </div>
+                  </div>
+                  <div class="cdr-txt">
+                    <h2>Alcohol Preference</h2>
+                    <div class="additional-option alc-pre">
+                      <label>
+                        <input
+                          type="checkbox"
+                          id="alcoholic"
+                          name="alcoholic"
+                          value="yes"
+                          checked
+                          onclick="toggleCheckbox(this)"
+                        />
+                        Alcoholic
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          id="non-alcoholic"
+                          name="non-alcoholic"
+                          value="yes"
+                          onclick="toggleCheckbox(this)"
+                        />
+                        Non-Alcoholic
                       </label>
                     </div>
                   </div>
@@ -470,6 +522,24 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Remark Popup -->
+    <div id="remarkPopup" class="popupx2 remark-popup" style="display: none">
+      <div class="popup-contentx2">
+        <span id="closeRemarkPopup" class="closex2">&times;</span>
+        <div class="remark-container">
+          <h2 class="txc">Add Remarks To Selected Ingredients</h2>
+          <div id="selected-ingredients-list" class="selected-ingredients-list">
+            <!-- Selected ingredients will be dynamically added here -->
+          </div>
+          <div class="footer-btn">
+            <button id="save-remarks" class="btn active btns">
+              Save Remarks
+            </button>
           </div>
         </div>
       </div>
