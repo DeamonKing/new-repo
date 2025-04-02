@@ -84,7 +84,7 @@ select {
 }
 .picker-setting {
   position: absolute;
-  top: 50%;
+  top: 33%;
   right: 1.5%;
   transform: translateY(-50%);
   z-index: 5;
@@ -93,7 +93,24 @@ select {
   cursor: pointer;
 }
 .picker-setting img {
-  width: 70px;
+  width: 50px;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+}
+
+.update-setting {
+  position: absolute;
+  top: 67%;
+  right: 1.5%;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+.update-setting:hover {
+  cursor: pointer;
+}
+.update-setting img {
+  width: 50px;
   height: auto;
   object-fit: contain;
   object-position: center;
@@ -2190,4 +2207,77 @@ select,
   overflow-y: scroll;
   height: 100%;
   padding-right: 15px;
+}
+
+/* Add Note Button Styles */
+.add-note-btn {
+  background-color: #359267;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.add-note-btn:hover {
+  background-color: #2a6b5d;
+}
+
+/* Note Popup Styles */
+.note-popup .popup-contentx2 {
+  max-width: 500px;
+  width: 90%;
+}
+
+.note-container {
+  width: 100%;
+}
+
+.note-container h2 {
+  margin-bottom: 25px;
+}
+
+.note-input-container {
+  margin-bottom: 15px;
+}
+
+/* Note Indicator Styles */
+.note-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 12px;
+  height: 12px;
+  background-color: #ff4444;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.note-indicator:hover::after {
+  content: attr(title);
+  position: absolute;
+  top: 20px;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  white-space: nowrap;
+  z-index: 1000;
+}
+
+/* Make pipe container position relative for proper indicator positioning */
+.pipe-dropdown-container {
+  position: relative;
+}
+
+.note-popup .footer-btn {
+  position: unset;
+  bottom: unset;
+  right: unset;
+  padding: 0px;
 }

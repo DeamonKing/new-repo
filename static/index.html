@@ -28,6 +28,9 @@
           <div class="picker-setting" id="open-color-picker">
             <img src="img/color-picker.png" alt="" />
           </div>
+          <div class="update-setting" id="update">
+            <img src="img/update.png" alt="" />
+          </div>
         </div>
         <div class="app-body">
           <div class="app-sidebar bg">
@@ -540,6 +543,28 @@
             <button id="save-remarks" class="btn active btns">
               Save Remarks
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add this at the end of the body, after the existing popups -->
+    <div id="notePopup" class="popupx2 note-popup" style="display: none">
+      <div class="popup-contentx2">
+        <span id="closeNotePopup" class="closex2">&times;</span>
+        <div class="note-container">
+          <h2 class="txc">
+            Add Note For <span id="currentPipeName" class="txc"></span>
+          </h2>
+          <div class="note-input-container">
+            <textarea
+              id="pipeNoteTextarea"
+              class="ingredient-remark-textarea"
+              placeholder="Add note for this pipeline ingredeint"
+            ></textarea>
+          </div>
+          <div class="footer-btn">
+            <button id="save-note" class="btn active btns">Save Note</button>
           </div>
         </div>
       </div>

@@ -288,6 +288,100 @@ function setupPipeDropdown(pipeNumber) {
   // ... rest of the existing code ...
 }
 
+// Global object to store notes for individual pipelines
+let pipelineNotes = {};
+
+// Function to add the "Add Note" button to each pipe dropdown container
+function addNoteButtonToPipeDropdown(pipeNumber) {
+  const pipeContainer = document.getElementById(`pipeContainer${pipeNumber}`);
+  if (!pipeContainer) return;
+
+  // Check if button already exists
+  if (pipeContainer.querySelector(".add-note-btn")) return;
+
+  // Create the Add Note button
+  const addNoteBtn = document.createElement("button");
+  addNoteBtn.className = "add-note-btn";
+  addNoteBtn.textContent = "Add Note";
+
+  // Add click event to show note popup
+  addNoteBtn.addEventListener("click", (event) => {
+    event.preventDefault();
+    showNotePopup(pipeNumber);
+  });
+
+  // Append button to the pipe container
+  pipeContainer.appendChild(addNoteBtn);
+}
+
+// Function to show the note popup for a specific pipe
+function showNotePopup(pipeNumber) {
+  const pipeName = `Pipe ${pipeNumber}`;
+  const ingredientName = currentPipeAssignments[pipeName] || "";
+
+  // Set the current pipe name in the popup
+  document.getElementById("currentPipeName").textContent =
+    pipeName + (ingredientName ? ` - ${ingredientName}` : "");
+
+  // Set existing note if available
+  const noteTextarea = document.getElementById("pipeNoteTextarea");
+  noteTextarea.value = pipelineNotes[pipeName] || "";
+
+  // Show the popup
+  document.getElementById("notePopup").style.display = "flex";
+}
+
+// Function to hide the note popup
+function hideNotePopup() {
+  document.getElementById("notePopup").style.display = "none";
+}
+
+// Function to save the note for a specific pipe
+function savePipelineNote() {
+  const pipeName = document
+    .getElementById("currentPipeName")
+    .textContent.split(" - ")[0];
+  const noteText = document.getElementById("pipeNoteTextarea").value.trim();
+
+  if (noteText) {
+    pipelineNotes[pipeName] = noteText;
+
+    // Add a note indicator to the pipe container
+    const pipeNumber = parseInt(pipeName.split(" ")[1]);
+    const pipeContainer = document.getElementById(`pipeContainer${pipeNumber}`);
+
+    if (pipeContainer) {
+      // Add or update note indicator
+      let noteIndicator = pipeContainer.querySelector(".note-indicator");
+      if (!noteIndicator) {
+        noteIndicator = document.createElement("div");
+        noteIndicator.className = "note-indicator";
+        pipeContainer.appendChild(noteIndicator);
+      }
+      noteIndicator.title = noteText;
+    }
+  } else {
+    // Remove note if empty
+    delete pipelineNotes[pipeName];
+
+    // Remove note indicator if exists
+    const pipeNumber = parseInt(pipeName.split(" ")[1]);
+    const pipeContainer = document.getElementById(`pipeContainer${pipeNumber}`);
+    if (pipeContainer) {
+      const noteIndicator = pipeContainer.querySelector(".note-indicator");
+      if (noteIndicator) {
+        pipeContainer.removeChild(noteIndicator);
+      }
+    }
+  }
+
+  // Hide the popup
+  hideNotePopup();
+
+  // Show confirmation message
+  showCustomAlert("Note saved successfully!");
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initializeApp();
   setupCocktailIngredientHandlers();
@@ -2100,7 +2194,77 @@ function setupPipeDropdown(pipeNumber) {
     searchInput.value = previousAssignment;
     clearButton.style.display = "block";
   }
+
+  // Add the note button after setting up the dropdown
+  addNoteButtonToPipeDropdown(pipeNumber);
 }
+
+// Add event listeners for the note popup
+document.addEventListener("DOMContentLoaded", () => {
+  // Existing event listeners...
+
+  // Add event listeners for note popup
+  const closeNotePopup = document.getElementById("closeNotePopup");
+  const saveNoteButton = document.getElementById("save-note");
+
+  if (closeNotePopup) {
+    closeNotePopup.addEventListener("click", hideNotePopup);
+  }
+
+  if (saveNoteButton) {
+    saveNoteButton.addEventListener("click", savePipelineNote);
+  }
+
+  // Modify populateAssignPipeDropdowns to add note buttons
+  const originalPopulateAssignPipeDropdowns = populateAssignPipeDropdowns;
+  populateAssignPipeDropdowns = function () {
+    originalPopulateAssignPipeDropdowns();
+
+    // Add note buttons to all pipe containers
+    for (let i = 1; i <= numberOfPipes; i++) {
+      addNoteButtonToPipeDropdown(i);
+    }
+  };
+});
+
+// Add function to save pipeline notes to config
+const originalSaveConfig = saveConfig;
+saveConfig = function (numberOfPipes, selectedIngredients) {
+  // Call the original saveConfig function
+  originalSaveConfig(numberOfPipes, selectedIngredients);
+
+  // Save pipeline notes to localStorage
+  localStorage.setItem("pipelineNotes", JSON.stringify(pipelineNotes));
+};
+
+// Add function to load pipeline notes from config
+const originalLoadConfig = loadConfig;
+loadConfig = async function () {
+  await originalLoadConfig();
+
+  // Load pipeline notes from localStorage
+  const savedNotes = localStorage.getItem("pipelineNotes");
+  if (savedNotes) {
+    pipelineNotes = JSON.parse(savedNotes);
+
+    // Add note indicators to pipes with notes
+    for (const pipeName in pipelineNotes) {
+      const pipeNumber = parseInt(pipeName.split(" ")[1]);
+      addNoteButtonToPipeDropdown(pipeNumber);
+
+      // Add note indicator
+      const pipeContainer = document.getElementById(
+        `pipeContainer${pipeNumber}`
+      );
+      if (pipeContainer) {
+        const noteIndicator = document.createElement("div");
+        noteIndicator.className = "note-indicator";
+        noteIndicator.title = pipelineNotes[pipeName];
+        pipeContainer.appendChild(noteIndicator);
+      }
+    }
+  }
+};
 
 saveButton.addEventListener("click", () => {
   // Call the saveConfig function with the current global variables
