@@ -60,6 +60,10 @@ async function loadRemarksFromDB() {
     });
 
     console.log("Loaded remarks from db.json:", ingredientRemarks);
+    
+    // Update the UI to display the loaded remarks
+    updateRemarksDisplay();
+    updatePipelineRemarksDisplay();
   } catch (error) {
     console.error("Error loading remarks from db.json:", error);
   }
@@ -175,6 +179,9 @@ async function saveIngredientRemarks() {
 
       // Refresh the ingredients display to show the updated remarks
       await fetchIngredients();
+      
+      // Reload remarks from db.json to ensure they are up to date
+      await loadRemarksFromDB();
 
       // Update the pipeline remarks display
       updatePipelineRemarksDisplay();
@@ -424,6 +431,7 @@ function initializeApp() {
   fetchIngredients();
   setupEventListeners();
   checkActiveMenu();
+  loadRemarksFromDB(); // Load remarks from db.json when the page is loaded
 }
 
 function setupCocktailIngredientHandlers() {
@@ -491,6 +499,14 @@ async function fetchIngredientsForCocktail(searchTerm = "") {
   try {
     const ingredients = await fetchIngredientsData();
     ingredients.sort((a, b) => a.ING_Name.localeCompare(b.ING_Name));
+    
+    // Update the ingredientRemarks object with remarks from the loaded ingredients
+    ingredients.forEach((ingredient) => {
+      if (ingredient.ING_Remark && ingredient.ING_Remark.trim() !== "") {
+        ingredientRemarks[ingredient.ING_Name] = ingredient.ING_Remark;
+      }
+    });
+    
     const container = document.getElementById(
       "cocktail-ingredients-container1"
     );
@@ -1423,6 +1439,13 @@ async function fetchIngredients(searchTerm = "") {
     // Sort ingredients alphabetically by name
     ingredientsData.sort((a, b) => a.ING_Name.localeCompare(b.ING_Name));
 
+    // Update the ingredientRemarks object with remarks from the loaded ingredients
+    ingredientsData.forEach((ingredient) => {
+      if (ingredient.ING_Remark && ingredient.ING_Remark.trim() !== "") {
+        ingredientRemarks[ingredient.ING_Name] = ingredient.ING_Remark;
+      }
+    });
+
     const container = document.getElementById("ingredients-container");
     container.innerHTML = ""; // Clear existing ingredients
 
@@ -1489,6 +1512,10 @@ async function fetchIngredients(searchTerm = "") {
     });
 
     updateSelectedCount(); // Update the selected count
+    
+    // Update the UI to display the loaded remarks
+    updateRemarksDisplay();
+    updatePipelineRemarksDisplay();
   } catch (error) {
     console.error(`Error fetching ingredients: ${error.message}`);
   }
