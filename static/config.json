@@ -28,5 +28,15 @@
     "Pipe 1": "Motor1Pipe",
     "Pipe 2": "Motor2Pipe"
   },
-  "ingredientRemarks": {}
+  "ingredientRemarks": {},
+  "theme": {
+    "bgColor": "#000000",
+    "color1": "#6be6fc",
+    "color2": "#ff6d97",
+    "btnBackgroundColor": "#b95b5b",
+    "btnHoverBackgroundColor": "#7a2929",
+    "btnTextColor": "#ffffff",
+    "btnHoverTextColor": "#ffffff",
+    "angle": 40.62020650468452
+  }
 }

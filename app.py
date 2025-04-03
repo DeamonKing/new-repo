@@ -321,11 +321,19 @@ class CustomHandler(SimpleHTTPRequestHandler):
         try:
             config_data = json.loads(post_data)
             config_path = os.path.join(web_dir, "config.json")
-            print(post_data)
-
-            # Write the configuration data to config.json
+            
+            # Load existing config if it exists
+            existing_config = {}
+            if os.path.exists(config_path):
+                with open(config_path, "r") as file:
+                    existing_config = json.load(file)
+            
+            # Merge new config with existing config
+            merged_config = {**existing_config, **config_data}
+            
+            # Write the merged configuration data to config.json
             with open(config_path, "w") as file:
-                json.dump(config_data, file, indent=2)
+                json.dump(merged_config, file, indent=2)
 
             self.send_response(200)
             self.end_headers()

@@ -105,7 +105,72 @@ window.addEventListener("click", (event) => {
 bgColorPicker.addEventListener("input", (event) => {
   app.style.background = event.target.value;
   document.documentElement.style.setProperty("--bg-color", event.target.value);
+  saveThemeValues();
 });
+
+// Function to save theme values to config.json
+async function saveThemeValues() {
+  const themeValues = {
+    bgColor: bgColorPicker.value,
+    color1: color1Picker.value,
+    color2: color2Picker.value,
+    btnBackgroundColor: btnBackgroundColorPicker.value,
+    btnHoverBackgroundColor: btnHoverBackgroundColorPicker.value,
+    btnTextColor: btnTextColorPicker.value,
+    btnHoverTextColor: btnHoverTextColorPicker.value,
+    angle: angle
+  };
+
+  try {
+    const response = await fetch('/save-config', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...JSON.parse(localStorage.getItem('config') || '{}'),
+        theme: themeValues
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to save theme values');
+    }
+  } catch (error) {
+    console.error('Error saving theme values:', error);
+  }
+}
+
+// Function to load theme values from config.json
+async function loadThemeValues() {
+  try {
+    const response = await fetch('/config.json');
+    const config = await response.json();
+    
+    if (config.theme) {
+      const theme = config.theme;
+      
+      // Set color picker values
+      bgColorPicker.value = theme.bgColor;
+      color1Picker.value = theme.color1;
+      color2Picker.value = theme.color2;
+      btnBackgroundColorPicker.value = theme.btnBackgroundColor;
+      btnHoverBackgroundColorPicker.value = theme.btnHoverBackgroundColor;
+      btnTextColorPicker.value = theme.btnTextColor;
+      btnHoverTextColorPicker.value = theme.btnHoverTextColor;
+      
+      // Set angle
+      angle = theme.angle;
+      setKnobPosition(angle);
+      
+      // Update UI
+      updateGradient();
+      updateButtonStyles();
+    }
+  } catch (error) {
+    console.error('Error loading theme values:', error);
+  }
+}
 
 // Update gradient on color pick
 const updateGradient = () => {
@@ -116,15 +181,28 @@ const updateGradient = () => {
   document.documentElement.style.setProperty("--gradient-color1", color1);
   document.documentElement.style.setProperty("--gradient-color2", color2);
   document.documentElement.style.setProperty("--gradient-angle", `${angle}deg`);
+  saveThemeValues();
 };
 
 // Event listeners for color inputs
 color1Picker.addEventListener("input", updateGradient);
 color2Picker.addEventListener("input", updateGradient);
-btnBackgroundColorPicker.addEventListener("input", updateButtonStyles);
-btnHoverBackgroundColorPicker.addEventListener("input", updateButtonStyles);
-btnTextColorPicker.addEventListener("input", updateButtonStyles);
-btnHoverTextColorPicker.addEventListener("input", updateButtonStyles);
+btnBackgroundColorPicker.addEventListener("input", () => {
+  updateButtonStyles();
+  saveThemeValues();
+});
+btnHoverBackgroundColorPicker.addEventListener("input", () => {
+  updateButtonStyles();
+  saveThemeValues();
+});
+btnTextColorPicker.addEventListener("input", () => {
+  updateButtonStyles();
+  saveThemeValues();
+});
+btnHoverTextColorPicker.addEventListener("input", () => {
+  updateButtonStyles();
+  saveThemeValues();
+});
 
 const resetToDefaults = () => {
   bgColorPicker.value = defaultValues.bgColor;
@@ -174,8 +252,6 @@ const updateAngle = (event) => {
   setKnobPosition(angle);
 };
 
-
-
 function handleTouchInput(event) {
     event.preventDefault();
     const touch = event.touches[0];
@@ -220,19 +296,66 @@ colorButtons.forEach((button) => {
   button.style.background = color;
 });
 
+// Function to convert rgba to hex
+function rgbaToHex(rgba) {
+  // Extract the RGB values from rgba string
+  const match = rgba.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*(\d+)\)/);
+  if (!match) return null;
+  
+  const r = parseInt(match[1]);
+  const g = parseInt(match[2]);
+  const b = parseInt(match[3]);
+  
+  // Convert to hex
+  const toHex = (n) => {
+    const hex = n.toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  };
+  
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
 // Event listeners for predefined color buttons
 const predefinedColorButtons = document.querySelectorAll(".predefined-color");
 predefinedColorButtons.forEach((button) => {
   button.addEventListener("click", (event) => {
-    const selectedColor = event.target.getAttribute("data-color");
-    app.style.background = selectedColor;
-    document.documentElement.style.setProperty("--bg-color", selectedColor);
+    const gradientValue = event.target.getAttribute("data-color");
+    
+    // Extract colors from the gradient value
+    const colorMatch = gradientValue.match(/rgba\((\d+,\d+,\d+,\d+)\)/g);
+    if (colorMatch && colorMatch.length >= 2) {
+      const color1 = colorMatch[0];
+      const color2 = colorMatch[1];
+      
+      // Convert rgba to hex
+      const hexColor1 = rgbaToHex(color1);
+      const hexColor2 = rgbaToHex(color2);
+      
+      if (hexColor1 && hexColor2) {
+        // Extract angle from the gradient value
+        const angleMatch = gradientValue.match(/(\d+)deg/);
+        const angle = angleMatch ? parseInt(angleMatch[1]) : 45;
+        
+        // Update color pickers with the hex colors
+        color1Picker.value = hexColor1;
+        color2Picker.value = hexColor2;
+        
+        // Update angle
+        setKnobPosition(angle);
+        
+        // Update UI with the gradient
+        app.style.background = gradientValue;
+        document.documentElement.style.setProperty("--bg-color", hexColor1);
+        document.documentElement.style.setProperty("--gradient-color1", hexColor1);
+        document.documentElement.style.setProperty("--gradient-color2", hexColor2);
+        document.documentElement.style.setProperty("--gradient-angle", `${angle}deg`);
+        
+        // Save all theme values
+        saveThemeValues();
+      }
+    }
   });
 });
 
-// Remove duplicate event listener
-window.removeEventListener("click", (event) => {
-  if (event.target === colorPickerModal) {
-    colorPickerModal.style.display = "none";
-  }
-});
+// Load theme values on startup
+document.addEventListener('DOMContentLoaded', loadThemeValues);
