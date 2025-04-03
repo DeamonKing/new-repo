@@ -787,6 +787,22 @@ function setupEventListeners() {
     .getElementById("ingredient-search")
     .addEventListener("input", debounce(handleSearchInput, 300));
 
+  // Add click handler for ingredient search
+  document
+    .getElementById("ingredient-search")
+    .addEventListener("click", function() {
+      this.value = "";
+      fetchIngredients("");
+    });
+
+  // Add click handler for cocktail ingredient search
+  document
+    .getElementById("cocktail-ingredient-search")
+    .addEventListener("click", function() {
+      this.value = "";
+      fetchIngredientsForCocktail("");
+    });
+
   // Fetch ingredients ID when the DOM is loaded
   fetchIngredientsID();
 } // Close setupEventListeners

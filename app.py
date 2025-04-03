@@ -212,6 +212,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
                         file_name = os.path.basename(file_path)
                         backup_path = os.path.join(backup_folder, file_name)
                         if os.path.exists(backup_path):
+                            # Always overwrite the file if backup exists
                             with open(backup_path, "rb") as src, open(file_path, "wb") as dst:
                                 dst.write(src.read())
                 
@@ -220,11 +221,12 @@ class CustomHandler(SimpleHTTPRequestHandler):
                     if not os.path.exists(img_dir):
                         os.makedirs(img_dir)
                     
-                    # Copy all files from backup to img directory
+                    # Copy all files from backup to img directory, overwriting existing files
                     for file_name in os.listdir(backup_img_dir):
                         src_path = os.path.join(backup_img_dir, file_name)
                         dst_path = os.path.join(img_dir, file_name)
                         if os.path.isfile(src_path):
+                            # Always overwrite the file
                             with open(src_path, "rb") as src, open(dst_path, "wb") as dst:
                                 dst.write(src.read())
                 
