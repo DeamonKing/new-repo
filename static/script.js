@@ -819,13 +819,28 @@ async function showAvailableCocktails() {
   document.getElementById("back-button-all-cocktail").style.display = "none";
   updateButtonStyles();
 
-  const cocktails = await fetchCocktails();
+  // Fetch both cocktails and ingredients data
+  const [cocktails, ingredients] = await Promise.all([
+    fetchCocktails(),
+    fetchIngredientsData()
+  ]);
 
-  // Filter cocktails based on saved ingredients instead of selected ingredients
+  // Create a map of ingredient names to their types for quick lookup
+  const ingredientTypes = {};
+  ingredients.forEach(ing => {
+    ingredientTypes[ing.ING_Name] = ing.ING_Type;
+  });
+
+  // Filter cocktails based on saved ingredients, ignoring garnish ingredients
   const filteredCocktails = cocktails.filter((cocktail) => {
-    return cocktail.PIng.every((ingredient) =>
-      savedIngredients.includes(ingredient.ING_Name)
-    );
+    return cocktail.PIng.every((ingredient) => {
+      // If it's a garnish ingredient, don't check if it's available
+      if (ingredientTypes[ingredient.ING_Name] === "Garnish") {
+        return true;
+      }
+      // For non-garnish ingredients, check if they're available
+      return savedIngredients.includes(ingredient.ING_Name);
+    });
   });
 
   const cocktailListContainer = document.querySelector(".cocktail-list");

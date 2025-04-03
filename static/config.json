@@ -2,8 +2,8 @@
   "numberOfPipes": 10,
   "pipeConfig": {
     "Pipe 1": "Aperol",
-    "Pipe 2": "Basil",
-    "Pipe 3": "Crushed Ice",
+    "Pipe 2": "Sugar",
+    "Pipe 3": "Blackberry Liqueur",
     "Pipe 4": "Prosecco",
     "Pipe 5": "Cachaca",
     "Pipe 6": "Club Soda",
@@ -14,14 +14,14 @@
   },
   "selectedIngredients": [
     "Aperol",
-    "Basil",
-    "Crushed Ice",
     "Prosecco",
     "Cachaca",
     "Club Soda",
     "Anejo Rum",
-    "Amaretto",
     "Bitters",
-    "Agave Nectar"
+    "Agave Nectar",
+    "Amaretto",
+    "Sugar",
+    "Blackberry Liqueur"
   ]
 }
