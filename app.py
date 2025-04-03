@@ -287,6 +287,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
             product_id = data['productId']
             ingredients = data['ingredients']
             drink_type = data['drinkType']
+            is_alcoholic = data.get('isAlcoholic', True)  # Default to True if not specified
             
             # Find the appropriate serial port
             port = None
@@ -309,8 +310,12 @@ class CustomHandler(SimpleHTTPRequestHandler):
                     ser.write(f"ID:{product_id}\n".encode())
                     time.sleep(0.1)  # Small delay between writes
                     
-                    # Send drink type
+                    # Send drink type (light, medium, strong)
                     ser.write(f"TYPE:{drink_type}\n".encode())
+                    time.sleep(0.1)
+                    
+                    # Send alcoholic status
+                    ser.write(f"ALCOHOL:{1 if is_alcoholic else 0}\n".encode())
                     time.sleep(0.1)
                     
                     # Send each ingredient with its pipe number

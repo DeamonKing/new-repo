@@ -1018,6 +1018,9 @@ document.getElementById("serial-out-button").addEventListener("click", () => {
     'input[name="drink-type"]:checked'
   ).value;
 
+  // Get the alcoholic/non-alcoholic status
+  const isAlcoholic = document.getElementById("alcoholic").checked;
+
   // Get the cocktail's ingredients and their assigned pipes
   const cocktailIngredients = [];
   const cocktail = document.querySelector(".cocktail-details");
@@ -1048,6 +1051,7 @@ document.getElementById("serial-out-button").addEventListener("click", () => {
     productId: parseInt(cocktailId),
     ingredients: cocktailIngredients,
     drinkType: drinkType,
+    isAlcoholic: isAlcoholic
   };
 
   // Show loading page
@@ -1085,10 +1089,15 @@ function sendPipesToPython(assignedPipes) {
   const drinkType = document.querySelector(
     'input[name="drink-type"]:checked'
   ).value; // Get the selected drink type
+  
+  // Get the alcoholic/non-alcoholic status
+  const isAlcoholic = document.getElementById("alcoholic").checked;
+  
   const dataToSend = {
     productId: selectedCocktailID,
     ingredients: assignedPipes,
     drinkType: drinkType,
+    isAlcoholic: isAlcoholic
   };
   console.log(`assigned pipes ${JSON.stringify(dataToSend)}`);
   fetch("/send-pipes", {
