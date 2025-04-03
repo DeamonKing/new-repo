@@ -1,28 +1,34 @@
 {
-  "numberOfPipes": 5,
+  "numberOfPipes": 7,
   "pipeConfig": {
-    "Pipe 1": "Aperol",
+    "Pipe 1": "NewTestIngredient",
     "Pipe 2": "Club Soda",
-    "Pipe 3": "Cinnamon",
+    "Pipe 3": "NewTestIngredient",
     "Pipe 4": "Prosecco",
-    "Pipe 5": "Basil"
+    "Pipe 5": "Aperol",
+    "Pipe 6": "Aperol",
+    "Pipe 7": "Blue Curacao"
   },
   "selectedIngredients": [
     "Aperol",
     "Prosecco",
     "Club Soda",
     "Basil",
-    "Cinnamon"
+    "Cinnamon",
+    "NewTestIngredient",
+    "Blue Curacao"
   ],
   "pipeNotes": {
     "Pipe 1": "Motor1Pipe",
     "Pipe 2": "Motor2Pipe"
   },
   "ingredientRemarks": {
-    "Aperol": "esfa",
-    "Blackberry Liqueur": "Test 2",
+    "Aperol": "Okay this",
+    "Sugar": "Test",
+    "Club Soda": "Note",
     "Prosecco": "Test 3",
-    "Sugar": "Test"
+    "Blackberry Liqueur": "Test 2",
+    "NewTestIngredient": "NewRemark"
   },
   "theme": {
     "bgColor": "#e3d7c1",

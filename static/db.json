@@ -228,7 +228,7 @@
     "ING_Name": "Club Soda",
     "ING_Type": "Liquid",
     "ING_IMG": "",
-    "ING_Remark": ""
+    "ING_Remark": "Note"
   },
   {
     "ING_ID": "34",
@@ -733,5 +733,12 @@
     "ING_Type": "Garnish",
     "ING_IMG": "/img/upload/new_stawberry.png",
     "ING_Remark": ""
+  },
+  {
+    "ING_ID": "106",
+    "ING_Name": "NewTestIngredient",
+    "ING_Type": "garnish",
+    "ING_IMG": "/img/upload/newtestingredient.png",
+    "ING_Remark": "NewRemark"
   }
 ]

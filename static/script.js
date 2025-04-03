@@ -1342,11 +1342,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Show loading screen
     document.getElementById("loading-page").style.display = "block";
 
-    const ingredientId = document.getElementById("ingredient-id").textContent; // Get the ID from the span
+    const ingredientId = document.getElementById("ingredient-id").textContent;
     const ingredientName = document.getElementById("ingredient-name").value;
     const ingredientType = document.getElementById("ingredient-type").value;
     const ingredientImageInput = document.getElementById("ingredient-image");
-    const ingredientImage = ingredientImageInput.files[0]; // Get the selected image file
+    const ingredientImage = ingredientImageInput.files[0];
+    const ingredientRemark = document.getElementById("ingredient-remark").value; // Get remark value
 
     // Initialize an array to collect error messages
     let errorMessages = [];
@@ -1367,7 +1368,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // If there are error messages, showCustomAlert the user and return
     if (errorMessages.length > 0) {
-      showCustomAlert(errorMessages.join("\n")); // Display all error messages in an showCustomAlert
+      showCustomAlert(errorMessages.join("\n"));
       return;
     }
 
@@ -1379,7 +1380,8 @@ document.addEventListener("DOMContentLoaded", () => {
         ING_ID: ingredientId,
         ING_Name: ingredientName,
         ING_Type: ingredientType,
-        ING_IMG: reader.result, // Base64 string of the image
+        ING_IMG: reader.result,
+        ING_Remark: ingredientRemark || "" // Add remark to the ingredient object
       };
 
       // Append new ingredient to db.json
@@ -1438,17 +1440,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to reset the ingredient form fields
   function resetIngredientForm() {
-    document.getElementById("ingredient-name").value = ""; // Clear the ingredient name
-    document.getElementById("ingredient-type").value = "Liquid"; // Reset to default type
-    document.getElementById("ingredient-image").value = ""; // Clear the image input
-    document.getElementById("image-name").textContent = ""; // Clear the displayed image name
-  }
-  function resetIngredientForm() {
     enableForms(); // Enable inputs before resetting
     document.getElementById("ingredient-name").value = ""; // Clear the ingredient name
     document.getElementById("ingredient-type").value = "Liquid"; // Reset to default type
     document.getElementById("ingredient-image").value = ""; // Clear the image input
     document.getElementById("image-name").textContent = ""; // Clear the displayed image name
+    document.getElementById("ingredient-remark").value = ""; // Clear the remark field
   }
 });
 
@@ -2168,6 +2165,9 @@ function populateAssignPipeDropdowns() {
     pipeAssignContainer.appendChild(dropdownContainer);
     setupPipeDropdown(i);
   }
+      // Update UI to show notes and remarks
+      updatePipelineRemarksDisplay();
+      updateRemarksDisplay();
 }
 
 // Check if ingredient is already assigned to any pipe
@@ -2547,6 +2547,7 @@ async function saveConfig(numberOfPipes, selectedIngredients) {
       // Update available cocktails after successful save
       showAvailableCocktails();
     }
+    loadConfig();
   } catch (error) {
     console.error("Error saving configuration:", error);
     showCustomAlert("Failed to save configuration");
