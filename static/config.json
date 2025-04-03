@@ -23,5 +23,10 @@
     "Amaretto",
     "Sugar",
     "Blackberry Liqueur"
-  ]
+  ],
+  "pipeNotes": {
+    "Pipe 1": "Motor1Pipe",
+    "Pipe 2": "Motor2Pipe"
+  },
+  "ingredientRemarks": {}
 }

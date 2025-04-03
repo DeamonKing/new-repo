@@ -157,7 +157,7 @@ async function saveIngredientRemarks() {
       updatedIngredients.push(ingredient);
     });
 
-    // Save the updated ingredients back to db.json
+    // Save the updated ingredients back to db.json through the server
     const saveResponse = await fetch("/updateIngredients", {
       method: "POST",
       headers: {
@@ -179,10 +179,11 @@ async function saveIngredientRemarks() {
       // Update the pipeline remarks display
       updatePipelineRemarksDisplay();
     } else {
-      showCustomAlert("Failed to save remarks. Please try again.");
+      const errorText = await saveResponse.text();
+      showCustomAlert("Failed to save remarks. Server response: " + errorText);
     }
   } catch (error) {
-    console.error("Error saving remarks to db.json:", error);
+    console.error("Error saving remarks:", error);
     showCustomAlert("An error occurred while saving remarks: " + error.message);
   }
 }
@@ -258,7 +259,6 @@ function updatePipelineRemarksDisplay() {
 
 // Call this function whenever pipe assignments change
 function setupPipeDropdown(pipeNumber) {
-  // ... existing setup code ...
 
   // Modify the option selection handler to update remarks display
   optionsContainer.addEventListener("click", (e) => {
@@ -285,7 +285,6 @@ function setupPipeDropdown(pipeNumber) {
     }
   });
 
-  // ... rest of the existing code ...
 }
 
 // Global object to store notes for individual pipelines
@@ -1767,6 +1766,11 @@ async function wshowCocktailDetails(cocktail) {
     "cocktail-ingredients-container"
   );
   const cocktailHtm = document.getElementById("htm");
+  const showRemarkDiv = document.querySelector(".show-remark p");
+  const showRemarkSection = document.querySelector(".show-remark");
+
+  // Hide the remark section initially
+  showRemarkSection.style.display = "none";
 
   cocktailImage.src = cocktail.PImage; // Set the image source
   cocktailID.textContent = cocktail.PID;
@@ -1791,9 +1795,16 @@ async function wshowCocktailDetails(cocktail) {
     ingredientItem.innerHTML = `
       <label class="btn-checkbox">
         <img src="img/ing2.gif" alt="Ingredient - ${ingredient.ING_Name}" />
-        <p class="${className}">${ingredient.ING_Name}</p> <!-- Add class here -->
+        <p class="${className}">${ingredient.ING_Name}</p>
       </label>
     `;
+
+    // Add click handler to show remark
+    ingredientItem.addEventListener("click", () => {
+      const remark = ingredientRemarks[ingredient.ING_Name] || "No remark available";
+      showRemarkDiv.innerHTML = `<span>Remark for ${ingredient.ING_Name}: </span>${remark}`;
+      showRemarkSection.style.display = "block"; // Show the remark section when an ingredient is clicked
+    });
 
     cocktailIngredientsContainer.appendChild(ingredientItem);
   });
@@ -2441,6 +2452,8 @@ async function saveConfig(numberOfPipes, selectedIngredients) {
     numberOfPipes: numberOfPipes,
     pipeConfig: currentPipeAssignments,
     selectedIngredients: savedIngredients,
+    pipeNotes: pipelineNotes, // Add pipe notes to config
+    ingredientRemarks: ingredientRemarks // Add ingredient remarks to config
   };
 
   try {
@@ -2462,6 +2475,7 @@ async function saveConfig(numberOfPipes, selectedIngredients) {
     showCustomAlert("Failed to save configuration");
   }
 }
+
 async function loadConfig() {
   try {
     const response = await fetch("config.json");
@@ -2475,6 +2489,10 @@ async function loadConfig() {
     // Load pipe assignments
     currentPipeAssignments = configData.pipeConfig || {};
 
+    // Load pipe notes and ingredient remarks
+    pipelineNotes = configData.pipeNotes || {};
+    ingredientRemarks = configData.ingredientRemarks || {};
+
     await fetchIngredients();
     updateSelectedCount();
 
@@ -2482,6 +2500,10 @@ async function loadConfig() {
     if (configData.pipeConfig) {
       populateAssignPipeDropdowns();
     }
+
+    // Update UI to show notes and remarks
+    updatePipelineRemarksDisplay();
+    updateRemarksDisplay();
 
     console.log(
       `Loaded ${numberOfPipes} pipes and saved ingredients:`,

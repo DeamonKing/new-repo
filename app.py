@@ -148,9 +148,13 @@ class CustomHandler(SimpleHTTPRequestHandler):
         elif self.path == "/save-config":
             self.save_config(post_data)
 
+        elif self.path == "/updateIngredients":
+            self.update_ingredients(post_data)
+
         else:
             self.send_response(404)
             self.end_headers()
+            self.wfile.write(b"Not Found")
 
     def execute_shell_script(self, script_name):
         # Run scripts from the same directory as the Python script
@@ -331,6 +335,24 @@ class CustomHandler(SimpleHTTPRequestHandler):
             self.send_response(500)
             self.end_headers()
             self.wfile.write(f"Error: {str(e)}".encode())
+
+    def update_ingredients(self, post_data):
+        try:
+            # Parse the updated ingredients data
+            updated_ingredients = json.loads(post_data)
+            
+            # Write the updated data back to db.json
+            with open(os.path.join(web_dir, "db.json"), "w") as file:
+                json.dump(updated_ingredients, file, indent=2)
+            
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"Ingredients updated successfully")
+        except Exception as e:
+            print(f"Error updating ingredients: {e}")
+            self.send_response(500)
+            self.end_headers()
+            self.wfile.write(f"Error updating ingredients: {str(e)}".encode())
 
 
 def start_http_server():
