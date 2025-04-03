@@ -2670,3 +2670,130 @@ function toggleCheckbox(clickedCheckbox) {
       }
     });
 }
+
+// Add event listener for the update button
+document.getElementById("update").addEventListener("click", async function() {
+  try {
+    // Show a loading popup
+    showPopup("Checking for updates...", false);
+    
+    // Check for updates
+    const response = await fetch("/check-updates", {
+      method: "GET"
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      
+      if (data.hasUpdates) {
+        // Show update available popup with pull button
+        showUpdatePopup(data.message);
+      } else {
+        // Show no updates available popup
+        showPopup("No updates available. You are using the latest version.", true);
+      }
+    } else {
+      showPopup("Error checking for updates. Please try again later.", true);
+    }
+  } catch (error) {
+    console.error("Error checking for updates:", error);
+    showPopup("Error checking for updates. Please try again later.", true);
+  }
+});
+
+// Function to show update popup with pull button
+function showUpdatePopup(message) {
+  // Create popup container
+  const popupContainer = document.createElement("div");
+  popupContainer.className = "popup-container";
+  
+  // Create popup content
+  const popupContent = document.createElement("div");
+  popupContent.className = "popup-content";
+  
+  // Create message element
+  const messageElement = document.createElement("p");
+  messageElement.textContent = message;
+  
+  // Create button container
+  const buttonContainer = document.createElement("div");
+  buttonContainer.className = "popup-buttons";
+  
+  // Create pull button
+  const pullButton = document.createElement("button");
+  pullButton.className = "modern-button btn";
+  pullButton.textContent = "Pull Updates";
+  pullButton.addEventListener("click", async () => {
+    try {
+      // Show loading popup
+      showPopup("Updating... This may take a moment.", false);
+      
+      // Call the update endpoint
+      const response = await fetch("/pull-updates", {
+        method: "POST"
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        showPopup("Update successful! The application will restart.", true);
+        
+        // Wait a moment before reloading the page
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        showPopup("Error updating. Please try again later.", true);
+      }
+    } catch (error) {
+      console.error("Error updating:", error);
+      showPopup("Error updating. Please try again later.", true);
+    }
+  });
+  
+  // Create cancel button
+  const cancelButton = document.createElement("button");
+  cancelButton.className = "modern-button btn cancel";
+  cancelButton.textContent = "Cancel";
+  cancelButton.addEventListener("click", () => {
+    document.body.removeChild(popupContainer);
+  });
+  
+  // Assemble the popup
+  buttonContainer.appendChild(pullButton);
+  buttonContainer.appendChild(cancelButton);
+  popupContent.appendChild(messageElement);
+  popupContent.appendChild(buttonContainer);
+  popupContainer.appendChild(popupContent);
+  document.body.appendChild(popupContainer);
+}
+
+// Update popup functionality
+function showPopup(message, isError = false) {
+    const popup = document.getElementById('updatePopup');
+    const content = document.getElementById('updatePopupContent');
+    
+    // Set the message and style
+    content.innerHTML = `<p style="color: ${isError ? '#ff4444' : '#359267'}; font-size: 18px;">${message}</p>`;
+    
+    // Show the popup
+    popup.style.display = 'flex';
+    
+    // If it's not an error message, automatically hide after 3 seconds
+    if (!isError) {
+        setTimeout(() => {
+            popup.style.display = 'none';
+        }, 3000);
+    }
+}
+
+// Close popup when clicking the close button
+document.getElementById('closeUpdatePopup').addEventListener('click', () => {
+    document.getElementById('updatePopup').style.display = 'none';
+});
+
+// Close popup when clicking outside
+document.getElementById('updatePopup').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('updatePopup')) {
+        document.getElementById('updatePopup').style.display = 'none';
+    }
+});

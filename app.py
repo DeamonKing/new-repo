@@ -65,6 +65,63 @@ class CustomHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(content)
             return
+            
+        # Check for updates endpoint
+        elif self.path == "/check-updates":
+            try:
+                # Run git fetch to check for updates
+                result = subprocess.run(
+                    ["git", "fetch", "origin"],
+                    cwd=base_dir,
+                    capture_output=True,
+                    text=True
+                )
+                
+                # Check if there are updates available
+                result = subprocess.run(
+                    ["git", "rev-list", "HEAD...origin/main", "--count"],
+                    cwd=base_dir,
+                    capture_output=True,
+                    text=True
+                )
+                
+                commit_count = int(result.stdout.strip())
+                
+                if commit_count > 0:
+                    # Get the latest commit message
+                    result = subprocess.run(
+                        ["git", "log", "-1", "origin/main", "--pretty=format:%s"],
+                        cwd=base_dir,
+                        capture_output=True,
+                        text=True
+                    )
+                    
+                    commit_message = result.stdout.strip()
+                    
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    self.wfile.write(json.dumps({
+                        "hasUpdates": True,
+                        "message": f"New updates available ({commit_count} commits). Latest: {commit_message}"
+                    }).encode())
+                else:
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    self.wfile.write(json.dumps({
+                        "hasUpdates": False,
+                        "message": "No updates available"
+                    }).encode())
+            except Exception as e:
+                print(f"Error checking for updates: {e}")
+                self.send_response(500)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({
+                    "error": str(e)
+                }).encode())
+            return
 
         # Use default GET behavior with the updated `translate_path` for other paths
         super().do_GET()
@@ -99,6 +156,99 @@ class CustomHandler(SimpleHTTPRequestHandler):
             
             # Force exit all processes
             os._exit(0)
+            return
+            
+        elif self.path == "/pull-updates":
+            try:
+                # Create backup directory outside the git repository
+                # Use the user's home directory for backups
+                home_dir = "C:\\Users\\" + os.getenv('USERNAME') if platform.system() == "Windows" else os.path.expanduser("~")
+                backup_dir = os.path.join(home_dir, "cocktail_app_backup")
+                if not os.path.exists(backup_dir):
+                    os.makedirs(backup_dir)
+                
+                # Create a timestamped backup folder to avoid conflicts
+                timestamp = time.strftime("%Y%m%d_%H%M%S")
+                backup_folder = os.path.join(backup_dir, f"backup_{timestamp}")
+                os.makedirs(backup_folder)
+                
+                # Backup important files
+                files_to_backup = [
+                    os.path.join(web_dir, "config.json"),
+                    os.path.join(web_dir, "db.json"),
+                    os.path.join(web_dir, "products.json")
+                ]
+                
+                # Backup each file
+                for file_path in files_to_backup:
+                    if os.path.exists(file_path):
+                        file_name = os.path.basename(file_path)
+                        backup_path = os.path.join(backup_folder, file_name)
+                        with open(file_path, "rb") as src, open(backup_path, "wb") as dst:
+                            dst.write(src.read())
+                
+                # Backup img folder
+                img_dir = os.path.join(web_dir, "img")
+                backup_img_dir = os.path.join(backup_folder, "img")
+                if os.path.exists(img_dir):
+                    if not os.path.exists(backup_img_dir):
+                        os.makedirs(backup_img_dir)
+                    
+                    # Copy all files from img directory to backup
+                    for file_name in os.listdir(img_dir):
+                        src_path = os.path.join(img_dir, file_name)
+                        dst_path = os.path.join(backup_img_dir, file_name)
+                        if os.path.isfile(src_path):
+                            with open(src_path, "rb") as src, open(dst_path, "wb") as dst:
+                                dst.write(src.read())
+                
+                # Reset git and pull latest changes
+                subprocess.run(["git", "reset", "--hard"], cwd=base_dir, check=True)
+                subprocess.run(["git", "pull", "origin", "main"], cwd=base_dir, check=True)
+                
+                # Restore backed up files
+                for file_path in files_to_backup:
+                    if os.path.exists(file_path):
+                        file_name = os.path.basename(file_path)
+                        backup_path = os.path.join(backup_folder, file_name)
+                        if os.path.exists(backup_path):
+                            with open(backup_path, "rb") as src, open(file_path, "wb") as dst:
+                                dst.write(src.read())
+                
+                # Restore img folder
+                if os.path.exists(backup_img_dir):
+                    if not os.path.exists(img_dir):
+                        os.makedirs(img_dir)
+                    
+                    # Copy all files from backup to img directory
+                    for file_name in os.listdir(backup_img_dir):
+                        src_path = os.path.join(backup_img_dir, file_name)
+                        dst_path = os.path.join(img_dir, file_name)
+                        if os.path.isfile(src_path):
+                            with open(src_path, "rb") as src, open(dst_path, "wb") as dst:
+                                dst.write(src.read())
+                
+                # Send success response
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({
+                    "success": True,
+                    "message": "Update successful",
+                    "backup_location": backup_folder
+                }).encode())
+                
+                # Restart the application
+                threading.Thread(target=self.restart_application).start()
+                
+            except Exception as e:
+                print(f"Error pulling updates: {e}")
+                self.send_response(500)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({
+                    "error": str(e)
+                }).encode())
             return
 
         content_length = int(self.headers["Content-Length"])
@@ -358,6 +508,25 @@ class CustomHandler(SimpleHTTPRequestHandler):
             self.send_response(500)
             self.end_headers()
             self.wfile.write(f"Error updating ingredients: {str(e)}".encode())
+
+    def restart_application(self):
+        """Restart the application after a short delay."""
+        time.sleep(2)  # Give time for the response to be sent
+        
+        # Kill the current process
+        if platform.system() == "Windows":
+            subprocess.run(["taskkill", "/F", "/IM", "python.exe"], capture_output=True)
+        else:
+            subprocess.run(["pkill", "-f", "python"], capture_output=True)
+        
+        # Start a new instance of the application
+        if platform.system() == "Windows":
+            subprocess.Popen(["python", os.path.join(base_dir, "app.py")])
+        else:
+            subprocess.Popen(["python3", os.path.join(base_dir, "app.py")])
+        
+        # Exit the current process
+        os._exit(0)
 
 
 def start_http_server():
