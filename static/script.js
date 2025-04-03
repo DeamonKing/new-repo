@@ -2183,6 +2183,9 @@ function setupPipeDropdown(pipeNumber) {
   // Show options on focus
   searchInput.addEventListener("focus", () => {
     optionsContainer.style.display = "block";
+    // Immediately update remarks displays after selection
+    updatePipelineRemarksDisplay();
+    updateRemarksDisplay();
   });
 
   // Handle search
@@ -2258,7 +2261,14 @@ function setupPipeDropdown(pipeNumber) {
       }
 
       populateAssignPipeDropdowns();
+      
+      // Immediately update remarks displays after selection
+      updatePipelineRemarksDisplay();
+      updateRemarksDisplay();
     }
+    // Immediately update remarks displays after selection
+    updatePipelineRemarksDisplay();
+    updateRemarksDisplay();
   });
 
   // Close options when clicking outside
@@ -2281,6 +2291,9 @@ function setupPipeDropdown(pipeNumber) {
 
   // Add the note button after setting up the dropdown
   addNoteButtonToPipeDropdown(pipeNumber);
+  // Immediately update remarks displays after selection
+  updatePipelineRemarksDisplay();
+  updateRemarksDisplay();
 }
 
 // Add event listeners for the note popup

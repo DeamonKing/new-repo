@@ -1,11 +1,11 @@
 {
   "numberOfPipes": 7,
   "pipeConfig": {
-    "Pipe 1": "NewTestIngredient",
+    "Pipe 1": "Basil",
     "Pipe 2": "Club Soda",
     "Pipe 3": "NewTestIngredient",
     "Pipe 4": "Prosecco",
-    "Pipe 5": "Aperol",
+    "Pipe 5": "Cinnamon",
     "Pipe 6": "Aperol",
     "Pipe 7": "Blue Curacao"
   },
