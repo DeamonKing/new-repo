@@ -1,42 +1,37 @@
 {
-  "numberOfPipes": 10,
+  "numberOfPipes": 5,
   "pipeConfig": {
     "Pipe 1": "Aperol",
-    "Pipe 2": "Sugar",
-    "Pipe 3": "Blackberry Liqueur",
+    "Pipe 2": "Club Soda",
+    "Pipe 3": "Cinnamon",
     "Pipe 4": "Prosecco",
-    "Pipe 5": "Cachaca",
-    "Pipe 6": "Club Soda",
-    "Pipe 7": "Amaretto",
-    "Pipe 8": "Anejo Rum",
-    "Pipe 9": "Bitters",
-    "Pipe 10": "Agave Nectar"
+    "Pipe 5": "Basil"
   },
   "selectedIngredients": [
     "Aperol",
     "Prosecco",
-    "Cachaca",
     "Club Soda",
-    "Anejo Rum",
-    "Bitters",
-    "Agave Nectar",
-    "Amaretto",
-    "Sugar",
-    "Blackberry Liqueur"
+    "Basil",
+    "Cinnamon"
   ],
   "pipeNotes": {
     "Pipe 1": "Motor1Pipe",
     "Pipe 2": "Motor2Pipe"
   },
-  "ingredientRemarks": {},
+  "ingredientRemarks": {
+    "Aperol": "esfa",
+    "Blackberry Liqueur": "Test 2",
+    "Prosecco": "Test 3",
+    "Sugar": "Test"
+  },
   "theme": {
-    "bgColor": "#000000",
-    "color1": "#6be6fc",
-    "color2": "#ff6d97",
-    "btnBackgroundColor": "#b95b5b",
-    "btnHoverBackgroundColor": "#7a2929",
+    "bgColor": "#e3d7c1",
+    "color1": "#ffc559",
+    "color2": "#ff8030",
+    "btnBackgroundColor": "#3d3229",
+    "btnHoverBackgroundColor": "#000000",
     "btnTextColor": "#ffffff",
     "btnHoverTextColor": "#ffffff",
-    "angle": 40.62020650468452
+    "angle": 135
   }
 }

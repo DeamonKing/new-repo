@@ -193,7 +193,7 @@
     "ING_Name": "Sugar",
     "ING_Type": "Liquid",
     "ING_IMG": "",
-    "ING_Remark": ""
+    "ING_Remark": "Test"
   },
   {
     "ING_ID": "29",
@@ -459,7 +459,7 @@
     "ING_Name": "Prosecco",
     "ING_Type": "Liquor",
     "ING_IMG": "",
-    "ING_Remark": ""
+    "ING_Remark": "Test 3"
   },
   {
     "ING_ID": "67",
@@ -487,7 +487,7 @@
     "ING_Name": "Blackberry Liqueur",
     "ING_Type": "Liquor",
     "ING_IMG": "",
-    "ING_Remark": ""
+    "ING_Remark": "Test 2"
   },
   {
     "ING_ID": "71",
