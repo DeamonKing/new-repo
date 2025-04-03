@@ -322,19 +322,26 @@ function addNoteButtonToPipeDropdown(pipeNumber) {
 
 // Function to show the note popup for a specific pipe
 function showNotePopup(pipeNumber) {
-  const pipeName = `Pipe ${pipeNumber}`;
-  const ingredientName = currentPipeAssignments[pipeName] || "";
+  // Get the current pipe assignments from config.json
+  fetch('/config.json')
+    .then(response => response.json())
+    .then(config => {
+      const ingredientName = config.pipeConfig[`Pipe ${pipeNumber}`];
+      if (!ingredientName) return;
 
-  // Set the current pipe name in the popup
-  document.getElementById("currentPipeName").textContent =
-    pipeName + (ingredientName ? ` - ${ingredientName}` : "");
-
-  // Set existing note if available
-  const noteTextarea = document.getElementById("pipeNoteTextarea");
-  noteTextarea.value = pipelineNotes[pipeName] || "";
-
-  // Show the popup
-  document.getElementById("notePopup").style.display = "flex";
+      // Get the current remark from db.json
+      return fetch('/db.json')
+        .then(response => response.json())
+        .then(ingredients => {
+          const ingredient = ingredients.find(ing => ing.ING_Name === ingredientName);
+          const currentRemark = ingredient ? ingredient.ING_Remark : '';
+          
+          document.getElementById('currentPipeName').textContent = `Pipe ${pipeNumber}`;
+          document.getElementById('pipeNoteTextarea').value = currentRemark;
+          document.getElementById('notePopup').style.display = 'block';
+        });
+    })
+    .catch(error => console.error('Error loading config:', error));
 }
 
 // Function to hide the note popup
@@ -344,48 +351,47 @@ function hideNotePopup() {
 
 // Function to save the note for a specific pipe
 function savePipelineNote() {
-  const pipeName = document
-    .getElementById("currentPipeName")
-    .textContent.split(" - ")[0];
-  const noteText = document.getElementById("pipeNoteTextarea").value.trim();
+  const pipeNumber = document.getElementById('currentPipeName').textContent.split(' ')[1];
+  
+  // Get the current pipe assignments from config.json
+  fetch('/config.json')
+    .then(response => response.json())
+    .then(config => {
+      const ingredientName = config.pipeConfig[`Pipe ${pipeNumber}`];
+      if (!ingredientName) return;
 
-  if (noteText) {
-    pipelineNotes[pipeName] = noteText;
+      const newRemark = document.getElementById('pipeNoteTextarea').value;
 
-    // Add a note indicator to the pipe container
-    const pipeNumber = parseInt(pipeName.split(" ")[1]);
-    const pipeContainer = document.getElementById(`pipeContainer${pipeNumber}`);
+      // Load current db.json
+      return fetch('/db.json')
+        .then(response => response.json())
+        .then(ingredients => {
+          // Update the remark for the ingredient
+          const updatedIngredients = ingredients.map(ing => {
+            if (ing.ING_Name === ingredientName) {
+              return { ...ing, ING_Remark: newRemark };
+            }
+            return ing;
+          });
 
-    if (pipeContainer) {
-      // Add or update note indicator
-      let noteIndicator = pipeContainer.querySelector(".note-indicator");
-      if (!noteIndicator) {
-        noteIndicator = document.createElement("div");
-        noteIndicator.className = "note-indicator";
-        pipeContainer.appendChild(noteIndicator);
+          // Save back to db.json
+          return fetch('/updateIngredients', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedIngredients)
+          });
+        });
+    })
+    .then(response => {
+      if (response.ok) {
+        hideNotePopup();
+        // Reload the page to show updated remarks
+        loadConfig();
       }
-      noteIndicator.title = noteText;
-    }
-  } else {
-    // Remove note if empty
-    delete pipelineNotes[pipeName];
-
-    // Remove note indicator if exists
-    const pipeNumber = parseInt(pipeName.split(" ")[1]);
-    const pipeContainer = document.getElementById(`pipeContainer${pipeNumber}`);
-    if (pipeContainer) {
-      const noteIndicator = pipeContainer.querySelector(".note-indicator");
-      if (noteIndicator) {
-        pipeContainer.removeChild(noteIndicator);
-      }
-    }
-  }
-
-  // Hide the popup
-  hideNotePopup();
-
-  // Show confirmation message
-  showCustomAlert("Note saved successfully!");
+    })
+    .catch(error => console.error('Error saving remark:', error));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -2320,27 +2326,46 @@ const originalLoadConfig = loadConfig;
 loadConfig = async function () {
   await originalLoadConfig();
 
-  // Load pipeline notes from localStorage
-  const savedNotes = localStorage.getItem("pipelineNotes");
-  if (savedNotes) {
-    pipelineNotes = JSON.parse(savedNotes);
+  // Load remarks from db.json and config.json
+  try {
+    const [dbResponse, configResponse] = await Promise.all([
+      fetch('/db.json'),
+      fetch('/config.json')
+    ]);
+    
+    const ingredients = await dbResponse.json();
+    const config = await configResponse.json();
+    
+    // Create a map of ingredient names to their remarks
+    const ingredientRemarks = {};
+    ingredients.forEach(ingredient => {
+      if (ingredient.ING_Remark) {
+        ingredientRemarks[ingredient.ING_Name] = ingredient.ING_Remark;
+      }
+    });
 
-    // Add note indicators to pipes with notes
-    for (const pipeName in pipelineNotes) {
+    // Add remark indicators to pipes with remarks
+    for (const pipeName in config.pipeConfig) {
       const pipeNumber = parseInt(pipeName.split(" ")[1]);
-      addNoteButtonToPipeDropdown(pipeNumber);
+      const ingredientName = config.pipeConfig[pipeName];
+      
+      if (ingredientRemarks[ingredientName]) {
+        addNoteButtonToPipeDropdown(pipeNumber);
 
-      // Add note indicator
-      const pipeContainer = document.getElementById(
-        `pipeContainer${pipeNumber}`
-      );
-      if (pipeContainer) {
-        const noteIndicator = document.createElement("div");
-        noteIndicator.className = "note-indicator";
-        noteIndicator.title = pipelineNotes[pipeName];
-        pipeContainer.appendChild(noteIndicator);
+        // Add remark indicator
+        const pipeContainer = document.getElementById(
+          `pipeContainer${pipeNumber}`
+        );
+        if (pipeContainer) {
+          const noteIndicator = document.createElement("div");
+          noteIndicator.className = "note-indicator";
+          noteIndicator.title = ingredientRemarks[ingredientName];
+          pipeContainer.appendChild(noteIndicator);
+        }
       }
     }
+  } catch (error) {
+    console.error('Error loading remarks:', error);
   }
 };
 
