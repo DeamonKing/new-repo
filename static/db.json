@@ -81,7 +81,7 @@
     "ING_Name": "Aperol",
     "ING_Type": "Liquor",
     "ING_IMG": "",
-    "ING_Remark": "Okay this"
+    "ING_Remark": "Test1"
   },
   {
     "ING_ID": "13",
@@ -228,7 +228,7 @@
     "ING_Name": "Club Soda",
     "ING_Type": "Liquid",
     "ING_IMG": "",
-    "ING_Remark": "Note"
+    "ING_Remark": ""
   },
   {
     "ING_ID": "34",
@@ -312,7 +312,7 @@
     "ING_Name": "Agave Nectar",
     "ING_Type": "Liquid",
     "ING_IMG": "",
-    "ING_Remark": ""
+    "ING_Remark": "Test3"
   },
   {
     "ING_ID": "46",
@@ -473,14 +473,14 @@
     "ING_Name": "Absinthe",
     "ING_Type": "Liquor",
     "ING_IMG": "",
-    "ING_Remark": ""
+    "ING_Remark": "Test2"
   },
   {
     "ING_ID": "69",
     "ING_Name": "Anejo Rum",
     "ING_Type": "Liquor",
     "ING_IMG": "",
-    "ING_Remark": ""
+    "ING_Remark": "Test5"
   },
   {
     "ING_ID": "70",
@@ -733,12 +733,5 @@
     "ING_Type": "Garnish",
     "ING_IMG": "/img/upload/new_stawberry.png",
     "ING_Remark": ""
-  },
-  {
-    "ING_ID": "106",
-    "ING_Name": "NewTestIngredient",
-    "ING_Type": "garnish",
-    "ING_IMG": "/img/upload/newtestingredient.png",
-    "ING_Remark": "NewRemark"
   }
 ]

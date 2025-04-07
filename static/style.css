@@ -2181,7 +2181,7 @@ select,
   grid-gap: 25px;
   align-items: center;
   margin: 0px;
-  min-height: 550px;
+  /* min-height: 550px; */
 }
 .remark-popup .ingredient-remark-item {
   margin: 0px;
@@ -2227,6 +2227,11 @@ select,
 }
 
 /* Note Popup Styles */
+.note-popup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .note-popup .popup-contentx2 {
   max-width: 500px;
   width: 90%;
@@ -2329,4 +2334,7 @@ select,
 
 .popup-buttons button.cancel:hover {
   background-color: #e0e0e0;
+}
+.add-cocktail .ing-item .remark-text {
+  display: none;
 }

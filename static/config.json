@@ -1,39 +1,33 @@
 {
-  "numberOfPipes": 7,
+  "numberOfPipes": 5,
   "pipeConfig": {
-    "Pipe 1": "Basil",
-    "Pipe 2": "Club Soda",
-    "Pipe 3": "NewTestIngredient",
-    "Pipe 4": "Prosecco",
-    "Pipe 5": "Cinnamon",
-    "Pipe 6": "Aperol",
-    "Pipe 7": "Blue Curacao"
+    "Pipe 1": "Aperol",
+    "Pipe 2": "Absinthe",
+    "Pipe 3": "Agave Nectar",
+    "Pipe 4": "Amaretto",
+    "Pipe 5": "Anejo Rum"
   },
   "selectedIngredients": [
-    "Aperol",
-    "Prosecco",
-    "Club Soda",
-    "Basil",
-    "Cinnamon",
-    "NewTestIngredient",
-    "Blue Curacao"
+    "Absinthe",
+    "Agave Nectar",
+    "Amaretto",
+    "Anejo Rum",
+    "Aperol"
   ],
   "pipeNotes": {
     "Pipe 1": "Motor1Pipe",
     "Pipe 2": "Motor2Pipe"
   },
   "ingredientRemarks": {
-    "Aperol": "Okay this",
+    "Aperol": "esfa",
     "Sugar": "Test",
-    "Club Soda": "Note",
     "Prosecco": "Test 3",
-    "Blackberry Liqueur": "Test 2",
-    "NewTestIngredient": "NewRemark"
+    "Blackberry Liqueur": "Test 2"
   },
   "theme": {
     "bgColor": "#e3d7c1",
-    "color1": "#ffc559",
-    "color2": "#ff8030",
+    "color1": "#9eb395",
+    "color2": "#e3d7c1",
     "btnBackgroundColor": "#3d3229",
     "btnHoverBackgroundColor": "#000000",
     "btnTextColor": "#ffffff",
