@@ -2362,3 +2362,7 @@ select,
 .add-cocktail .ing-item .remark-text {
   display: none;
 }
+.remark-popup .remark-container .footer-btn {
+  width: max-content;
+  padding: 0px 25px 25px 0px;
+}
