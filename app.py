@@ -162,7 +162,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
             try:
                 # Create backup directory outside the git repository
                 # Use the user's home directory for backups
-                home_dir = "C:\\Users\\" + os.getenv('USERNAME') if platform.system() == "Windows" else os.path.expanduser("~")
+                home_dir = os.path.join("C:\\Users", os.getenv('USERNAME', 'default')) if platform.system() == "Windows" else os.path.expanduser("~")
                 backup_dir = os.path.join(home_dir, "cocktail_app_backup")
                 if not os.path.exists(backup_dir):
                     os.makedirs(backup_dir)
