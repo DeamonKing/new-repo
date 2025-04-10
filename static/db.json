@@ -726,12 +726,5 @@
     "ING_Type": "Garnish",
     "ING_IMG": "",
     "ING_Remark": ""
-  },
-  {
-    "ING_ID": "105",
-    "ING_Name": "New Stawberry",
-    "ING_Type": "Garnish",
-    "ING_IMG": "/img/upload/new_stawberry.png",
-    "ING_Remark": ""
   }
 ]

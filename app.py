@@ -37,8 +37,8 @@ def upload_firebase_file(local_path, remote_path):
     except Exception as e:
         print(f"Error uploading {local_path}: {e}")
 
-def sync_firebase_data():
-    """Sync data between local files and Firebase Storage using parallel downloads"""
+def download_firebase_data():
+    """Download data from Firebase Storage to local path"""
     # Create necessary directories if they don't exist
     os.makedirs(os.path.join(web_dir, "img"), exist_ok=True)
     os.makedirs(os.path.join(web_dir, "img", "upload"), exist_ok=True)
@@ -46,86 +46,37 @@ def sync_firebase_data():
     # List to store all threads
     threads = []
     
-    # Sync JSON files
+    # Download JSON files
     json_files = {
         "data/db.json": os.path.join(web_dir, "db.json"),
         "data/config.json": os.path.join(web_dir, "config.json"),
         "data/products.json": os.path.join(web_dir, "products.json")
     }
     
-    def sync_json_file(remote_path, local_path):
+    def download_json_file(remote_path, local_path):
         try:
             # Get remote blob
             blob = bucket.blob(remote_path)
             if not blob.exists():
-                # If remote doesn't exist and local does, upload local
-                if os.path.exists(local_path):
-                    upload_firebase_file(local_path, remote_path)
-                    print(f"Uploaded new {local_path} to {remote_path}")
+                print(f"Remote file {remote_path} does not exist")
                 return
                 
-            # Get remote metadata
-            blob.reload()
-            remote_updated = blob.updated
-            
-            # Check if local file exists
-            if os.path.exists(local_path):
-                local_updated = os.path.getmtime(local_path)
-                
-                # If local is newer, upload to Firebase
-                if remote_updated is None or local_updated > remote_updated.timestamp():
-                    upload_firebase_file(local_path, remote_path)
-                    print(f"Uploaded updated {local_path} to {remote_path}")
-                # If remote is newer, download from Firebase
-                elif remote_updated.timestamp() > local_updated:
-                    blob.download_to_filename(local_path)
-                    print(f"Downloaded updated {remote_path} to {local_path}")
-                else:
-                    print(f"No changes in {remote_path}, skipping sync")
-            else:
-                # If local doesn't exist, download from Firebase
-                blob.download_to_filename(local_path)
-                print(f"Downloaded {remote_path} to {local_path}")
+            # Download the file
+            blob.download_to_filename(local_path)
+            print(f"Downloaded {remote_path} to {local_path}")
                 
         except Exception as e:
-            print(f"Error syncing {remote_path}: {e}")
+            print(f"Error downloading {remote_path}: {e}")
     
     # Create threads for JSON files
     for remote_path, local_path in json_files.items():
-        thread = threading.Thread(target=sync_json_file, args=(remote_path, local_path))
+        thread = threading.Thread(target=download_json_file, args=(remote_path, local_path))
         threads.append(thread)
         thread.start()
     
-    # Sync images
+    # Download images
     try:
-        # First, check local images and upload new/changed ones
-        for root, _, files in os.walk(os.path.join(web_dir, "img")):
-            for file in files:
-                if file.endswith(('.png', '.jpg', '.jpeg', '.gif')):
-                    local_path = os.path.join(root, file)
-                    remote_path = os.path.relpath(local_path, web_dir).replace('\\', '/')
-                    
-                    def sync_image(local_path, remote_path):
-                        try:
-                            blob = bucket.blob(remote_path)
-                            if not blob.exists():
-                                upload_firebase_file(local_path, remote_path)
-                                print(f"Uploaded new image {remote_path}")
-                                return
-                                
-                            blob.reload()
-                            local_updated = os.path.getmtime(local_path)
-                            if blob.updated is None or local_updated > blob.updated.timestamp():
-                                upload_firebase_file(local_path, remote_path)
-                                print(f"Uploaded updated image {remote_path}")
-                        except Exception as e:
-                            print(f"Error syncing image {remote_path}: {e}")
-                    
-                    thread = threading.Thread(target=sync_image, args=(local_path, remote_path))
-                    threads.append(thread)
-                    thread.start()
-        
-        # Then, check for remote images that need to be downloaded
+        # Check for remote images that need to be downloaded
         blobs = bucket.list_blobs(prefix="img/")
         for blob in blobs:
             if not blob.name.endswith('/'):  # Skip directories
@@ -133,17 +84,9 @@ def sync_firebase_data():
                 
                 def download_image(blob, local_path):
                     try:
-                        if os.path.exists(local_path):
-                            local_updated = os.path.getmtime(local_path)
-                            blob.reload()
-                            if blob.updated is not None and blob.updated.timestamp() > local_updated:
-                                os.makedirs(os.path.dirname(local_path), exist_ok=True)
-                                blob.download_to_filename(local_path)
-                                print(f"Downloaded updated image {blob.name}")
-                        else:
-                            os.makedirs(os.path.dirname(local_path), exist_ok=True)
-                            blob.download_to_filename(local_path)
-                            print(f"Downloaded new image {blob.name}")
+                        os.makedirs(os.path.dirname(local_path), exist_ok=True)
+                        blob.download_to_filename(local_path)
+                        print(f"Downloaded image {blob.name}")
                     except Exception as e:
                         print(f"Error downloading image {blob.name}: {e}")
                 
@@ -152,11 +95,72 @@ def sync_firebase_data():
                 thread.start()
                     
     except Exception as e:
-        print(f"Error in image sync process: {e}")
+        print(f"Error in image download process: {e}")
     
     # Wait for all threads to complete
     for thread in threads:
         thread.join()
+
+def upload_firebase_data():
+    """Upload local data to Firebase Storage"""
+    # List to store all threads
+    threads = []
+    
+    # Upload JSON files
+    json_files = {
+        "data/db.json": os.path.join(web_dir, "db.json"),
+        "data/config.json": os.path.join(web_dir, "config.json"),
+        "data/products.json": os.path.join(web_dir, "products.json")
+    }
+    
+    def upload_json_file(remote_path, local_path):
+        try:
+            if not os.path.exists(local_path):
+                print(f"Local file {local_path} does not exist")
+                return
+                
+            # Upload the file
+            upload_firebase_file(local_path, remote_path)
+            print(f"Uploaded {local_path} to {remote_path}")
+                
+        except Exception as e:
+            print(f"Error uploading {remote_path}: {e}")
+    
+    # Create threads for JSON files
+    for remote_path, local_path in json_files.items():
+        thread = threading.Thread(target=upload_json_file, args=(remote_path, local_path))
+        threads.append(thread)
+        thread.start()
+    
+    # Upload images
+    try:
+        # Check local images and upload them
+        for root, _, files in os.walk(os.path.join(web_dir, "img")):
+            for file in files:
+                if file.endswith(('.png', '.jpg', '.jpeg', '.gif')):
+                    local_path = os.path.join(root, file)
+                    remote_path = os.path.relpath(local_path, web_dir).replace('\\', '/')
+                    
+                    def upload_image(local_path, remote_path):
+                        try:
+                            upload_firebase_file(local_path, remote_path)
+                            print(f"Uploaded image {remote_path}")
+                        except Exception as e:
+                            print(f"Error uploading image {remote_path}: {e}")
+                    
+                    thread = threading.Thread(target=upload_image, args=(local_path, remote_path))
+                    threads.append(thread)
+                    thread.start()
+                    
+    except Exception as e:
+        print(f"Error in image upload process: {e}")
+    
+    # Wait for all threads to complete
+    for thread in threads:
+        thread.join()
+
+# Replace the old sync_firebase_data with download_firebase_data
+sync_firebase_data = download_firebase_data
 
 class CustomHandler(SimpleHTTPRequestHandler):
     def translate_path(self, path):
