@@ -4,30 +4,33 @@
     "Pipe 1": "Aperol",
     "Pipe 2": "Absinthe",
     "Pipe 3": "Agave Nectar",
-    "Pipe 4": "Amaretto",
-    "Pipe 5": "Anejo Rum"
+    "Pipe 4": "Cachaca",
+    "Pipe 5": "Sugar"
   },
   "selectedIngredients": [
     "Absinthe",
     "Agave Nectar",
-    "Amaretto",
-    "Anejo Rum",
-    "Aperol"
+    "Aperol",
+    "Sugar",
+    "Cachaca"
   ],
   "pipeNotes": {
     "Pipe 1": "Motor1Pipe",
     "Pipe 2": "Motor2Pipe"
   },
   "ingredientRemarks": {
-    "Aperol": "esfa",
+    "Aperol": "Test1",
     "Sugar": "Test",
+    "Agave Nectar": "Test3",
     "Prosecco": "Test 3",
+    "Absinthe": "Test2",
+    "Anejo Rum": "Test5",
     "Blackberry Liqueur": "Test 2"
   },
   "theme": {
     "bgColor": "#e3d7c1",
-    "color1": "#9eb395",
-    "color2": "#e3d7c1",
+    "color1": "#6be6fc",
+    "color2": "#ff6d97",
     "btnBackgroundColor": "#3d3229",
     "btnHoverBackgroundColor": "#000000",
     "btnTextColor": "#ffffff",

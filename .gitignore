@@ -3,3 +3,7 @@ jecon-cocktail-machine-firebase-adminsdk-fbsvc-0fecbeb26b.json
 
 # Don't ignore the encoded credentials
 !firebase_credentials_encoded.txt
+# Ignore JSON database files
+static/db.json
+static/config.json
+static/products.json
