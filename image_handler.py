@@ -5,6 +5,11 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import time
 import threading
+import firebase_admin
+from firebase_admin import storage
+from PIL import Image
+import io
+from firebase_config import bucket
 
 # Define the base directory as the directory where this script is located
 base_dir = os.path.dirname(__file__)
@@ -16,6 +21,16 @@ products_file_path = os.path.join(web_dir, "products.json")  # Path to products.
 
 # Create a global completion event that will be imported by app.py
 processing_complete = threading.Event()
+
+def upload_to_firebase(local_path, remote_path):
+    """Upload a file to Firebase Storage"""
+    try:
+        bucket = storage.bucket()
+        blob = bucket.blob(remote_path)
+        blob.upload_from_filename(local_path)
+        print(f"Uploaded {local_path} to {remote_path}")
+    except Exception as e:
+        print(f"Error uploading to Firebase: {e}")
 
 class JsonChangeHandler(FileSystemEventHandler):
     def __init__(self):
@@ -102,6 +117,9 @@ def save_image(item, type_):
             # Update the item's image path
             item[img_key] = f"/img/upload/{filename}"
 
+            # Upload to Firebase
+            upload_to_firebase(file_path, f"img/upload/{filename}")
+
             print(f"Image saved at: {file_path}")
             
             # Remove processing flag file after successful save
@@ -114,6 +132,10 @@ def save_image(item, type_):
     # Check if the image data is a file path
     elif img_data and img_data.startswith("/img/upload/"):
         print(f"Image already formatted for {name}: {img_data}")
+        # Upload to Firebase if not already there
+        local_path = os.path.join(web_dir, img_data.lstrip('/'))
+        if os.path.exists(local_path):
+            upload_to_firebase(local_path, img_data.lstrip('/'))
 
 # Start watching for changes in db.json
 def start_watching():

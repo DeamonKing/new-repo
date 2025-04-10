@@ -120,5 +120,39 @@
         "ING_Name": "Cinnamon"
       }
     ]
+  },
+  {
+    "PID": 6,
+    "PName": "NewFirebase",
+    "PImage": "/img/upload/newfirebase.png",
+    "PCat": "Cocktail",
+    "PDesc": "wasd",
+    "PHtm": "fead",
+    "PIng": [
+      {
+        "ING_ID": "68",
+        "ING_Name": "Absinthe"
+      },
+      {
+        "ING_ID": "45",
+        "ING_Name": "Agave Nectar"
+      },
+      {
+        "ING_ID": "52",
+        "ING_Name": "Amaretto"
+      },
+      {
+        "ING_ID": "81",
+        "ING_Name": "Benedictine"
+      },
+      {
+        "ING_ID": "25",
+        "ING_Name": "Bitters"
+      },
+      {
+        "ING_ID": "70",
+        "ING_Name": "Blackberry Liqueur"
+      }
+    ]
   }
 ]

@@ -8,13 +8,155 @@ import time
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import serial
 import serial.tools.list_ports
+import firebase_admin
+from firebase_admin import storage
+import base64
 
 from image_handler import processing_complete
+from firebase_config import bucket
 
 # Define the base directory as the directory where this script is located
 base_dir = os.path.dirname(__file__)
 web_dir = os.path.join(base_dir, "static")  # Define `static` folder path
 
+def download_firebase_file(remote_path, local_path):
+    """Download a file from Firebase Storage to local path"""
+    try:
+        blob = bucket.blob(remote_path)
+        blob.download_to_filename(local_path)
+        print(f"Downloaded {remote_path} to {local_path}")
+    except Exception as e:
+        print(f"Error downloading {remote_path}: {e}")
+
+def upload_firebase_file(local_path, remote_path):
+    """Upload a local file to Firebase Storage"""
+    try:
+        blob = bucket.blob(remote_path)
+        blob.upload_from_filename(local_path)
+        print(f"Uploaded {local_path} to {remote_path}")
+    except Exception as e:
+        print(f"Error uploading {local_path}: {e}")
+
+def sync_firebase_data():
+    """Sync data between local files and Firebase Storage using parallel downloads"""
+    # Create necessary directories if they don't exist
+    os.makedirs(os.path.join(web_dir, "img"), exist_ok=True)
+    os.makedirs(os.path.join(web_dir, "img", "upload"), exist_ok=True)
+    
+    # List to store all threads
+    threads = []
+    
+    # Sync JSON files
+    json_files = {
+        "data/db.json": os.path.join(web_dir, "db.json"),
+        "data/config.json": os.path.join(web_dir, "config.json"),
+        "data/products.json": os.path.join(web_dir, "products.json")
+    }
+    
+    def sync_json_file(remote_path, local_path):
+        try:
+            # Get remote blob
+            blob = bucket.blob(remote_path)
+            if not blob.exists():
+                # If remote doesn't exist and local does, upload local
+                if os.path.exists(local_path):
+                    upload_firebase_file(local_path, remote_path)
+                    print(f"Uploaded new {local_path} to {remote_path}")
+                return
+                
+            # Get remote metadata
+            blob.reload()
+            remote_updated = blob.updated
+            
+            # Check if local file exists
+            if os.path.exists(local_path):
+                local_updated = os.path.getmtime(local_path)
+                
+                # If local is newer, upload to Firebase
+                if remote_updated is None or local_updated > remote_updated.timestamp():
+                    upload_firebase_file(local_path, remote_path)
+                    print(f"Uploaded updated {local_path} to {remote_path}")
+                # If remote is newer, download from Firebase
+                elif remote_updated.timestamp() > local_updated:
+                    blob.download_to_filename(local_path)
+                    print(f"Downloaded updated {remote_path} to {local_path}")
+                else:
+                    print(f"No changes in {remote_path}, skipping sync")
+            else:
+                # If local doesn't exist, download from Firebase
+                blob.download_to_filename(local_path)
+                print(f"Downloaded {remote_path} to {local_path}")
+                
+        except Exception as e:
+            print(f"Error syncing {remote_path}: {e}")
+    
+    # Create threads for JSON files
+    for remote_path, local_path in json_files.items():
+        thread = threading.Thread(target=sync_json_file, args=(remote_path, local_path))
+        threads.append(thread)
+        thread.start()
+    
+    # Sync images
+    try:
+        # First, check local images and upload new/changed ones
+        for root, _, files in os.walk(os.path.join(web_dir, "img")):
+            for file in files:
+                if file.endswith(('.png', '.jpg', '.jpeg', '.gif')):
+                    local_path = os.path.join(root, file)
+                    remote_path = os.path.relpath(local_path, web_dir).replace('\\', '/')
+                    
+                    def sync_image(local_path, remote_path):
+                        try:
+                            blob = bucket.blob(remote_path)
+                            if not blob.exists():
+                                upload_firebase_file(local_path, remote_path)
+                                print(f"Uploaded new image {remote_path}")
+                                return
+                                
+                            blob.reload()
+                            local_updated = os.path.getmtime(local_path)
+                            if blob.updated is None or local_updated > blob.updated.timestamp():
+                                upload_firebase_file(local_path, remote_path)
+                                print(f"Uploaded updated image {remote_path}")
+                        except Exception as e:
+                            print(f"Error syncing image {remote_path}: {e}")
+                    
+                    thread = threading.Thread(target=sync_image, args=(local_path, remote_path))
+                    threads.append(thread)
+                    thread.start()
+        
+        # Then, check for remote images that need to be downloaded
+        blobs = bucket.list_blobs(prefix="img/")
+        for blob in blobs:
+            if not blob.name.endswith('/'):  # Skip directories
+                local_path = os.path.join(web_dir, blob.name)
+                
+                def download_image(blob, local_path):
+                    try:
+                        if os.path.exists(local_path):
+                            local_updated = os.path.getmtime(local_path)
+                            blob.reload()
+                            if blob.updated is not None and blob.updated.timestamp() > local_updated:
+                                os.makedirs(os.path.dirname(local_path), exist_ok=True)
+                                blob.download_to_filename(local_path)
+                                print(f"Downloaded updated image {blob.name}")
+                        else:
+                            os.makedirs(os.path.dirname(local_path), exist_ok=True)
+                            blob.download_to_filename(local_path)
+                            print(f"Downloaded new image {blob.name}")
+                    except Exception as e:
+                        print(f"Error downloading image {blob.name}: {e}")
+                
+                thread = threading.Thread(target=download_image, args=(blob, local_path))
+                threads.append(thread)
+                thread.start()
+                    
+    except Exception as e:
+        print(f"Error in image sync process: {e}")
+    
+    # Wait for all threads to complete
+    for thread in threads:
+        thread.join()
 
 class CustomHandler(SimpleHTTPRequestHandler):
     def translate_path(self, path):
@@ -32,6 +174,15 @@ class CustomHandler(SimpleHTTPRequestHandler):
         self.send_header("Pragma", "no-cache")
         self.send_header("Expires", "0")
         self.send_header("Access-Control-Allow-Origin", "*")
+
+    def upload_to_firebase(self, local_path, remote_path):
+        """Upload a file to Firebase Storage and return success status"""
+        try:
+            upload_firebase_file(local_path, remote_path)
+            return True
+        except Exception as e:
+            print(f"Error uploading to Firebase: {e}")
+            return False
 
     def do_GET(self):
         if self.path == "processing_complete":
@@ -317,6 +468,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
             subprocess.Popen(["sh", script_path])
         else:
             print(f"Unsupported operating system for script execution.")
+
     def save_config(self, post_data):
         try:
             config_data = json.loads(post_data)
@@ -334,6 +486,9 @@ class CustomHandler(SimpleHTTPRequestHandler):
             # Write the merged configuration data to config.json
             with open(config_path, "w") as file:
                 json.dump(merged_config, file, indent=2)
+
+            # Upload to Firebase
+            self.upload_to_firebase(config_path, "data/config.json")
 
             self.send_response(200)
             self.end_headers()
@@ -372,6 +527,9 @@ class CustomHandler(SimpleHTTPRequestHandler):
             # Write the updated data back to products.json
             with open(os.path.join(web_dir, "products.json"), "w") as file:
                 json.dump(cocktails, file, indent=2)
+
+            # Upload to Firebase
+            self.upload_to_firebase(products_path, "data/products.json")
 
             # Send success response immediately after saving JSON
             self.send_response(201)
@@ -428,10 +586,13 @@ class CustomHandler(SimpleHTTPRequestHandler):
             with open(os.path.join(web_dir, "db.json"), "w") as file:
                 json.dump(data, file, indent=2)
 
-                # Wait for image processing to complete (with timeout)
-                self.send_response(201)
-                self.end_headers()
-                self.wfile.write(b"Ingredient added successfully")
+            # Upload to Firebase
+            self.upload_to_firebase(db_path, "data/db.json")
+
+            # Wait for image processing to complete (with timeout)
+            self.send_response(201)
+            self.end_headers()
+            self.wfile.write(b"Ingredient added successfully")
 
         except Exception as e:
             print(f"Error adding ingredient: {e}")  # Log the error to the console
@@ -507,8 +668,12 @@ class CustomHandler(SimpleHTTPRequestHandler):
             updated_ingredients = json.loads(post_data)
             
             # Write the updated data back to db.json
-            with open(os.path.join(web_dir, "db.json"), "w") as file:
+            db_path = os.path.join(web_dir, "db.json")
+            with open(db_path, "w") as file:
                 json.dump(updated_ingredients, file, indent=2)
+            
+            # Upload to Firebase
+            self.upload_to_firebase(db_path, "data/db.json")
             
             self.send_response(200)
             self.end_headers()
@@ -592,6 +757,10 @@ def start_image_handler():
 
 
 if __name__ == "__main__":
+    # Sync with Firebase on startup
+    print("Syncing with Firebase...")
+    sync_firebase_data()
+    
     # Start the HTTP server in a separate thread
     http_thread = threading.Thread(target=start_http_server)
     http_thread.start()
