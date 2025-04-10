@@ -692,11 +692,17 @@ class CustomHandler(SimpleHTTPRequestHandler):
         """Restart the application after a short delay."""
         time.sleep(2)  # Give time for the response to be sent
         
-        # Kill the current process
+        # Kill the current process and Electron app
         if platform.system() == "Windows":
+            # Kill Python processes
             subprocess.run(["taskkill", "/F", "/IM", "python.exe"], capture_output=True)
+            # Kill Electron processes
+            subprocess.run(["taskkill", "/F", "/IM", "electron.exe"], capture_output=True)
         else:
+            # Kill Python processes
             subprocess.run(["pkill", "-f", "python"], capture_output=True)
+            # Kill Electron processes
+            subprocess.run(["pkill", "-f", "electron"], capture_output=True)
         
         # Start a new instance of the application
         if platform.system() == "Windows":
