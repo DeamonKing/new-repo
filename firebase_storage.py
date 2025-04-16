@@ -6,12 +6,33 @@ import firebase_admin
 from firebase_admin import credentials, storage
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
+import base64
 
-# Initialize Firebase Admin SDK
-cred = credentials.Certificate("jecon-cocktail-machine-firebase-adminsdk-fbsvc-45a8e9fa22.json")
-firebase_admin.initialize_app(cred, {
-    'storageBucket': 'jecon-cocktail-machine.firebasestorage.app'
-})
+# Initialize Firebase Admin SDK with encoded credentials
+def get_decoded_credentials():
+    try:
+        # Read the encoded credentials file
+        with open("encoded_credentials.txt", 'r') as f:
+            encoded_data = f.read()
+        
+        # Decode the credentials
+        decoded_data = base64.b64decode(encoded_data).decode()
+        credentials_dict = json.loads(decoded_data)
+        
+        # Create credentials object
+        return credentials.Certificate(credentials_dict)
+    except Exception as e:
+        print(f"Error loading credentials: {str(e)}")
+        return None
+
+# Initialize Firebase with decoded credentials
+cred = get_decoded_credentials()
+if cred:
+    firebase_admin.initialize_app(cred, {
+        'storageBucket': 'jecon-cocktail-machine.firebasestorage.app'
+    })
+else:
+    raise Exception("Failed to initialize Firebase credentials")
 
 # Get a reference to the storage service
 bucket = storage.bucket()
