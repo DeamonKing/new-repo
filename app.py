@@ -10,6 +10,7 @@ import serial
 import serial.tools.list_ports
 
 from image_handler import processing_complete
+from firebase_storage import sync_data, upload_all_data, download_all_data, sync_images
 
 # Define the base directory as the directory where this script is located
 base_dir = os.path.dirname(__file__)
@@ -289,19 +290,29 @@ class CustomHandler(SimpleHTTPRequestHandler):
 
         elif self.path == "/addIngredient":
             self.add_ingredient(post_data)
+            upload_all_data()
+            sync_images()
 
         elif self.path == "/addCocktail":
             self.add_cocktail(post_data)
+            upload_all_data()
+            sync_images()
 
         elif self.path == "/send-pipes":
             self.handle_send_pipes(post_data)
+            upload_all_data()
+            sync_images()
             return
         
         elif self.path == "/save-config":
             self.save_config(post_data)
+            upload_all_data()
+            sync_images()
 
         elif self.path == "/updateIngredients":
             self.update_ingredients(post_data)
+            upload_all_data()
+            sync_images()
 
         else:
             self.send_response(404)
@@ -592,6 +603,11 @@ def start_image_handler():
 
 
 if __name__ == "__main__":
+    # Sync data with Firebase Storage at startup
+    sync_data()
+    # Sync images with Firebase Storage at startup
+    sync_images()
+    
     # Start the HTTP server in a separate thread
     http_thread = threading.Thread(target=start_http_server)
     http_thread.start()
