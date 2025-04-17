@@ -2730,7 +2730,7 @@ function toggleCheckbox(clickedCheckbox) {
 document.getElementById("update").addEventListener("click", async function() {
   try {
     // Show a loading popup
-    showPopup("Checking for updates...", false);
+    showPopup("Checking for updates and syncing data...", false);
     
     // Check for updates
     const response = await fetch("/check-updates", {
@@ -2745,7 +2745,11 @@ document.getElementById("update").addEventListener("click", async function() {
         showUpdatePopup(data.message);
       } else {
         // Show no updates available popup
-        showPopup("No updates available. You are using the latest version.", true);
+        if (data.firebaseSync) {
+          showPopup("No updates available. You are using the latest version. Data has been synced with Firebase.", true);
+        } else {
+          showPopup("No updates available. You are using the latest version. Failed to sync with Firebase.", true);
+        }
       }
     } else {
       showPopup("Error checking for updates. Please try again later.", true);
@@ -2781,7 +2785,7 @@ function showUpdatePopup(message) {
   pullButton.addEventListener("click", async () => {
     try {
       // Show loading popup
-      showPopup("Updating... This may take a moment.", false);
+      showPopup("Updating and syncing data... This may take a moment.", false);
       
       // Call the update endpoint
       const response = await fetch("/pull-updates", {
@@ -2790,7 +2794,11 @@ function showUpdatePopup(message) {
       
       if (response.ok) {
         const data = await response.json();
-        showPopup("Update successful! The application will restart.", true);
+        if (data.firebaseSync) {
+          showPopup("Update successful! Data has been synced with Firebase. The application will restart.", true);
+        } else {
+          showPopup("Update successful! Failed to sync with Firebase. The application will restart.", true);
+        }
         
         // Wait a moment before reloading the page
         setTimeout(() => {

@@ -99,20 +99,30 @@ class CustomHandler(SimpleHTTPRequestHandler):
                     
                     commit_message = result.stdout.strip()
                     
+                    # Download data from Firebase
+                    download_success = download_all_data()
+                    sync_success = sync_images()
+                    
                     self.send_response(200)
                     self.send_header("Content-Type", "application/json")
                     self.end_headers()
                     self.wfile.write(json.dumps({
                         "hasUpdates": True,
-                        "message": f"New updates available ({commit_count} commits). Latest: {commit_message}"
+                        "message": f"New updates available ({commit_count} commits). Latest: {commit_message}",
+                        "firebaseSync": download_success and sync_success
                     }).encode())
                 else:
+                    # Still download data from Firebase even if no git updates
+                    download_success = download_all_data()
+                    sync_success = sync_images()
+                    
                     self.send_response(200)
                     self.send_header("Content-Type", "application/json")
                     self.end_headers()
                     self.wfile.write(json.dumps({
                         "hasUpdates": False,
-                        "message": "No updates available"
+                        "message": "No updates available",
+                        "firebaseSync": download_success and sync_success
                     }).encode())
             except Exception as e:
                 print(f"Error checking for updates: {e}")
