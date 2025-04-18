@@ -163,7 +163,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
             else:
                 subprocess.run(["pkill", "-f", "watchdog"], capture_output=True)
                 # Kill the Python process itself
-                subprocess.run(["pkill", "-f", "python"], capture_output=True)
+                subprocess.run(["pkill", "-f", "python3"], capture_output=True)
             
             # Force exit all processes
             os._exit(0)
@@ -548,7 +548,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
         if platform.system() == "Windows":
             subprocess.run(["taskkill", "/F", "/IM", "python.exe"], capture_output=True)
         else:
-            subprocess.run(["pkill", "-f", "python"], capture_output=True)
+            subprocess.run(["pkill", "-f", "python3"], capture_output=True)
         
         # Start a new instance of the application
         if platform.system() == "Windows":
@@ -609,7 +609,7 @@ def start_electron_app():
 
 def start_image_handler():
     """Start the image handler script in a separate thread."""
-    subprocess.Popen(["python", os.path.join(base_dir, "image_handler.py")])
+    subprocess.Popen(["python3", os.path.join(base_dir, "image_handler.py")])
 
 
 if __name__ == "__main__":

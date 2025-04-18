@@ -12,17 +12,22 @@
     "Agave Nectar",
     "Amaretto",
     "Anejo Rum",
-    "Aperol"
+    "Aperol",
+    "Test"
   ],
   "pipeNotes": {
     "Pipe 1": "Motor1Pipe",
     "Pipe 2": "Motor2Pipe"
   },
   "ingredientRemarks": {
-    "Aperol": "esfa",
+    "Aperol": "Test1",
     "Sugar": "Test",
+    "Agave Nectar": "Test3",
     "Prosecco": "Test 3",
-    "Blackberry Liqueur": "Test 2"
+    "Absinthe": "Test2",
+    "Anejo Rum": "Test5",
+    "Blackberry Liqueur": "Test 2",
+    "Test": "New Changes"
   },
   "theme": {
     "bgColor": "#e3d7c1",
