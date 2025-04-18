@@ -53,11 +53,10 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Install pv if not present
-if ! command -v pv >/dev/null 2>&1; then
-    print_status "Installing progress viewer..."
-    apt-get install -y pv
-fi
+# Install system dependencies for Python packages
+print_status "Installing system dependencies for Python packages..."
+(apt-get install -y python3-dev python3-setuptools build-essential libjpeg-dev zlib1g-dev python3-pil python3-requests python3-venv) & show_progress $!
+
 
 # Remove problematic PPA if it exists
 if [ -f "/etc/apt/sources.list.d/appimagelauncher-team-ubuntu-stable-plucky.list" ]; then
@@ -71,7 +70,7 @@ print_status "Updating package lists..."
 
 # Install required system packages with progress bar
 print_status "Installing system dependencies..."
-(apt-get install -y git python3 python3-pip nodejs npm tmux cron) & show_progress $!
+(apt-get install -y git python3 python3-pip nodejs npm tmux cron dbus-x11 python3-venv) & show_progress $!
 
 # Clone the repository with progress bar
 print_status "Cloning repository..."
@@ -96,7 +95,29 @@ fi
 # Install Python dependencies with progress bar
 print_status "Installing Python dependencies..."
 if [ -f "requirements.txt" ]; then
-    (pip3 install --break-system-packages -r requirements.txt) & show_progress $!
+    # Create a virtual environment
+    print_status "Setting up Python virtual environment..."
+    (python3 -m venv /opt/cocktail-mixer/venv) & show_progress $!
+    
+    # Activate virtual environment and install packages
+    source /opt/cocktail-mixer/venv/bin/activate
+    
+    # Install pyserial
+    (pip install pyserial==3.5) & show_progress $!
+    # Install firebase-admin
+    (pip install firebase-admin==6.2.0) & show_progress $!
+    # Install requests
+    (pip install requests==2.31.0) & show_progress $!
+    # Install python-dotenv
+    (pip install python-dotenv==1.0.0) & show_progress $!
+    # Install watchdog
+    (pip install watchdog==3.0.0) & show_progress $!
+    
+    # Deactivate virtual environment
+    deactivate
+    
+    # Update start_at_boot.sh to use virtual environment
+    sed -i 's|python3|/opt/cocktail-mixer/venv/bin/python3|g' /opt/cocktail-mixer/start_at_boot.sh
 else
     print_error "requirements.txt not found in repository!"
     exit 1
@@ -136,6 +157,8 @@ cp /usr/share/applications/cocktail-mixer.desktop /home/$SUDO_USER/.config/autos
 print_status "Configuring taskbar settings..."
 # For GNOME
 if [ -d "/usr/share/gnome-shell/extensions" ]; then
+    # Start dbus session
+    export $(dbus-launch)
     (gsettings set org.gnome.shell.extensions.dash-to-dock autohide true
     gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
     gsettings set org.gnome.shell.extensions.dash-to-dock intellihide true) & show_progress $!
