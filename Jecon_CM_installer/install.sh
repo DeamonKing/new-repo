@@ -71,14 +71,7 @@ else
     cd /opt/cocktail-mixer
 fi
 
-# Copy startup script
-print_status "Setting up startup script..."
-if [ -f "start_at_boot.sh" ]; then
-    cp start_at_boot.sh /opt/cocktail-mixer/ & show_progress $!
-else
-    print_error "Missing start_at_boot.sh"
-    exit 1
-fi
+
 
 # Python setup
 print_status "Installing Python packages..."
@@ -145,7 +138,8 @@ print_status "Setting up crontab for autostart..."
 CRON_LINE="@reboot /opt/cocktail-mixer/start_at_boot.sh"
 CRON_EXISTS=$(crontab -u $SUDO_USER -l 2>/dev/null | grep -F "$CRON_LINE" || true)
 if [ -z "$CRON_EXISTS" ]; then
-    (crontab -u $SUDO_USER -l 2>/dev/null; echo "$CRON_LINE") | crontab -u $SUDO_USER -
+    # Open crontab editor to add the entry manually
+    echo -e "$CRON_LINE" | crontab -u $SUDO_USER -
     print_status "Crontab entry added for autostart."
 else
     print_status "Crontab entry for autostart already exists."
