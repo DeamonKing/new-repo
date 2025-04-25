@@ -125,8 +125,13 @@ if [ -d "/usr/share/gnome-shell/extensions" ]; then
     gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
     gsettings set org.gnome.shell.extensions.dash-to-dock intellihide true
 elif [ -d "/usr/share/plasma" ]; then
-    kwriteconfig5 --file ~/.config/plasma-org.kde.plasma.desktop-appletsrc \
-        --group Containments --group 1 --group General --key hideTimeout 0
+    if command -v kwriteconfig5 &> /dev/null; then
+        kwriteconfig5 --file ~/.config/plasma-org.kde.plasma.desktop-appletsrc \
+            --group Containments --group 1 --group General --key hideTimeout 0
+    else
+        print_warning "kwriteconfig5 not found. Skipping KDE taskbar settings."
+    fi
+
 fi
 
 # Permissions
