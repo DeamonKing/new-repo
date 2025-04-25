@@ -81,14 +81,13 @@ else
 fi
 
 # Python setup
-print_status "Setting up Python virtual environment..."
-(python3 -m venv /opt/cocktail-mixer/venv) & show_progress $!
-source /opt/cocktail-mixer/venv/bin/activate
-
 print_status "Installing Python packages..."
-(pip install --upgrade pip) & show_progress $!
-(pip install pyserial==3.5 firebase-admin==6.2.0 requests==2.31.0 python-dotenv==1.0.0 watchdog==3.0.0) & show_progress $!
-deactivate
+(pip install --upgrade pip --break-system-packages) & show_progress $!
+if [ -f "requirements.txt" ]; then
+    (pip install --break-system-packages -r requirements.txt) & show_progress $!
+else
+    print_warning "requirements.txt not found, skipping package installation from file."
+fi
 
 # Replace python3 with full path
 sed -i 's|python3|/opt/cocktail-mixer/venv/bin/python3|g' /opt/cocktail-mixer/start_at_boot.sh
@@ -135,11 +134,18 @@ chmod +x /opt/cocktail-mixer/start_at_boot.sh
 chown -R $SUDO_USER:$SUDO_USER /opt/cocktail-mixer
 chown $SUDO_USER:$SUDO_USER /usr/share/applications/cocktail-mixer.desktop
 
+
 # Crontab
-print_status "Setting up crontab..."
-if ! crontab -l | grep -q "start_at_boot.sh"; then
-    (crontab -l 2>/dev/null; echo "@reboot /opt/cocktail-mixer/start_at_boot.sh") | crontab -
+print_status "Setting up crontab for autostart..."
+CRON_LINE="@reboot /opt/cocktail-mixer/start_at_boot.sh"
+CRON_EXISTS=$(crontab -u $SUDO_USER -l 2>/dev/null | grep -F "$CRON_LINE" || true)
+if [ -z "$CRON_EXISTS" ]; then
+    (crontab -u $SUDO_USER -l 2>/dev/null; echo "$CRON_LINE") | crontab -u $SUDO_USER -
+    print_status "Crontab entry added for autostart."
+else
+    print_status "Crontab entry for autostart already exists."
 fi
+
 
 # Done
 echo -e "\n${GREEN}========================================${NC}"
