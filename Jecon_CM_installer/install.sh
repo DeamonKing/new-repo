@@ -57,6 +57,10 @@ fi
 print_status "Installing system dependencies for Python packages..."
 (apt-get install -y python3-dev python3-setuptools build-essential libjpeg-dev zlib1g-dev python3-pil python3-requests python3-venv) & show_progress $!
 
+# Install system dependencies for Python packages
+print_status "Installing system dependencies for Python packages..."
+(apt-get install -y python3-dev python3-setuptools build-essential libjpeg-dev zlib1g-dev python3-pil python3-requests python3-venv) & show_progress $!
+
 
 # Remove problematic PPA if it exists
 if [ -f "/etc/apt/sources.list.d/appimagelauncher-team-ubuntu-stable-plucky.list" ]; then
