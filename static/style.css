@@ -2366,3 +2366,20 @@ select,
   width: max-content;
   padding: 0px 25px 25px 0px;
 }
+
+
+.all-cocktail .cocktail-box {
+  max-height: 500px; /* Adjust height as needed */
+  overflow-y: auto;
+}
+
+
+
+.all-cocktail .cocktail-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.all-cocktail .cocktail-list::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}

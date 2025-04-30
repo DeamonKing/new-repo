@@ -1834,22 +1834,40 @@ async function wshowCocktailDetails(cocktail) {
   cocktailHtm.textContent = cocktail.PHtm;
   const htmTitle = document.getElementById("htm-title");
 
+  // Fetch complete ingredient details from db.json
+  let ingredientsData = [];
+  try {
+    const response = await fetch("db.json");
+    ingredientsData = await response.json();
+  } catch (error) {
+    console.error("Error fetching ingredients:", error);
+  }
+
+  // Create a map of ingredient names to their full details
+  const ingredientMap = {};
+  ingredientsData.forEach(ing => {
+    ingredientMap[ing.ING_Name] = ing;
+  });
+
   // Clear previous ingredients
   cocktailIngredientsContainer.innerHTML = "";
 
-  // Populate the ingredients with red mark for unselected ones
+  // Populate the ingredients with full details
   cocktail.PIng.forEach((ingredient) => {
     const ingredientItem = document.createElement("div");
     ingredientItem.classList.add("ing-item");
 
+    // Get complete ingredient details from the map
+    const fullIngredient = ingredientMap[ingredient.ING_Name] || ingredient;
+
     // Check if the ingredient is selected
     const isSelected = selectedIngredients.includes(ingredient.ING_Name);
     console.log(`checking ${ingredient.ING_Name} is ${isSelected}`);
-    const className = isSelected ? "" : "not-selected"; // Add class if not selected
+    const className = isSelected ? "" : "not-selected";
 
     ingredientItem.innerHTML = `
       <label class="btn-checkbox">
-        <img src="img/ing2.gif" alt="Ingredient - ${ingredient.ING_Name}" />
+        <img src="${fullIngredient.ING_IMG || 'img/ing2.gif'}" alt="Ingredient - ${ingredient.ING_Name}" />
         <p class="${className}">${ingredient.ING_Name}</p>
       </label>
     `;
@@ -1858,7 +1876,7 @@ async function wshowCocktailDetails(cocktail) {
     ingredientItem.addEventListener("click", () => {
       const remark = ingredientRemarks[ingredient.ING_Name] || "No remark available";
       showRemarkDiv.innerHTML = `<span>Remark for ${ingredient.ING_Name}: </span>${remark}`;
-      showRemarkSection.style.display = "block"; // Show the remark section when an ingredient is clicked
+      showRemarkSection.style.display = "block";
     });
 
     cocktailIngredientsContainer.appendChild(ingredientItem);

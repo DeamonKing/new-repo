@@ -8,9 +8,8 @@ import time
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import serial
 import serial.tools.list_ports
-
 from image_handler import processing_complete
-from firebase_storage import sync_data, upload_all_data, download_all_data, sync_images
+# from firebase_storage import sync_data, upload_all_data, download_all_data, sync_images
 
 # Define the base directory as the directory where this script is located
 base_dir = os.path.dirname(__file__)
@@ -100,8 +99,8 @@ class CustomHandler(SimpleHTTPRequestHandler):
                     commit_message = result.stdout.strip()
                     
                     # Download data from Firebase
-                    download_success = download_all_data()
-                    sync_success = sync_images()
+                    # download_success = download_all_data()
+                    # sync_success = sync_images()
                     
                     self.send_response(200)
                     self.send_header("Content-Type", "application/json")
@@ -109,12 +108,12 @@ class CustomHandler(SimpleHTTPRequestHandler):
                     self.wfile.write(json.dumps({
                         "hasUpdates": True,
                         "message": f"New updates available ({commit_count} commits). Latest: {commit_message}",
-                        "firebaseSync": download_success and sync_success
+                        # "firebaseSync": download_success and sync_success
                     }).encode())
                 else:
-                    # Still download data from Firebase even if no git updates
-                    download_success = download_all_data()
-                    sync_success = sync_images()
+                    # # Still download data from Firebase even if no git updates
+                    # download_success = download_all_data()
+                    # sync_success = sync_images()
                     
                     self.send_response(200)
                     self.send_header("Content-Type", "application/json")
@@ -122,7 +121,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
                     self.wfile.write(json.dumps({
                         "hasUpdates": False,
                         "message": "No updates available",
-                        "firebaseSync": download_success and sync_success
+                        # "firebaseSync": download_success and sync_success
                     }).encode())
             except Exception as e:
                 print(f"Error checking for updates: {e}")
@@ -300,29 +299,29 @@ class CustomHandler(SimpleHTTPRequestHandler):
 
         elif self.path == "/addIngredient":
             self.add_ingredient(post_data)
-            upload_all_data()
-            sync_images()
+            # upload_all_data()
+            # sync_images()
 
         elif self.path == "/addCocktail":
             self.add_cocktail(post_data)
-            upload_all_data()
-            sync_images()
+            # upload_all_data()
+            # sync_images()
 
         elif self.path == "/send-pipes":
             self.handle_send_pipes(post_data)
-            upload_all_data()
-            sync_images()
+            # upload_all_data()
+            # sync_images()
             return
         
         elif self.path == "/save-config":
             self.save_config(post_data)
-            upload_all_data()
-            sync_images()
+            # upload_all_data()
+            # sync_images()
 
         elif self.path == "/updateIngredients":
             self.update_ingredients(post_data)
-            upload_all_data()
-            sync_images()
+            # upload_all_data()
+            # sync_images()
 
         else:
             self.send_response(404)
@@ -614,9 +613,9 @@ def start_image_handler():
 
 if __name__ == "__main__":
     # Sync data with Firebase Storage at startup
-    sync_data()
-    # Sync images with Firebase Storage at startup
-    sync_images()
+    # sync_data()
+    # # Sync images with Firebase Storage at startup
+    # sync_images()
     
     # Start the HTTP server in a separate thread
     http_thread = threading.Thread(target=start_http_server)
