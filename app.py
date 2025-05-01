@@ -90,38 +90,28 @@ class CustomHandler(SimpleHTTPRequestHandler):
                 if commit_count > 0:
                     # Get the latest commit message
                     result = subprocess.run(
-                        ["git", "log", "-1", "origin/main", "--pretty=format:%s"],
-                        cwd=base_dir,
-                        capture_output=True,
-                        text=True
+                    ["git", "log", "-1", "origin/main", "--pretty=format:%s"],
+                    cwd=base_dir,
+                    capture_output=True,
+                    text=True
                     )
                     
                     commit_message = result.stdout.strip()
                     
-                    # Download data from Firebase
-                    # download_success = download_all_data()
-                    # sync_success = sync_images()
-                    
                     self.send_response(200)
                     self.send_header("Content-Type", "application/json")
                     self.end_headers()
                     self.wfile.write(json.dumps({
-                        "hasUpdates": True,
-                        "message": f"New updates available ({commit_count} commits). Latest: {commit_message}",
-                        # "firebaseSync": download_success and sync_success
+                    "hasUpdates": True,
+                    "message": f"New updates available ({commit_count} commits). Latest: {commit_message}"
                     }).encode())
                 else:
-                    # # Still download data from Firebase even if no git updates
-                    # download_success = download_all_data()
-                    # sync_success = sync_images()
-                    
                     self.send_response(200)
                     self.send_header("Content-Type", "application/json")
                     self.end_headers()
                     self.wfile.write(json.dumps({
-                        "hasUpdates": False,
-                        "message": "No updates available",
-                        # "firebaseSync": download_success and sync_success
+                    "hasUpdates": False,
+                    "message": "No updates available"
                     }).encode())
             except Exception as e:
                 print(f"Error checking for updates: {e}")
@@ -170,75 +160,9 @@ class CustomHandler(SimpleHTTPRequestHandler):
             
         elif self.path == "/pull-updates":
             try:
-                # Create backup directory outside the git repository
-                # Use the user's home directory for backups
-                home_dir = "C:\\Users\\" + os.getenv('USERNAME') if platform.system() == "Windows" else os.path.expanduser("~")
-                backup_dir = os.path.join(home_dir, "cocktail_app_backup")
-                if not os.path.exists(backup_dir):
-                    os.makedirs(backup_dir)
-                
-                # Create a timestamped backup folder to avoid conflicts
-                timestamp = time.strftime("%Y%m%d_%H%M%S")
-                backup_folder = os.path.join(backup_dir, f"backup_{timestamp}")
-                os.makedirs(backup_folder)
-                
-                # Backup important files
-                files_to_backup = [
-                    os.path.join(web_dir, "config.json"),
-                    os.path.join(web_dir, "db.json"),
-                    os.path.join(web_dir, "products.json")
-                ]
-                
-                # Backup each file
-                for file_path in files_to_backup:
-                    if os.path.exists(file_path):
-                        file_name = os.path.basename(file_path)
-                        backup_path = os.path.join(backup_folder, file_name)
-                        with open(file_path, "rb") as src, open(backup_path, "wb") as dst:
-                            dst.write(src.read())
-                
-                # Backup img folder
-                img_dir = os.path.join(web_dir, "img")
-                backup_img_dir = os.path.join(backup_folder, "img")
-                if os.path.exists(img_dir):
-                    if not os.path.exists(backup_img_dir):
-                        os.makedirs(backup_img_dir)
-                    
-                    # Copy all files from img directory to backup
-                    for file_name in os.listdir(img_dir):
-                        src_path = os.path.join(img_dir, file_name)
-                        dst_path = os.path.join(backup_img_dir, file_name)
-                        if os.path.isfile(src_path):
-                            with open(src_path, "rb") as src, open(dst_path, "wb") as dst:
-                                dst.write(src.read())
-                
                 # Reset git and pull latest changes
                 subprocess.run(["git", "reset", "--hard"], cwd=base_dir, check=True)
                 subprocess.run(["git", "pull", "origin", "main"], cwd=base_dir, check=True)
-                
-                # Restore backed up files
-                for file_path in files_to_backup:
-                    if os.path.exists(file_path):
-                        file_name = os.path.basename(file_path)
-                        backup_path = os.path.join(backup_folder, file_name)
-                        if os.path.exists(backup_path):
-                            # Always overwrite the file if backup exists
-                            with open(backup_path, "rb") as src, open(file_path, "wb") as dst:
-                                dst.write(src.read())
-                
-                # Restore img folder
-                if os.path.exists(backup_img_dir):
-                    if not os.path.exists(img_dir):
-                        os.makedirs(img_dir)
-                    
-                    # Copy all files from backup to img directory, overwriting existing files
-                    for file_name in os.listdir(backup_img_dir):
-                        src_path = os.path.join(backup_img_dir, file_name)
-                        dst_path = os.path.join(img_dir, file_name)
-                        if os.path.isfile(src_path):
-                            # Always overwrite the file
-                            with open(src_path, "rb") as src, open(dst_path, "wb") as dst:
-                                dst.write(src.read())
                 
                 # Send success response
                 self.send_response(200)
@@ -246,8 +170,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps({
                     "success": True,
-                    "message": "Update successful",
-                    "backup_location": backup_folder
+                    "message": "Update successful"
                 }).encode())
                 
                 # Restart the application
