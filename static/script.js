@@ -2764,9 +2764,9 @@ document.getElementById("update").addEventListener("click", async function() {
       } else {
         // Show no updates available popup
         if (data.firebaseSync) {
-          showPopup("No updates available. You are using the latest version. Data has been synced with Firebase.", true);
+          showPopup("No updates available. You are using the latest version.", true);
         } else {
-          showPopup("No updates available. You are using the latest version. Failed to sync with Firebase.", true);
+          showPopup("No updates available. You are using the latest version.", true);
         }
       }
     } else {
