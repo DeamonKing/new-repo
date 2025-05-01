@@ -12,7 +12,13 @@
     "Campari",
     "Tonic",
     "Orange",
-    "Ice"
+    "Ice",
+    "Tequila Blanco",
+    "Salt",
+    "Lime",
+    "Triple Sec",
+    "Amaretto",
+    "Cognac"
   ],
   "pipeNotes": {
     "Pipe 1": "Motor1Pipe",
@@ -72,8 +78,8 @@
     "bgColor": "#e3d7c1",
     "color1": "#6be6fc",
     "color2": "#ff6d97",
-    "btnBackgroundColor": "#3d3229",
-    "btnHoverBackgroundColor": "#000000",
+    "btnBackgroundColor": "#17dae8",
+    "btnHoverBackgroundColor": "#fbc1f6",
     "btnTextColor": "#ffffff",
     "btnHoverTextColor": "#ffffff",
     "angle": 135

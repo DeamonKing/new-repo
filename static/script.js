@@ -1790,8 +1790,8 @@ function displayCocktails(cocktails) {
     cocktailItem.id = `cocktail-${cocktail.PID}`; // Set the ID for each cocktail item
 
     cocktailItem.innerHTML = `
-          <img src="${cocktail.PImage}" alt="${cocktail.PName}" />
-          <p>${cocktail.PName}</p>
+        <img src="${cocktail.PImage || 'img/upload/extra_cocktail.jpg'}" alt="${cocktail.PName}" />
+        <p>${cocktail.PName}</p>
       `;
 
     // Append the cocktail item to the cocktail list container
@@ -1827,7 +1827,7 @@ async function wshowCocktailDetails(cocktail) {
   // Hide the remark section initially
   showRemarkSection.style.display = "none";
 
-  cocktailImage.src = cocktail.PImage; // Set the image source
+  cocktailImage.src = cocktail.PImage || 'img/upload/extra_cocktail.jpg'; // Set the image source with fallback
   cocktailID.textContent = cocktail.PID;
   cocktailName.textContent = cocktail.PName; // Set the cocktail name
   cocktailDescription.textContent = cocktail.PDesc;
